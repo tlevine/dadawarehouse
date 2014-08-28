@@ -1,0 +1,28 @@
+A data warehouse for Tom's personal life, potentially including
+some of these cubes or data sources
+
+* Shell sessions (from shell history files)
+* Shell commands (from shell history files)
+* Git commits
+* Project pages (``pip install tlevine``)
+* Emails, possibly broken out as
+  * Notifications from various services
+  * Sent emails
+  * Mailing lists
+  * Travel bookings
+  * ...
+* Finances (Gnucash)
+* Appointments (from my [calendar](http://thomaslevine.com/schedule))
+* Old calendar (Google Calendar)
+* Other Google services, mainly for stuff from years ago
+* Text messages
+* Meetup.com history
+* Twitter, Facebook
+* Server logs
+* Piwik database
+
+Some tables to create to assist in the creation of these tools
+
+* Unique identifiers for people with links to email addresses, phone
+    numbers, &c.
+* Cities I've been in, people I stayed with
