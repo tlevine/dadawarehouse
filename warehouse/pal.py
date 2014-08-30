@@ -1,28 +1,31 @@
-import sqlalchemy as s
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+import os
 
-Base = declarative_base()
+from warehouse.db import Calendar, Event
 
-class Event(Base):
-    __tablename__ = 'ft_calendar_event'
+CALENDARS = [os.path.join(os.path.expanduser('~/.pal'), rest) for rest in [\
+    'secrets-nsa/secret-calendar.txt',
+    'p/activities.txt',
+    'p/to-do.txt',
+    'p/birthdays.txt',
+    'p/sleeping.txt',
+    'p/travel.txt',
+    'p/postponed.txt',
+]]
+    
+def update(session):
+    for filename in CALENDARS:
+        with open(filename) as fp:
+            calendar, events = parse(fp)
+        session.add(calendar)
+        calendar.add_all(events)
 
-    event_id = s.Column(s.Integer, primary_key = True)
-    calendar_code = s.Column(s.String,
-                             s.ForeignKey('dim_calendar.code'),
-                             nullable=False)
-    event_date = s.Column(s.DateTime, nullable = False)
-    event_description = s.Column(s.String, nullable = False)
-
-class Calendar(Base):
-    __tablename__ = 'dim_calendar'
-
-    code = s.Column(s.String(2), primary_key = True)
-    description = s.Column(S.String, nullable = False)
-    filename = s.Column(S.String, nullable = False)
-
-def parse(fp, filename = fp.name):
+def parse(fp, filename = None):
     'Read a pal calendar file.'
+    if filename == None:
+        try:
+            filename = fp.name
+        except NameError:
+            raise ValueError('You must specify a filename.')
     calendar = None
     events = []
 
@@ -37,13 +40,13 @@ def parse(fp, filename = fp.name):
                                 filename = filename)
         else:
             events.extend(entry(line))
-    
-    # session.drop( both of the tables)
-    session.add(calendar)
-    calendar.add_all(events)
+    return calendar, events
 
 def entry(line):
     'Read a pal calendar entry'
     datespec, _, description = line.partition(' ')
     for date in dates(datespec):
         yield date, description
+
+def dates(datespec:str):
+
