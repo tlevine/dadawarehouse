@@ -3,6 +3,7 @@ import logging
 
 level = logging.DEBUG
 filename = os.path.expanduser('~/.dadawarehouse/warehouse.log')
+filename = None
 
 logger = logging.getLogger('dada-warehouse')
 logger.setLevel(level)
