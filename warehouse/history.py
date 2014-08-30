@@ -31,12 +31,25 @@ class Command(Base):
                (self.shell, self.command_date, self.command)
 
 
+drop_dim_shells = 'DROP VIEW IF EXISTS dim_shells;'
+create_dim_shells = '''
+CREATE VIEW dim_shells AS
+SELECT
+  shells.shell, shells.shell_date,
+  max(commands.command_date) as 'final_command_date'
+FROM commands
+JOIN shells ON shells.shell = commands.shell
+GROUP BY shells.shell;
+'''
+
 def session(cache_directory):
     database_file = os.path.join(cache_directory, 'shell-history.sqlite')
     engine = s.create_engine('sqlite:///' + database_file)
     Base.metadata.create_all(engine) 
-    return sessionmaker(bind=engine)()
-   #metadata.create_all(engine)
+    the_session = sessionmaker(bind=engine)()
+    the_session.execute(drop_dim_shells)
+    the_session.execute(create_dim_shells)
+    return the_session
 
 def update(session):
     HISTORY = os.path.join(os.path.expanduser('~'), 'history', 'shell')
