@@ -5,7 +5,7 @@ level = logging.DEBUG
 filename = os.path.expanduser('~/.dadawarehouse/warehouse.log')
 filename = None
 
-logger = logging.getLogger('dada-warehouse')
+logger = logging.getLogger('dadawarehouse')
 logger.setLevel(level)
 
 stream = logging.StreamHandler()
