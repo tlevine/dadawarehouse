@@ -1,0 +1,18 @@
+"cubes": [
+  { "name": "history",
+    "label": "Shell History",
+    "dimensions": ["shell"],
+    "joins": [
+      {"master":"command.shell", "detail":"shell.shell"}
+    ]
+  }
+],
+"dimensions": [
+  { "name": "shell",
+    "label": "Shell session",
+    "attributes": [
+      {"name": "shell_date", "label": "Shell open date"},
+      {"name": "final_command_date", "label": "Final command date"}
+    ]
+  }
+]

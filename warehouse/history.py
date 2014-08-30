@@ -11,7 +11,7 @@ from warehouse.logger import logger
 Base = declarative_base()
 
 class Shell(Base):
-    __tablename__ = 'shells'
+    __tablename__ = 'shell'
 
     shell = s.Column(s.String(40), primary_key = True)
     shell_date = s.Column(s.DateTime(), nullable = False)
@@ -21,9 +21,9 @@ class Shell(Base):
                (self.shell, self.shell_date)
 
 class Command(Base):
-    __tablename__ = 'commands'
+    __tablename__ = 'ft_command'
     command_id = s.Column(s.Integer, primary_key = True)
-    shell = s.Column(s.String(40), s.ForeignKey('shells.shell'), nullable=False)
+    shell = s.Column(s.String(40), s.ForeignKey('shell.shell'), nullable=False)
     command_date = s.Column(s.DateTime, nullable = False)
     command = s.Column(s.String, nullable = False)
     def __repr__(self):
@@ -31,15 +31,15 @@ class Command(Base):
                (self.shell, self.command_date, self.command)
 
 
-drop_dim_shells = 'DROP VIEW IF EXISTS dim_shells;'
-create_dim_shells = '''
-CREATE VIEW dim_shells AS
+drop_dim_shell = 'DROP VIEW IF EXISTS dim_shell;'
+create_dim_shell = '''
+CREATE VIEW dim_shell AS
 SELECT
-  shells.shell, shells.shell_date,
-  max(commands.command_date) as 'final_command_date'
-FROM commands
-JOIN shells ON shells.shell = commands.shell
-GROUP BY shells.shell;
+  shell.shell, shell.shell_date,
+  max(ft_command.command_date) as 'final_command_date'
+FROM ft_command
+JOIN shell ON shell.shell = ft_command.shell
+GROUP BY shell.shell;
 '''
 
 def session(cache_directory):
@@ -47,8 +47,8 @@ def session(cache_directory):
     engine = s.create_engine('sqlite:///' + database_file)
     Base.metadata.create_all(engine) 
     the_session = sessionmaker(bind=engine)()
-    the_session.execute(drop_dim_shells)
-    the_session.execute(create_dim_shells)
+    the_session.execute(drop_dim_shell)
+    the_session.execute(create_dim_shell)
     return the_session
 
 def update(session):
