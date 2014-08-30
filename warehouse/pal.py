@@ -17,9 +17,12 @@ def update(session):
     for filename in CALENDARS:
         with open(filename) as fp:
             calendar, events = parse(fp)
+        session.execute('DELETE FROM dim_calendar;')
         session.add(calendar)
+        session.execute('DELETE FROM ft_calendar_event;')
         session.add_all(events)
         session.commit()
+        logger.info('Inserted events from calendar %s' % filename)
 
 def parse(fp, filename = None):
     'Read a pal calendar file.'
