@@ -57,7 +57,7 @@ class Calendar(Base):
 
 
 def session(cache_directory):
-    database_file = os.path.join(cache_directory, 'shell-history.sqlite')
+    database_file = os.path.join(cache_directory, 'dada.sqlite')
     engine = s.create_engine('sqlite:///' + database_file)
     Base.metadata.create_all(engine) 
     the_session = sessionmaker(bind=engine)()
