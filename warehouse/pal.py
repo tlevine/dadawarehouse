@@ -1,12 +1,13 @@
 import os
+import datetime
 
+from warehouse.logger import logger
 from warehouse.db import Calendar, Event
 
 CALENDARS = [os.path.join(os.path.expanduser('~/.pal'), rest) for rest in [\
     'secrets-nsa/secret-calendar.txt',
     'p/activities.txt',
     'p/to-do.txt',
-    'p/birthdays.txt',
     'p/sleeping.txt',
     'p/travel.txt',
     'p/postponed.txt',
@@ -17,7 +18,8 @@ def update(session):
         with open(filename) as fp:
             calendar, events = parse(fp)
         session.add(calendar)
-        calendar.add_all(events)
+        session.add_all(events)
+        session.commit()
 
 def parse(fp, filename = None):
     'Read a pal calendar file.'
@@ -39,7 +41,10 @@ def parse(fp, filename = None):
                                 description = calendar_description,
                                 filename = filename)
         else:
-            events.extend(entry(line))
+            events.extend((Event(calendar_code = calendar_code,
+                                 event_date = date,
+                                 event_description = description) \
+                           for date, description in entry(line)))
     return calendar, events
 
 def entry(line):
@@ -48,5 +53,25 @@ def entry(line):
     for date in dates(datespec):
         yield date, description
 
-def dates(datespec:str):
+def read_date(datestring):
+    try:
+        date = datetime.datetime.strptime(datestring, '%Y%m%d')
+    except ValueError:
+        return None
+    else:
+        return date.date()
 
+def dates(datespec:str):
+    single_date = read_date(datespec)
+    if single_date != None:
+        yield single_date
+    elif datespec.count(':') == 2:
+        subset, start, end = datespec.split(':')
+        if subset == 'DAILY':
+            today = read_date(start)
+            end = read_date(end)
+            while today <= end:
+                yield today
+                today += datetime.timedelta(days = 1)
+    else:
+        logger.warn('Unsupported date specification: "%s"' % datespec)
