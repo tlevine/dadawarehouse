@@ -58,6 +58,20 @@ class Calendar(Base):
     description = s.Column(s.String, nullable = False)
     filename = s.Column(s.String, nullable = False)
 
+'''
+class FacebookUser(Base):
+
+class FacebookMessage(Base):
+    __tablename__ = 'ft_facebook_message'
+
+    user_id = s.Column(s.Integer, s.ForeignKey('ft_facebook_user.id'),
+                       nullable = False)
+    current_nick = s.Column(s.String, nullable = False)
+
+CREATE TABLE log_msg (session TEXT, uid TEXT, nick TEXT, type TEXT, sent INT, ts INT, sentts INT, body TEXT);
+CREATE TABLE log_status (session TEXT, uid TEXT, nick TEXT, ts INT, status TEXT, desc TEXT);
+
+'''
 
 def session(cache_directory):
     database_file = os.path.join(cache_directory, 'dada.sqlite')
