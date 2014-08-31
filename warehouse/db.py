@@ -58,23 +58,10 @@ class Calendar(Base):
     description = s.Column(s.String, nullable = False)
     filename = s.Column(s.String, nullable = False)
 
-class Person(Base):
-    __tablename__ = 'ft_person'
-
-    person_id = s.Column(s.Integer, primary_key = True)
-    facebook_user_id = s.Column(s.Integer, s.ForeignKey('ft_facebook_user.id'), nullable = False)
-
-class FacebookUserNicks(Base):
-    __tablename__ = 'dim_facebook_user_nicks'
-
-    user_id = s.Column(s.Integer, nullable = False)
-    nick = s.Column(s.String, nullable = False)
-
 class FacebookMessage(Base):
     __tablename__ = 'ft_facebook_chat_message'
 
-    user_id = s.Column(s.Integer, s.ForeignKey('ft_facebook_user.id'),
-                       nullable = False)
+    user_id = s.Column(s.Integer, nullable = False)
     current_nick = s.Column(s.String, nullable = False)
     date = s.Column(s.DateTime, nullable = False)
     body = s.Column(s.String, nullable = False)
