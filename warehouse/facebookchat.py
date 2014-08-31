@@ -45,7 +45,7 @@ def convert_log(engine, file_date):
             body = body)
 
 def update(session):
-  # download()
+    download()
     for filename in os.listdir(LOCAL_CHAT):
         file_date = datetime.datetime.strptime(filename, '%Y-%m-%d.db').date()
         is_new = session.query(FacebookChatStatus).\
