@@ -2,8 +2,10 @@
 "cubes": [
   { "name": "history",
     "label": "Shell History",
-    "details" [
-      {"name": "", "label": ""}
+    "details": [
+      {"name": "command_id", "label": "Command ID"},
+      {"name": "command_date", "label": "Command Date"},
+      {"name": "command", "label": "Command Text"}
     ],
     "dimensions": ["shell"],
     "joins": [
@@ -13,7 +15,9 @@
   { "name": "calendar_event",
     "label": "Calendar Events",
     "details" [
-      {"name": "", "label": ""}
+      {"name": "event_id", "label": "Event ID"},
+      {"name": "event_date", "label": "Event Date"},
+      {"name": "event_description", "label": "Event Description"}
     ],
     "dimensions": ["calendar"],
     "joins": [
@@ -48,7 +52,6 @@
     "label": "Shell session",
     "attributes": [
       {"name": "shell_date", "label": "Shell open date"},
-      {"name": "final_command_date", "label": "Final command date"}
     ]
   },
   { "name": "calendar",
