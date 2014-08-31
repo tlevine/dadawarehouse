@@ -62,7 +62,7 @@ class FacebookMessage(Base):
     __tablename__ = 'ft_facebook_chat_message'
 
     file_date = s.Column(s.Date, primary_key = True)
-    status_id = s.Column(s.Integer, primary_key = True)
+    message_id = s.Column(s.Integer, primary_key = True)
     user_id = s.Column(s.Integer, nullable = False)
     current_nick = s.Column(s.String, nullable = False)
     date = s.Column(s.DateTime, nullable = False)
