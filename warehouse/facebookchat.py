@@ -3,6 +3,7 @@ import shutil
 import subprocess
 
 import sqlalchemy
+from .db import FacebookChatStatus, FacebookMessage
 
 WAREHOUSE = os.path.expanduser('~/.dadawarehouse')
 LOCAL_CHAT = os.path.join(WAREHOUSE, 'facebookchat')
@@ -18,29 +19,33 @@ def download():
     scp = subprocess.Popen(RSYNC + [REMOTE_CHAT, LOCAL_CHAT])
     scp.wait()
 
-def union(sources:str, destination:str):
-    sql = '''\
-CREATE TABLE log_msg (session TEXT, uid TEXT, nick TEXT, type TEXT, sent INT, ts INT, sentts INT, body TEXT);
-CREATE TABLE log_status (session TEXT, uid TEXT, nick TEXT, ts INT, status TEXT, desc TEXT);
-CREATE INDEX ts ON log_msg(ts);
-CREATE INDEX uid_ts ON log_msg(uid, ts);'''
-    for source in sources:
-        sql += '''\
-ATTACH DATABASE '%s' AS today;
-BEGIN TRANSACTION;
-INSERT INTO log_msg SELECT * FROM today.log_msg;
-INSERT INTO log_status SELECT * FROM today.log_status;
-COMMIT TRANSACTION;
-DETACH DATABASE today;
-''' % source
-    sqlite3 = subprocess.Popen(['sqlite3', destination], stdin = subprocess.PIPE)
-    sqlite3.stdin.write(sql.encode('latin1'))
-    sqlite3.wait()
+def convert_log(engine, file_date):
+    for row in engine.execute('SELECT rowid, uid, nick, ts, status FROM log_status').fetchall():
+        rowid, uid, nick, ts, status = row
+        yield FacebookChatStatus(
+            status_id = rowid,
+            file_date = file_date,
+            user_id = uid, current_nick = nick,
+            date = datetime.datetime.fromtimestamp(ts),
+            status = status)
+    for row in engine.execute('SELECT rowid, uid, nick, ts, body FROM log_msg').fetchall():
+        rowid, uid, nick, ts, body = row
+        yield FacebookMessage(
+            file_date = file_date,
+            message_id = rowid,
+            user_id = uid, current_nick = nick,
+            date = datetime.datetime.fromtimestamp(ts),
+            body = body)
 
 def update(session):
   # download()
-    daily_logs = (os.path.join(LOCAL_CHAT, fn) for fn in os.listdir(LOCAL_CHAT))
-    if os.path.exists(TMP):
-        raise ValueError(TMP + ' exists')
-    else:
-        union(daily_logs, TMP)
+    for filename in os.listdir(LOCAL_CHAT):
+        file_date = datetime.datetime.strptime(filename, '%Y-%m-%d.db').date()
+        is_new = session.query(db.FacebookStatusMessage).\
+            filter(db.FacebookStatusMessage.file_date == file_date).\
+            count() == 0:
+        if is_new:
+            engine = sqlalchemy.create_engine('sqlite:///' +
+                os.path.join(LOCAL_CHAT, filename))
+            engine.add_all(convert_log(engine, file_date))
+            engine.commit()
