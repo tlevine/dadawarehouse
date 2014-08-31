@@ -10,5 +10,5 @@ def load():
     if not os.path.isdir(CACHE_DIRECTORY):
         os.mkdir(CACHE_DIRECTORY)
     session = db.session(CACHE_DIRECTORY)
-   #history.update(session)
+    history.update(session)
     pal.update(session)

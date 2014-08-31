@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 Base = declarative_base()
 
 class Shell(Base):
-    __tablename__ = 'shell'
+    __tablename__ = 'dim_shell'
 
     shell = s.Column(s.String(40), primary_key = True)
     shell_date = s.Column(s.DateTime(), nullable = False)
@@ -17,7 +17,7 @@ class Shell(Base):
                (self.shell, self.shell_date)
 
 class Command(Base):
-    __tablename__ = 'ft_command'
+    __tablename__ = 'command'
     command_id = s.Column(s.Integer, primary_key = True)
     shell = s.Column(s.String(40), s.ForeignKey('shell.shell'), nullable=False)
     command_date = s.Column(s.DateTime, nullable = False)
@@ -26,16 +26,19 @@ class Command(Base):
         return '<Command(shell = "%s", command_date = %s, command = """%s""")>' % \
                (self.shell, self.command_date, self.command)
 
-
-drop_dim_shell = 'DROP VIEW IF EXISTS dim_shell;'
-create_dim_shell = '''
-CREATE VIEW dim_shell AS
+drop_ft_command = 'DROP VIEW IF EXISTS ft_command;'
+create_ft_command = '''
+CREATE VIEW ft_command AS
 SELECT
-  shell.shell, shell.shell_date,
-  max(ft_command.command_date) as 'final_command_date'
-FROM ft_command
-JOIN shell ON shell.shell = ft_command.shell
-GROUP BY shell.shell;
+  command_id, shell, command_date,
+  strftime('%Y', command_date) 'year',
+  strftime('%m', command_date) 'month',
+  strftime('%d', command_date) 'day',
+  strftime('%H', command_date) 'hour',
+  strftime('%M', command_date) 'minute',
+  strftime('%S', command_date) 'second',
+  command
+FROM command;
 '''
 
 class Event(Base):
@@ -61,6 +64,6 @@ def session(cache_directory):
     engine = s.create_engine('sqlite:///' + database_file)
     Base.metadata.create_all(engine) 
     the_session = sessionmaker(bind=engine)()
-    the_session.execute(drop_dim_shell)
-    the_session.execute(create_dim_shell)
+    the_session.execute(drop_ft_command)
+    the_session.execute(create_ft_command)
     return the_session
