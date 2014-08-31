@@ -4,6 +4,8 @@ import datetime
 import subprocess
 
 import sqlalchemy
+
+from .logger import logger
 from .db import FacebookChatStatus, FacebookMessage
 
 WAREHOUSE = os.path.expanduser('~/.dadawarehouse')
@@ -47,12 +49,19 @@ def convert_log(engine, file_date):
 def update(session):
     download()
     for filename in os.listdir(LOCAL_CHAT):
-        file_date = datetime.datetime.strptime(filename, '%Y-%m-%d.db').date()
-        is_new = session.query(FacebookChatStatus).\
-            filter(FacebookChatStatus.file_date == file_date).\
-            count() == 0
-        if is_new:
-            engine = sqlalchemy.create_engine('sqlite:///' +
-                os.path.join(LOCAL_CHAT, filename))
-            session.add_all(convert_log(engine, file_date))
-            session.commit()
+        try:
+            file_date = datetime.datetime.strptime(filename, '%Y-%m-%d.db').date()
+            is_new = session.query(FacebookChatStatus).\
+                filter(FacebookChatStatus.file_date == file_date).\
+                count() == 0
+            if is_new:
+                logger.info('Importing %s' % filename)
+                engine = sqlalchemy.create_engine('sqlite:///' +
+                    os.path.join(LOCAL_CHAT, filename))
+                session.add_all(convert_log(engine, file_date))
+                session.commit()
+                logger.info('Finished %s' % filename)
+            else:
+                logger.info('Skipping %s' % filename)
+        except KeyboardInterrupt:
+            break
