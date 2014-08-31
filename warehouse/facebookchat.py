@@ -30,19 +30,15 @@ def tmpdb():
         ]
         for command in SCHEMA:
             engine.execute(command)
-    return bubbles.SQLDataStore(TMP)
+    return bubbles.open_store("sql", TMP)
 
 def update(session):
-    fn = 'sqlite:////home/tlevine/.dadawarehouse/facebookchat/2013-11-25.db'
+    day_log = 'sqlite:////home/tlevine/.dadawarehouse/facebookchat/2013-11-25.db'
+    log = bubbles.open_store('sql', day_log)
 
-
-    log = bubbles.SQLDataStore(fn)
-    log_status = bubbles.SQLTable('log_status', log)
-    log_msg = bubbles.SQLTable('log_msg', log)
-
-    p = bubbles.Pipeline(stores = {'tmp': tmpdb()})
-    p.source(log_msg)
-    p.append_into('tmp', 'log_msg')
+    p = bubbles.Pipeline(stores = {'tmp': tmpdb(), 'log': log})
+    p.source('log', 'log_msg')
+    p.insert_into('tmp', 'log_msg')
     p.run()
 
 
