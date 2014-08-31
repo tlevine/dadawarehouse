@@ -2,6 +2,9 @@
 "cubes": [
   { "name": "history",
     "label": "Shell History",
+    "details" [
+      {"name": "", "label": ""}
+    ],
     "dimensions": ["shell"],
     "joins": [
       {"master":"command.shell", "detail":"shell.shell"}
@@ -9,9 +12,34 @@
   },
   { "name": "calendar_event",
     "label": "Calendar Events",
+    "details" [
+      {"name": "", "label": ""}
+    ],
     "dimensions": ["calendar"],
     "joins": [
       {"master":"calendar_event.calendar_code", "detail":"calendar.code"}
+    ]
+  },
+  { "name": "facebook_chat_message",
+    "label": "Facebook Message",
+    "details" [
+      {"name": "file_date", "label": "Log file date"},
+      {"name": "message_id", "label": "Message ID within log file"},
+      {"name": "user_id", "label": "Facebook ID"},
+      {"name": "current_nick", "label": "Full name"},
+      {"name": "date", "label": "Date and time of message"},
+      {"name": "body", "label": "Text of the message"}
+    ]
+  },
+  { "name": "facebook_chat_status",
+    "label": "Facebook Login/Logout",
+    "details" [
+      {"name": "file_date", "label": "Log file date"},
+      {"name": "status_id", "label": "Status ID within log file"},
+      {"name": "user_id", "label": "Facebook ID"},
+      {"name": "current_nick", "label": "Full name"},
+      {"name": "date", "label": "Date and time of message"},
+      {"name": "status", "label": "Available or not available?"}
     ]
   }
 ],
