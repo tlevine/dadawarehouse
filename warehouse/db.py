@@ -19,7 +19,7 @@ class Shell(Base):
 class Command(Base):
     __tablename__ = 'command'
     command_id = s.Column(s.Integer, primary_key = True)
-    shell = s.Column(s.String(40), s.ForeignKey('shell.shell'), nullable=False)
+    shell = s.Column(s.String(40), s.ForeignKey('dim_shell.shell'), nullable=False)
     command_date = s.Column(s.DateTime, nullable = False)
     command = s.Column(s.String, nullable = False)
     def __repr__(self):
