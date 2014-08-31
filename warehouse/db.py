@@ -58,20 +58,46 @@ class Calendar(Base):
     description = s.Column(s.String, nullable = False)
     filename = s.Column(s.String, nullable = False)
 
-'''
-class FacebookUser(Base):
+class Person(Base):
+    __tablename__ = 'ft_person'
+
+    person_id = s.Column(s.Integer, primary_key = True)
+    facebook_user_id = s.Column(s.Integer, s.ForeignKey('ft_facebook_user.id'), nullable = False)
+
+class FacebookUserNicks(Base):
+    __tablename__ = 'dim_facebook_user_nicks'
+
+    user_id = s.Column(s.Integer, nullable = False)
+    nick = s.Column(s.String, nullable = False)
 
 class FacebookMessage(Base):
-    __tablename__ = 'ft_facebook_message'
+    __tablename__ = 'ft_facebook_chat_message'
 
     user_id = s.Column(s.Integer, s.ForeignKey('ft_facebook_user.id'),
                        nullable = False)
     current_nick = s.Column(s.String, nullable = False)
+    date = s.Column(s.DateTime, nullable = False)
+    body = s.Column(s.String, nullable = False)
 
-CREATE TABLE log_msg (session TEXT, uid TEXT, nick TEXT, type TEXT, sent INT, ts INT, sentts INT, body TEXT);
-CREATE TABLE log_status (session TEXT, uid TEXT, nick TEXT, ts INT, status TEXT, desc TEXT);
+    # CREATE TABLE log_msg (session TEXT, uid TEXT, nick TEXT, type TEXT, sent INT, ts INT, sentts INT, body TEXT);
+    # "session" is always the same
+    # "type" is always "chat"
+    # "sent" is always 0
+    # "ts" versus "sentts"? maybe ts is the date it was written?
 
-'''
+class FacebookStatus(Base):
+    __tablename__ = 'ft_facebook_chat_status'
+
+    user_id = s.Column(s.Integer, s.ForeignKey('ft_facebook_user.id'),
+                       nullable = False)
+    current_nick = s.Column(s.String, nullable = False)
+    date = s.Column(s.DateTime, nullable = False)
+    status = s.Column(s.Enum('avail', 'notavai'), nullable = False)
+
+    # CREATE TABLE log_status (session TEXT, uid TEXT, nick TEXT, ts INT, status TEXT, desc TEXT);
+    # "session" is always the same
+    # "desc" is always empty.
+
 
 def session(cache_directory):
     database_file = os.path.join(cache_directory, 'dada.sqlite')
