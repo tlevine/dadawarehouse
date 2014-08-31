@@ -37,6 +37,23 @@ DETACH DATABASE today;
     sqlite3.stdin.write(sql.encode('latin1'))
     sqlite3.wait()
 
+def pipe():
+    stores = {
+        "logs": bubbles.open_store("sql", "sqlite:////tmp/facebookchat.sqlite"),
+       #"dada": bubbles.open_store("sql", "sqlite:////home/tlevine/.dadawarehouse/dada.sqlite"),
+        "dada": bubbles.open_store("sql", "sqlite:////tmp/dada.sqlite"),
+    }
+
+    p = bubbles.Pipeline(stores=stores)
+    p.source('logs', 'log_status')
+
+    p.create('dada', 'ft_facebook_chat_status')
+
+    p.aggregate("Category", "Amount (US$, Millions)")
+    p.pretty_print()
+    p.run()
+
+
 def update(session):
   # download()
     daily_logs = (os.path.join(LOCAL_CHAT, fn) for fn in os.listdir(LOCAL_CHAT))
