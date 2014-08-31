@@ -74,6 +74,10 @@ class FacebookMessage(Base):
     # "sent" is always 0
     # "ts" versus "sentts"? maybe ts is the date it was written?
 
+    def __repr__(self):
+        return '<FacebookMessage(file_date = %s, status_id = %d)>' % \
+            (self.file_date, self.status_id)
+
 class FacebookChatStatus(Base):
     __tablename__ = 'ft_facebook_chat_status'
 
@@ -82,12 +86,15 @@ class FacebookChatStatus(Base):
     user_id = s.Column(s.Integer, nullable = False)
     current_nick = s.Column(s.String, nullable = False)
     date = s.Column(s.DateTime, nullable = False)
-    status = s.Column(s.Enum('avail', 'notavai'), nullable = False)
+    status = s.Column(s.Enum('avail', 'notavail'), nullable = False)
 
     # CREATE TABLE log_status (session TEXT, uid TEXT, nick TEXT, ts INT, status TEXT, desc TEXT);
     # "session" is always the same
     # "desc" is always empty.
 
+    def __repr__(self):
+        return '<FacebookMessage(file_date = %s, status_id = %d)>' % \
+            (self.file_date, self.status_id)
 
 def session(cache_directory):
     database_file = os.path.join(cache_directory, 'dada.sqlite')
