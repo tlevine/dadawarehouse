@@ -14,7 +14,7 @@
   },
   { "name": "calendar_event",
     "label": "Calendar Events",
-    "details" [
+    "details": [
       {"name": "event_id", "label": "Event ID"},
       {"name": "event_date", "label": "Event Date"},
       {"name": "event_description", "label": "Event Description"}
@@ -26,7 +26,7 @@
   },
   { "name": "facebook_chat_message",
     "label": "Facebook Message",
-    "details" [
+    "details": [
       {"name": "file_date", "label": "Log file date"},
       {"name": "message_id", "label": "Message ID within log file"},
       {"name": "user_id", "label": "Facebook ID"},
@@ -37,7 +37,7 @@
   },
   { "name": "facebook_chat_status",
     "label": "Facebook Login/Logout",
-    "details" [
+    "details": [
       {"name": "file_date", "label": "Log file date"},
       {"name": "status_id", "label": "Status ID within log file"},
       {"name": "user_id", "label": "Facebook ID"},
@@ -51,7 +51,7 @@
   { "name": "shell",
     "label": "Shell session",
     "attributes": [
-      {"name": "shell_date", "label": "Shell open date"},
+      {"name": "shell_date", "label": "Shell open date"}
     ]
   },
   { "name": "calendar",

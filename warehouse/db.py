@@ -96,6 +96,9 @@ class FacebookChatStatus(Base):
         return '<FacebookMessage(file_date = %s, status_id = %d)>' % \
             (self.file_date, self.status_id)
 
+class Email(Base):
+    __tablename__ = 'ft_email'
+
 def session(cache_directory):
     database_file = os.path.join(cache_directory, 'dada.sqlite')
     engine = s.create_engine('sqlite:///' + database_file)

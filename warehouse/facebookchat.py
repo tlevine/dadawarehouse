@@ -13,9 +13,6 @@ LOCAL_CHAT = os.path.join(WAREHOUSE, 'facebookchat')
 REMOTE_CHAT = 'safe:rsync/ekg2-logs/xmpp:perluette@chat.facebook.com/*.db'
 RSYNC = ['rsync', '--archive', '--sparse'] #, '--verbose']
 
-RESULT = 'sqlite:////home/tlevine/.dadawarehouse/dada.sqlite'
-TMP = '/tmp/facebookchat.sqlite' 
-
 def download():
     if not os.path.isdir(LOCAL_CHAT):
         os.mkdir(LOCAL_CHAT)
