@@ -1,0 +1,25 @@
+This happened.
+
+    [tlevine@arch dadawarehouse]$ slicer serve etc/slicer.ini 
+     * Running on http://localhost:5000/
+     * Restarting with reloader
+    2014-09-01 14:22:35,180 ERROR Internal error: No info for store default
+    2014-09-01 14:22:35,184 ERROR Exception on /cube/calendar_event/model [GET]
+    Traceback (most recent call last):
+      File "/usr/lib/python3.4/site-packages/flask/app.py", line 1817, in wsgi_app
+        response = self.full_dispatch_request()
+      File "/usr/lib/python3.4/site-packages/flask/app.py", line 1478, in full_dispatch_request
+        response = self.make_response(rv)
+      File "/usr/lib/python3.4/site-packages/flask/app.py", line 1566, in make_response
+        raise ValueError('View function did not return a response')
+    ValueError: View function did not return a response
+    127.0.0.1 - - [01/Sep/2014 14:22:35] "GET /cube/calendar_event/model HTTP/1.1" 500 -
+
+So I looked in cubes/workspace.py for the error
+
+    try:
+        type_, options = self.store_infos[name]
+    except KeyError:
+        raise ConfigurationError("No info for store %s" % name)
+
+
