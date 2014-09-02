@@ -26,18 +26,17 @@ from sqlalchemy import and_, or_
 from .inference import dim_levels, fact_measures, joins
 
 class Cube:
-    dimensions = {}
-    # A dictionary of string keys and list-of-Column-object values,
-    # traversing recursively into the full snowflake of dimensions
-
     def __init__(self, session, fact_table):
         '''
         fact_table: a Fact class
         '''
         self._args = (session, fact_table)
 
+        # A dictionary of string keys and list-of-Column-object values,
+        # traversing recursively into the full snowflake of dimensions
+        self.dimensions = fact_measures(fact_table)
+
         # Flatten the table, and record dimensions
-        self.dimensions.update(fact_measures(fact_table))
         self._query = session.query(fact_table)
         tables = [fact_table]
         while len(tables) > 0:
