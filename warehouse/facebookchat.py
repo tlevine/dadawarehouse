@@ -62,3 +62,15 @@ def update(session):
                 logger.info('Skipping %s' % filename)
         except KeyboardInterrupt:
             break
+
+# Schema notes
+#
+# CREATE TABLE log_msg (session TEXT, uid TEXT, nick TEXT, type TEXT, sent INT, ts INT, sentts INT, body TEXT);
+# "session" is always the same
+# "type" is always "chat"
+# "sent" is always 0
+# "ts" versus "sentts"? maybe ts is the date it was written?
+#
+# CREATE TABLE log_status (session TEXT, uid TEXT, nick TEXT, ts INT, status TEXT, desc TEXT);
+# "session" is always the same
+# "desc" is always empty.
