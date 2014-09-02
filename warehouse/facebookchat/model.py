@@ -1,3 +1,10 @@
+import os
+
+import sqlalchemy as s
+
+from .model import Fact, Dimension, Column, IdColumn, Date
+from sqlalchemy import ForeignKey, String
+
 
 class FacebookMessage(Fact):
     file_date = Column(s.Date, primary_key = True)

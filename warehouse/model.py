@@ -26,7 +26,7 @@ class Date(Dimension):
     day = Column(s.Integer)
 
 class Time(Dimension):
-    pk = IdColumn(primary_key = True) # seconds from midnight
+    pk = IdColumn(s.Time, primary_key = True) # seconds from midnight
     hour = Column(s.Integer)
     minute = Column(s.Integer)
     second = Column(s.Integer)
