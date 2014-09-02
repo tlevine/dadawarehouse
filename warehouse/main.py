@@ -18,9 +18,9 @@ def load():
     if not os.path.isdir(CACHE_DIRECTORY):
         os.mkdir(CACHE_DIRECTORY)
     session, _ = connect(CACHE_DIRECTORY)
-    fb.update(session)
+   #fb.update(session)
    #history.update(session)
-   #pal.update(session)
+    pal.update(session)
 
 def query():
     session, cubes = connect(CACHE_DIRECTORY)
