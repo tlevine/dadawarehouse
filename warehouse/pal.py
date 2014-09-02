@@ -14,12 +14,12 @@ CALENDARS = [os.path.join(os.path.expanduser('~/.pal'), rest) for rest in [\
 ]]
     
 def update(session):
+    session.query(CalendarFile).delete()
+    session.query(CalendarEvent).delete()
     for filename in CALENDARS:
         with open(filename) as fp:
             calendar, events = parse(fp)
-        session.query(CalendarFile).delete()
         session.add(calendar)
-        session.query(CalendarEvent).delete()
         session.add_all(events)
         session.commit()
         logger.info('Inserted events from calendar %s' % filename)
