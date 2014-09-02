@@ -1,0 +1,7 @@
+#!/usr/bin/env python3
+import cubes.compat
+import cubes.server
+
+config = cubes.compat.ConfigParser()
+config.read(os.path.join('etc', 'slicer.ini'))
+cubes.server.run_server(config)
