@@ -1,14 +1,40 @@
-def cube(table):
-    '''
-    table:: a Fact table
-    '''
+'''
+Group the fact table's columns into two categories
 
+References
+    Foreign keys that reference dimensions
+Measures
+    Not foreign keys, which are each dimensions themselves
+
+(The primary key will fall into one of these categories.)
+'''
+
+class Cube:
+    def __init__(self, fact_table):
+        '''
+        fact_table: a Fact class
+        '''
+        self.fact = fact_table
+
+        # A dictionary from of string keys and Column object values,
+        # traversing recursively into the full snowflake of dimensions
+        self.dimensions
+
+    def point_cut(self, dimension, path):
+        raise NotImplementedError
+
+    def set_cut(self, dimension, paths):
+        raise NotImplementedError
+
+    def range_cut(self, dimension, from_path, to_path):
+        raise NotImplementedError
     
 
 
 def dim_levels(table):
     '''
-    Everything that isn't a primary key is a level.'
+    Everything that isn't a primary key is a level.
+    The implied hierarchy is from left to right along the table.
     '''
     return filter(lambda column: not column.primary_key, table.columns)
 
