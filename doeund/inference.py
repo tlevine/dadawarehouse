@@ -15,8 +15,8 @@ def fact_measures(table):
 def joins(table):
     '''
     List the joins from this fact table to dimension tables.
-    yields (column in this table, column in the other table)
+    yields (from_column, to_column)
     '''
     for column in table.columns:
         for foreign_key in column.foreign_keys:
-            yield column, foreign_key.column, foreign_key.column.table
+            yield column, foreign_key.column
