@@ -35,3 +35,24 @@ Some tables to create to assist in the creation of these tools
 * Unique identifiers for people with links to email addresses, phone
     numbers, &c.
 * Cities I've been in, people I stayed with
+
+
+Notes on how cubes
+====================
+Cubes has enough layers to confuse me, and it's not clear to me whether
+the documentation is up to date. Instead of defining my models as cubes
+model JSON files, I'm using the underlying stuff.
+
+Models are defined with
+`model providers <http://pythonhosted.org/cubes/extensions/providers.html>`_.
+The mixpanel model provider, in ``cubes/backends/mixpanel/store.py``,
+is a decent example. Here's the method where it loads the Mixpanel model.
+
+    def default_metadata(self, metadata=None):
+        """Return Mixpanel's default metadata."""
+
+        model = pkgutil.get_data("cubes.backends.mixpanel", "mixpanel_model.json")
+        metadata = json.loads(model)
+
+        return metadata
+
