@@ -1,9 +1,14 @@
 from collections import namedtuple
+from enum import Enum
 
 from sqlalchemy import Column as _Column
 from sqlalchemy.ext.declarative import declarative_base as _declarative_base
 
 Base = _declarative_base()
+
+class TableType(Enum):
+    fact = 0
+    dimension = 1
 
 class Column(_Column):
     '''
@@ -24,6 +29,7 @@ class Column(_Column):
 
 class ModelTable(Base):
     __label__ = None
+    __abstract__ = True
 
 class Dimension(ModelTable):
     '''
@@ -33,7 +39,9 @@ class Dimension(ModelTable):
 
     __hierarchies__ is a list of cubes.models.Hierarchy objects
     '''
+    __abstract__ = True
     __hierarchies__ = []
+    __tabletype__ = TableType.dimension
 
     @classmethod
     def levels(Class):
@@ -48,6 +56,9 @@ class Fact(ModelTable):
     I think we can do without mappings.
     http://pythonhosted.org/cubes/backends/sql.html#explicit-mapping
     '''
+    __abstract__ = True
+    __tabletype__ = TableType.fact
+
     @classmethod
     def measures(Class):
         '''

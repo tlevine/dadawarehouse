@@ -10,6 +10,7 @@ class _DoeundProvider(_ModelProvider):
 
     def list_cubes(self):
     # return a list of cubes that the provider provides. Return value should be a dictionary with keys: name, label, description and info.
+        self.Base
 
     def cube(self, name):
     # return a cubes.Cube object
