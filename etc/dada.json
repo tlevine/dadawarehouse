@@ -1,4 +1,5 @@
 {
+"name": "dadawarehouse",
 "cubes": [
   { "name": "history",
     "label": "Shell History",
