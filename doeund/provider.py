@@ -12,7 +12,13 @@ class _DoeundProvider(_ModelProvider):
     # return a list of cubes that the provider provides. Return value should be a dictionary with keys: name, label, description and info.
         for table_name, table in Base.metadata.tables.items():
             if table_name.startswith('fact_'):
-                yield cube(table)
+                name = table_name[5:]
+                yield {
+                    'name': name,
+                    'label': name,
+                    'description': name,
+                    'info': table.info,
+                }
 
     def cube(self, name):
         '''
