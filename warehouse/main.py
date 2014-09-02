@@ -1,9 +1,9 @@
 import os
 
-import warehouse.db as db
-import warehouse.history as history
-import warehouse.pal as pal
-import warehouse.facebookchat as fb
+import .db as db
+import .history as history
+import .pal as pal
+import .facebookchat as fb
 
 CACHE_DIRECTORY = os.path.expanduser('~/.dadawarehouse')
 

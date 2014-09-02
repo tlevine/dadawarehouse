@@ -1,8 +1,8 @@
 import os
 import datetime
 
-from warehouse.logger import logger
-from warehouse.db import Calendar, Event
+from .logger import logger
+from .db import Calendar, Event
 
 CALENDARS = [os.path.join(os.path.expanduser('~/.pal'), rest) for rest in [\
     'secrets-nsa/secret-calendar.txt',

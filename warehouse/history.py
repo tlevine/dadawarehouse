@@ -2,8 +2,8 @@ import os
 
 from historian_reader.shell import historian
 
-from warehouse.db import Command, Shell
-from warehouse.logger import logger
+from .db import Command, Shell
+from .logger import logger
 
 def update(session):
     HISTORY = os.path.join(os.path.expanduser('~'), 'history', 'shell')
