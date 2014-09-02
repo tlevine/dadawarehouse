@@ -25,7 +25,7 @@ class Column(_Column):
             info['label'] = _kwargs.pop('label')
         if 'aggregations' in _kwargs:
             info['aggregations'] = _kwargs.pop('aggregations')
-        super(Column, self).__init__(self, *args, info = info, **_kwargs)
+        _Column.__init__(self, *args, info = info, **_kwargs)
 
 class Fact(Base):
     '''

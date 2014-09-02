@@ -6,7 +6,7 @@ import subprocess
 import sqlalchemy
 
 from .logger import logger
-from .db import FacebookChatStatus, FacebookMessage
+from .model import FacebookChatStatus, FacebookMessage
 
 WAREHOUSE = os.path.expanduser('~/.dadawarehouse')
 LOCAL_CHAT = os.path.join(WAREHOUSE, 'facebookchat')
