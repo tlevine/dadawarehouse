@@ -19,6 +19,7 @@ Levels
 
 Treat the levels as components of the dimension.
 '''
+import re
 from functools import partial
 
 from sqlalchemy import and_, or_
@@ -42,8 +43,12 @@ class Cube:
         while len(tables) > 0:
             for from_column, to_column in joins(tables.pop()):
                 to_table = to_column.table
+
                 self._query = self._query.join(to_table, from_column == to_column)
-                self.dimensions[to_column.name] = dim_levels(to_table)
+
+                dim_name = re.sub(r'^dim_', '', to_table.name)
+               #self.dimensions[dim_name] = dim_levels(to_table)
+
                 tables.append(to_table)
 
     def __repr__(self):

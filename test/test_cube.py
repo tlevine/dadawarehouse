@@ -5,4 +5,4 @@ import warehouse.main
 cube = warehouse.main.query()['fact_calendarevent']
 
 def test_keys():
-    n.assert_list_equal(cube.dimensions.keys(), ['calendarfile'])
+    n.assert_list_equal(list(cube.dimensions.keys()), ['calendarfile'])
