@@ -11,12 +11,13 @@ class ModelColumn(_Column):
         _kwargs = dict(kwargs) # copy it rather than mutating it
         if 'label' in _kwargs:
             self.__label__ = _kwargs.pop('label')
-        Column.__init__(self, *args, **_kwargs)
+        _Column.__init__(self, *args, **_kwargs)
 
 class Measure(ModelColumn):
     __aggregations__ = []
 
 class ModelTable(Base):
+    __label__ = None
 
 class Dimension(ModelTable):
     '''
@@ -26,7 +27,6 @@ class Dimension(ModelTable):
 
     __hierarchies__ is a list of cubes.models.Hierarchy objects
     '''
-    __name__ = None
     __hierarchies__ = []
 
     @classmethod
