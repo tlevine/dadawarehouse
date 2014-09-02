@@ -7,6 +7,17 @@ Measures
     Not foreign keys, which are each dimensions themselves
 
 (The primary key will fall into one of these categories.)
+
+Group each dimension's columns into three categories.
+
+Primary keys
+    Primary keys on this table
+Foreign keys
+    References to another dimension table
+Levels
+    Everything else
+
+Treat the levels as components of the dimension.
 '''
 
 class Cube:
@@ -16,7 +27,7 @@ class Cube:
         '''
         self.fact = fact_table
 
-        # A dictionary from of string keys and Column object values,
+        # A dictionary of string keys and Column object values,
         # traversing recursively into the full snowflake of dimensions
         self.dimensions
 
