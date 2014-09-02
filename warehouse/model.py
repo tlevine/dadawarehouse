@@ -37,16 +37,6 @@ class Time(Dimension):
 
 
 
-class Shell(Dimension):
-    shell = Column(s.String(40), primary_key = True)
-    shell_date = Column(s.DateTime(), nullable = False)
-
-class Command(Fact):
-    command_id = Column(s.Integer, primary_key = True)
-    shell = Column(s.String(40), s.ForeignKey(Shell.shell), nullable=False)
-    command_date = Column(s.DateTime, nullable = False)
-    command = Column(s.String, nullable = False)
-
 class FacebookMessage(Fact):
     file_date = Column(s.Date, primary_key = True)
     message_id = Column(s.Integer, primary_key = True)

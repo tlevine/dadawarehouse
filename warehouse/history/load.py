@@ -2,8 +2,8 @@ import os
 
 from historian_reader.shell import historian
 
-from .model import Command, Shell
-from .logger import logger
+from .model import Command # ...
+from ..logger import logger
 
 def update(session):
     HISTORY = os.path.join(os.path.expanduser('~'), 'history', 'shell')
