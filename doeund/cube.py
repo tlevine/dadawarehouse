@@ -19,57 +19,74 @@ Levels
 
 Treat the levels as components of the dimension.
 '''
+import functools
 
 class Cube:
-    def __init__(self, fact_table):
+    dimensions = {}
+    # A dictionary of string keys and list-of-Column-object values,
+    # traversing recursively into the full snowflake of dimensions
+
+    def __init__(self, session, fact_table):
         '''
         fact_table: a Fact class
         '''
-        self.fact = fact_table
-
-        # A dictionary of string keys and Column object values,
-        # traversing recursively into the full snowflake of dimensions
-        self.dimensions
+        # Flatten the table, and record dimensions
+        self.dimensions.update(fact_measures(fact_table))
+        self.query = session.query(fact_table)
+        tables = [fact_table]
+        while len(tables) > 0:
+            for from_column, to_column, to_table in fact_joins(tables.pop()):
+                self.query = self.query.join(to_table, from_column == to_column)
+                self.dimensions[to_table.name] = dim_levels(to_table)
+                tables.push(to_table)
 
     def point_cut(self, dimension, path):
-        raise NotImplementedError
+        # Copy the query
+        query = self.query.all()
+
+        # Drill down as deep as the path allows.
+        for level, value in zip(self.dimensions[dimension], path):
+            query = self.query.filter(level == value)
+        return query
 
     def set_cut(self, dimension, paths):
-        raise NotImplementedError
+        subqueries = map(functools.partial(self.point_cut, dimension), paths)
+        if len(subqueries) >= 1:
+            q, *qs = subqueries
+        return q.union_all(qs)
 
     def range_cut(self, dimension, from_path, to_path):
-        raise NotImplementedError
-    
+        'from_path must be less than to_path'
+        # Copy the query
+        query = self.query.all()
 
+        # Drill down as deep as the path allows.
+        for level, value in zip(self.dimensions[dimension], from_path):
+            query = self.query.filter(level >= value)
+        for level, value in zip(self.dimensions[dimension], to_path):
+            query = self.query.filter(level <= value)
+
+        return query
 
 def dim_levels(table):
     '''
     Everything that isn't a primary key is a level.
     The implied hierarchy is from left to right along the table.
     '''
-    return filter(lambda column: not column.primary_key, table.columns)
+    return [column for column in table.columns if not column.primary_key]
 
 def fact_measures(table):
     '''
     List the columns that are not foreign keys.
     '''
-    return filter(lambda column: len(column.foreign_keys) == 0, table.columns)
+    return {column.name: [column] for column in table.columns \
+            if not len(column.foreign_keys) == 0}
 
-def fact_joins(table):
+def joins(table):
     '''
     List the joins from this fact table to dimension tables.
     yields (column in this table, column in the other table)
     '''
     for column in table.columns:
         for foreign_key in column.foreign_keys:
-            # foreign_key.target_fullname
-            yield column, foreign_key.column
-
-def fact_dimensions(table):
-    '''
-    List this fact table's dimension tables.
-    (tables that this table joins to)
-    '''
-    for column in table.columns:
-        for foreign_key in column.foreign_keys:
-            yield foreign_key.column.table
+            yield column, foreign_key.column, foreign_key.column.table
