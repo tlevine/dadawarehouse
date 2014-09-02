@@ -1,7 +1,7 @@
+from collections import namedtuple
+
 from sqlalchemy import Column as _Column
 from sqlalchemy.ext.declarative import declarative_base as _declarative_base
-
-from cubes.model import Hierarchy
 
 Base = _declarative_base()
 
@@ -21,10 +21,13 @@ class ModelTable(Base):
 class Dimension(ModelTable):
     '''
     What's info?
+
     levels are inferred from columns.
+
+    __hierarchies__ is a list of cubes.models.Hierarchy objects
     '''
-    name = None
-    hierarchies = []
+    __name__ = None
+    __hierarchies__ = []
 
 class Fact(ModelTable):
     '''
