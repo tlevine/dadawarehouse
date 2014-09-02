@@ -58,3 +58,14 @@ is a decent example. Here's the method where it loads the Mixpanel model.
 
 So I want to define an SQLAlchemy model provider that takes an SQLAlchemy
 declarative base as input. I think.
+
+
+Structure of the repository
+==============================
+
+``doeund``
+    A separate package for assembling a model from sqlalchemy
+``warehouse``
+    Overall configuration of the data warehouse
+``connectors``
+    Connectors to different data sources
