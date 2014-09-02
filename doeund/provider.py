@@ -1,6 +1,6 @@
 from cubes import ModelProvider as _ModelProvider
 
-class Model(_ModelProvider):
+class _DoeundProvider(_ModelProvider):
     def __init__(self, metadata = None, declarative_base = None):
         super(Model, self).__init__(metadata)
         if declarantive_base == None:
