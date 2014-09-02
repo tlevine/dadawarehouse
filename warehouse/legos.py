@@ -29,6 +29,13 @@ class Dimension(ModelTable):
     __name__ = None
     __hierarchies__ = []
 
+    @classmethod
+    def levels(Class):
+        '''
+        Everything that isn't a primary key is a level.'
+        '''
+        return filter(lambda column: not column.primary_key, Class.__table__.columns)
+
 class Fact(ModelTable):
     '''
     Dimensions and joins will be inferred based on foreign keys.
@@ -38,18 +45,15 @@ class Fact(ModelTable):
     @classmethod
     def measures(Class):
         '''
-        List the measures--not references to dimensions.
+        List the columns that are not foreign keys.
         '''
-        for column in Class.__table__.columns:
-            if len(column.foreign_keys) == 0:
-                yield column
+        return filter(lambda column: len(column.foreign_keys) == 0, Class.__table__.columns)
 
     @classmethod
     def joins(Class):
         '''
         List the joins from this fact table to dimension tables.
-        This the left element of the tuple is the "dimension"
-        in cubes model json language.
+        yields (column in this table, column in the other table)
         '''
         for column in Class.__table__.columns:
             for foreign_key in column.foreign_keys:
@@ -60,6 +64,7 @@ class Fact(ModelTable):
     def dimensions(Class):
         '''
         List this fact table's dimension tables.
+        (tables that this table joins to)
         '''
         for column in Class.__table__.columns:
             for foreign_key in column.foreign_keys:
