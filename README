@@ -65,7 +65,7 @@ Structure of the repository
 
 ``doeund``
     A separate package for assembling a model from sqlalchemy
-``warehouse``
+``warehouse/{main,model,logger}.py``
     Overall configuration of the data warehouse
-``connectors``
+The rest of ``warehouse``
     Connectors to different data sources
