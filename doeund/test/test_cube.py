@@ -4,5 +4,7 @@ import warehouse.main
 
 cube = warehouse.main.query()['fact_calendarevent']
 
-def test_fact_measures():
-    n.assert_list_equal(list(cube.dimensions.keys()), ['calendarfile'])
+def test_dimensions():
+    observed = list(cube.dimensions.keys())
+    expected = ['calendarfile', 'event_description']
+    n.assert_list_equal(observed, expected)

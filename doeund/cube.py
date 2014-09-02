@@ -46,7 +46,7 @@ class Cube:
                 self._query = self._query.join(to_table, from_column == to_column)
 
                 dim_name = re.sub(r'^dim_', '', to_table.name)
-               #self.dimensions[dim_name] = dim_levels(to_table)
+                self.dimensions[dim_name] = dim_levels(to_table)
 
                 tables.append(to_table)
 
