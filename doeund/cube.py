@@ -37,8 +37,8 @@ class Cube:
         self.query = session.query(fact_table)
         tables = [fact_table]
         while len(tables) > 0:
-            for from_column, to_column, to_table in fact_joins(tables.pop()):
-                self.query = self.query.join(to_table, from_column == to_column)
+            for from_column, to_column in joins(tables.pop()):
+                self.query = self.query.join(to_column.table, from_column == to_column)
                 self.dimensions[to_table.name] = dim_levels(to_table)
                 tables.push(to_table)
 
