@@ -33,6 +33,8 @@ class Cube:
         '''
         fact_table: a Fact class
         '''
+        self._args = (session, fact_table)
+
         # Flatten the table, and record dimensions
         self.dimensions.update(fact_measures(fact_table))
         self.query = session.query(fact_table)
@@ -43,6 +45,9 @@ class Cube:
                 self.query = self.query.join(to_table, from_column == to_column)
                 self.dimensions[to_table.name] = dim_levels(to_table)
                 tables.append(to_table)
+
+    def __repr__(self):
+        return '<Cube for table "%s">' % self._args[1]
 
     def point_cut(self, dimension, path):
         # Copy the query

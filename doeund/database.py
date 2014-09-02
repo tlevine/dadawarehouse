@@ -5,7 +5,7 @@ from sqlalchemy import Column as _Column
 from sqlalchemy.ext.declarative import \
     declarative_base as _declarative_base, declared_attr
 
-from .inference import dim_levels, fact_measures
+from .inference import dim_levels, fact_measures, joins
 
 Base = _declarative_base()
 

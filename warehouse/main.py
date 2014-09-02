@@ -24,4 +24,5 @@ def load():
     pal(session)
 
 def query():
-    session, cubes = connect(CACHE_DIRECTORY)
+    _, cubes = connect(CACHE_DIRECTORY)
+    return cubes
