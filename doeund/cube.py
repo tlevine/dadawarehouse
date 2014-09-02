@@ -39,9 +39,10 @@ class Cube:
         tables = [fact_table]
         while len(tables) > 0:
             for from_column, to_column in joins(tables.pop()):
-                self.query = self.query.join(to_column.table, from_column == to_column)
+                to_table = to_column.table
+                self.query = self.query.join(to_table, from_column == to_column)
                 self.dimensions[to_table.name] = dim_levels(to_table)
-                tables.push(to_table)
+                tables.append(to_table)
 
     def point_cut(self, dimension, path):
         # Copy the query

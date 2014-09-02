@@ -2,7 +2,7 @@ import os
 import datetime
 
 from .logger import logger
-from .model import Calendar, Event
+from .model import CalendarFile, CalendarEvent
 
 CALENDARS = [os.path.join(os.path.expanduser('~/.pal'), rest) for rest in [\
     'secrets-nsa/secret-calendar.txt',
@@ -40,11 +40,11 @@ def parse(fp, filename = None):
             pass
         elif calendar == None:
             calendar_code, _, calendar_description = line.partition(' ')
-            calendar = Calendar(code = calendar_code,
+            calendar = CalendarFile(code = calendar_code,
                                 description = calendar_description,
                                 filename = filename)
         else:
-            events.extend((Event(calendar_code = calendar_code,
+            events.extend((CalendarEvent(calendar_code = calendar_code,
                                  event_date = date,
                                  event_description = description) \
                            for date, description in entry(line)))
