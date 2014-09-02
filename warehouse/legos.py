@@ -6,15 +6,21 @@ from sqlalchemy.ext.declarative import declarative_base as _declarative_base
 Base = _declarative_base()
 
 class ModelColumn(_Column):
-    'Column in a table, with model metadata'
+    '''
+    Column in a table, with model metadata
+
+    This is a normal SQLAlchemy column with two special keyword arguments.
+
+    label: pretty label for the field
+    aggregations: list of aggregation functions
+    '''
     def __init__(self, *args, **kwargs):
         _kwargs = dict(kwargs) # copy it rather than mutating it
         if 'label' in _kwargs:
             self.__label__ = _kwargs.pop('label')
+        if 'aggregations' in _kwargs:
+            self.__aggregations__ = _kwargs.pop('aggregations')
         _Column.__init__(self, *args, **_kwargs)
-
-class Measure(ModelColumn):
-    __aggregations__ = []
 
 class ModelTable(Base):
     __label__ = None
