@@ -37,13 +37,13 @@ class Cube:
 
         # Flatten the table, and record dimensions
         self.dimensions.update(fact_measures(fact_table))
-        self.query = session.query(fact_table)
+        self._query = session.query(fact_table)
         tables = [fact_table]
         while len(tables) > 0:
             for from_column, to_column in joins(tables.pop()):
                 to_table = to_column.table
-                self.query = self.query.join(to_table, from_column == to_column)
-                self.dimensions[to_table.name] = dim_levels(to_table)
+                self._query = self._query.join(to_table, from_column == to_column)
+                self.dimensions[to_column.name] = dim_levels(to_table)
                 tables.append(to_table)
 
     def __repr__(self):
@@ -51,11 +51,11 @@ class Cube:
 
     def point_cut(self, dimension, path):
         # Copy the query
-        query = self.query.all()
+        query = self._query.all()
 
         # Drill down as deep as the path allows.
         for level, value in zip(self.dimensions[dimension], path):
-            query = self.query.filter(level == value)
+            query = self._query.filter(level == value)
         return query
 
     def set_cut(self, dimension, paths):
@@ -65,20 +65,20 @@ class Cube:
                           zip(dimension, path)))
 
         # An OR-joined query to match any of the paths
-        filter_criteria = _or(*map(partial(match_path, dimension), paths))
+        filter_criteria = or_(*map(partial(match_path, dimension), paths))
 
         # Apply the criteria
-        return self.query.filter(filter_criteria)
+        return self._query.filter(filter_criteria)
 
     def range_cut(self, dimension, from_path, to_path):
         'from_path must be less than to_path'
         # Copy the query
-        query = self.query.all()
+        query = self._query.all()
 
         # Drill down as deep as the path allows.
         for level, value in zip(self.dimensions[dimension], from_path):
-            query = self.query.filter(level >= value)
+            query = self._query.filter(level >= value)
         for level, value in zip(self.dimensions[dimension], to_path):
-            query = self.query.filter(level <= value)
+            query = self._query.filter(level <= value)
 
         return query
