@@ -8,9 +8,10 @@ Base = _declarative_base()
 class ModelColumn(_Column):
     'Column in a table, with model metadata'
     def __init__(self, *args, **kwargs):
-        name, label, *rest = args
-        self.label = label
-        Column.__init__(self, name, *rest, **kwargs)
+        _kwargs = dict(kwargs) # copy it rather than mutating it
+        if 'label' in _kwargs:
+            self.label = _kwargs.pop('label')
+        Column.__init__(self, *args, **_kwargs)
 
 class ModelTable(Base):
 
@@ -29,3 +30,12 @@ class Fact(ModelTable):
     http://pythonhosted.org/cubes/backends/sql.html#explicit-mapping
     '''
     measures = []
+    def joins(self):
+        '''
+        List the joins from this fact table to dimension tables.
+        This the right element of the tuple is the "dimension"
+        in cubes model json language.
+        '''
+        for column in Fact.__table__.columns:
+            for foreign_key in column.foreign_keys:
+                yield column, foreign_key.column
