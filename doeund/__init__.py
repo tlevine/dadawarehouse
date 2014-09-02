@@ -14,4 +14,4 @@ def doeund(engine):
     session = _sessionmaker(bind=engine)()
     cubes = {name: Cube(session, table) for name, table in \
              _Base.metadata.tables.items() if name.startswith('fact_')}
-    return cubes
+    return session, cubes

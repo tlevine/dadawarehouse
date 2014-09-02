@@ -5,6 +5,8 @@ from sqlalchemy import Column as _Column
 from sqlalchemy.ext.declarative import \
     declarative_base as _declarative_base, declared_attr
 
+from .inference import dim_levels, fact_measures
+
 Base = _declarative_base()
 
 class Column(_Column):
@@ -34,6 +36,10 @@ class Fact(Base):
     @declared_attr
     def __tablename__(Class):
         return 'fact_' + Class.__name__.lower()
+
+    def __repr__(self):
+        return '<Shell(shell = "%s", shell_date = %s)>' % \
+               (self.shell, self.shell_date)
 
 class Dimension(Base):
     '''
