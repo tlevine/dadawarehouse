@@ -1,9 +1,15 @@
 from collections import namedtuple
+from enum import Enum
 
 from sqlalchemy import Column as _Column
-from sqlalchemy.ext.declarative import declarative_base as _declarative_base
+from sqlalchemy.ext.declarative import \
+    declarative_base as _declarative_base, declared_attr
 
 Base = _declarative_base()
+
+class TableType(Enum):
+    fact = 0
+    dimension = 1
 
 class Column(_Column):
     '''
@@ -23,7 +29,6 @@ class Column(_Column):
         _Column.__init__(self, *args, **_kwargs)
 
 class ModelTable(Base):
-    __label__ = None
     __abstract__ = True
 
 class Dimension(ModelTable):
@@ -36,6 +41,10 @@ class Dimension(ModelTable):
     '''
     __abstract__ = True
     __hierarchies__ = []
+
+    @declared_attr
+    def __tablename__(Class):
+        return 'dim_' + Class.__name__.lower()
 
     @classmethod
     def levels(Class):
@@ -51,6 +60,10 @@ class Fact(ModelTable):
     http://pythonhosted.org/cubes/backends/sql.html#explicit-mapping
     '''
     __abstract__ = True
+
+    @declared_attr
+    def __tablename__(Class):
+        return 'fact_' + Class.__name__.lower()
 
     @classmethod
     def measures(Class):
