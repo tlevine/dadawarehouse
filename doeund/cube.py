@@ -19,8 +19,9 @@ Levels
 
 Treat the levels as components of the dimension.
 '''
-import functools
+from functools import partial
 
+from sqlalchemy import and_, or_
 from .inference import dim_levels, fact_measures, joins
 
 class Cube:
@@ -52,10 +53,16 @@ class Cube:
         return query
 
     def set_cut(self, dimension, paths):
-        subqueries = map(functools.partial(self.point_cut, dimension), paths)
-        if len(subqueries) >= 1:
-            q, *qs = subqueries
-        return q.union_all(qs)
+        def match_path(dimension, path):
+            # An AND-joined query to match the full path
+            return and_(*(level == value for level, value in \
+                          zip(dimension, path)))
+
+        # An OR-joined query to match any of the paths
+        filter_criteria = _or(*map(partial(match_path, dimension), paths))
+
+        # Apply the criteria
+        return self.query.filter(filter_criteria)
 
     def range_cut(self, dimension, from_path, to_path):
         'from_path must be less than to_path'
