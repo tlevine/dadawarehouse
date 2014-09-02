@@ -22,5 +22,5 @@ def test_fact_measures_real():
     cube = warehouse.main.query()['fact_calendarevent']
 
     observed = list(fact_measures(cube._args[1]).keys())
-    expected = ['event_id', 'calendar_code', 'event_date', 'event_description']
+    expected = ['event_id', 'event_date', 'event_description']
     n.assert_list_equal(observed, expected)
