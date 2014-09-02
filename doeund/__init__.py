@@ -1,22 +1,17 @@
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker as _sessionmaker
 
-from .components import Fact, Dimension, Column, Base as _Base
-from .provider import _DoeundProvider
+from .database import Fact, Dimension, Column, Base as _Base
+from .cube import Cube
 
-def doeund(engine, fact_tables, dimension_tables):
+def doeund(engine):
     '''
     After assembling your schema with the Fact, Dimension, and
-    Column classes from doeund, produce a database session and
-    a cubes model provider.
+    Column classes from doeund, produce some cubes.
 
     engine: SQLAlchemy engine, from sqlalchemy.create_engine
     '''
-    class DoeundProvider(_DoeundProvider):
-        def __init__(self, metadata = None):
-            super(_DoeundProvider, self).__init__(metadata = metadata,
-                declarative_base = _Base, fact_tables = fact_tables,
-                dimension_tables = dimension_tables)
-
     _Base.metadata.create_all(engine) 
-    session = sessionmaker(bind=engine)()
-    return session, DoeundProvider
+    session = _sessionmaker(bind=engine)()
+    cubes = {name: Cube(session, table) for name, table in \
+             _Base.metadata.tables.items() if name.startswith('fact_')}
+    return cubes

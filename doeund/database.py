@@ -9,7 +9,7 @@ Base = _declarative_base()
 
 class Column(_Column):
     '''
-    Column in a table, with model metadata
+    Column in a table with some model metadata
 
     This is a normal SQLAlchemy column with two special keyword arguments.
 
@@ -18,17 +18,16 @@ class Column(_Column):
     '''
     def __init__(self, *args, **kwargs):
         _kwargs = dict(kwargs) # copy it rather than mutating it
+        info = _kwargs.pop('info', {})
         if 'label' in _kwargs:
-            self.__label__ = _kwargs.pop('label')
+            info['label'] = _kwargs.pop('label')
         if 'aggregations' in _kwargs:
-            self.__aggregations__ = _kwargs.pop('aggregations')
-        _Column.__init__(self, *args, **_kwargs)
+            info['aggregations'] = _kwargs.pop('aggregations')
+        super(Column, self).__init__(self, *args, info = info, **_kwargs)
 
 class Fact(Base):
     '''
-    Dimensions and joins will be inferred based on foreign keys.
-    I think we can do without mappings.
-    http://pythonhosted.org/cubes/backends/sql.html#explicit-mapping
+    A fact table
     '''
     __abstract__ = True
 
@@ -38,14 +37,13 @@ class Fact(Base):
 
 class Dimension(Base):
     '''
-    What's info?
+    A dimension table
 
-    levels are inferred from columns.
-
-    __hierarchies__ is a list of cubes.models.Hierarchy objects
+    Each dimension table should have only one dimension;
+    the different columns within that table are treated
+    as a hierarchy of levels within that dimension.
     '''
     __abstract__ = True
-    __hierarchies__ = []
 
     @declared_attr
     def __tablename__(Class):
