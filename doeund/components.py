@@ -7,10 +7,6 @@ from sqlalchemy.ext.declarative import \
 
 Base = _declarative_base()
 
-class TableType(Enum):
-    fact = 0
-    dimension = 1
-
 class Column(_Column):
     '''
     Column in a table, with model metadata
@@ -28,10 +24,19 @@ class Column(_Column):
             self.__aggregations__ = _kwargs.pop('aggregations')
         _Column.__init__(self, *args, **_kwargs)
 
-class ModelTable(Base):
+class Fact(Base):
+    '''
+    Dimensions and joins will be inferred based on foreign keys.
+    I think we can do without mappings.
+    http://pythonhosted.org/cubes/backends/sql.html#explicit-mapping
+    '''
     __abstract__ = True
 
-class Dimension(ModelTable):
+    @declared_attr
+    def __tablename__(Class):
+        return 'fact_' + Class.__name__.lower()
+
+class Dimension(Base):
     '''
     What's info?
 
@@ -45,50 +50,3 @@ class Dimension(ModelTable):
     @declared_attr
     def __tablename__(Class):
         return 'dim_' + Class.__name__.lower()
-
-    @classmethod
-    def levels(Class):
-        '''
-        Everything that isn't a primary key is a level.'
-        '''
-        return filter(lambda column: not column.primary_key, Class.__table__.columns)
-
-class Fact(ModelTable):
-    '''
-    Dimensions and joins will be inferred based on foreign keys.
-    I think we can do without mappings.
-    http://pythonhosted.org/cubes/backends/sql.html#explicit-mapping
-    '''
-    __abstract__ = True
-
-    @declared_attr
-    def __tablename__(Class):
-        return 'fact_' + Class.__name__.lower()
-
-    @classmethod
-    def measures(Class):
-        '''
-        List the columns that are not foreign keys.
-        '''
-        return filter(lambda column: len(column.foreign_keys) == 0, Class.__table__.columns)
-
-    @classmethod
-    def joins(Class):
-        '''
-        List the joins from this fact table to dimension tables.
-        yields (column in this table, column in the other table)
-        '''
-        for column in Class.__table__.columns:
-            for foreign_key in column.foreign_keys:
-                # foreign_key.target_fullname
-                yield column, foreign_key.column
-
-    @classmethod
-    def dimensions(Class):
-        '''
-        List this fact table's dimension tables.
-        (tables that this table joins to)
-        '''
-        for column in Class.__table__.columns:
-            for foreign_key in column.foreign_keys:
-                yield foreign_key.column.table
