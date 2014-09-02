@@ -10,7 +10,7 @@ def fact_measures(table):
     List the columns that are not foreign keys.
     '''
     return {column.name: [column] for column in table.columns \
-            if not len(column.foreign_keys) == 0}
+            if len(column.foreign_keys) == 0}
 
 def joins(table):
     '''
