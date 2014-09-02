@@ -2,24 +2,24 @@ import os
 
 import sqlalchemy as s
 
-from .model import Fact, Dimension, Column, IdColumn, Date
+from ..model import Fact, Dimension, Column, PkColumn, FkColumn, LabelColumn, Date, Time
 from sqlalchemy import ForeignKey, String
 
 class CalendarFilename(Dimension):
-    pk = IdColumn(primary_key = True)
-    filename = Column(String, unique = True)
+    pk = PkColumn()
+    filename = LabelColumn()
 
 class CalendarDescription(Dimension):
-    pk = IdColumn(primary_key = True)
-    description = Column(String, unique = True)
+    pk = PkColumn()
+    description = LabelColumn()
 
 class CalendarFile(Dimension):
     code = Column(s.String(2), primary_key = True)
-    filename_id = IdColumn(ForeignKey(CalendarFilename.pk))
-    description_id = IdColumn(ForeignKey(CalendarDescription.pk))
+    filename_id = FkColumn(CalendarFilename.pk)
+    description_id = FkColumn(CalendarDescription.pk)
 
 class CalendarEvent(Fact):
-    pk = Column(s.Integer, primary_key = True)
+    pk = PkColumn()
     calendar = Column(s.String(2), s.ForeignKey(CalendarFile.code))
     date = Column(s.Date, s.ForeignKey(Date.pk))
-    description = IdColumn(s.ForeignKey(CalendarDescription))
+    description = FkColumn(CalendarDescription))

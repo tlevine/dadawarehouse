@@ -1,10 +1,10 @@
 import sqlalchemy as s
 
-from .model import Fact, Dimension, Column, IdColumn, Date, Time
+from ..model import Fact, Dimension, Column, PkColumn, FkColumn, LabelColumn, Date, Time
 
 class ShellFilename(Dimension):
-    pk = IdColumn(primary_key = True)
-    filename = Column(s.String, unique = True)
+    pk = PkColumn()
+    filename = LabelColumn()
 
 class ShellSession(Dimension):
     pk = IdColumn(primary_key = True, s.ForeignKey(ShellFilename.pk))
@@ -12,12 +12,12 @@ class ShellSession(Dimension):
     time = Column(s.Time, s.ForeignKey(Time.pk))
 
 class CommandString(Dimension):
-    pk = IdColumn(primary_key = True)
-    command = Column(s.String, unique = True)
+    pk = PkColumn()
+    command = LabelColumn()
 
 class Command(Fact):
-    pk = IdColumn(primary_key = True)
-    shell = IdColumn(s.ForeignKey(ShellSession.shell))
+    pk = PkColumn()
+    shell = FkColumn(ShellSession.shell)
     date = Column(s.Date, s.ForeignKey(Date.pk))
     time = Column(s.Time, s.ForeignKey(Time.pk))
-    command = IdColumn(s.ForeignKey(CommandString))
+    command = FkColumn(CommandString)
