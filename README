@@ -56,3 +56,5 @@ is a decent example. Here's the method where it loads the Mixpanel model.
 
         return metadata
 
+So I want to define an SQLAlchemy model provider that takes an SQLAlchemy
+declarative base as input. I think.
