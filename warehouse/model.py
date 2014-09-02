@@ -42,5 +42,4 @@ class FacebookChatStatus(Fact):
     date = Column(s.DateTime, nullable = False)
     status = Column(s.Enum('avail', 'notavail'), nullable = False)
 
-class Email(Fact):
-    pass
+#class Email(Fact):
