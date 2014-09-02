@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 def dim_levels(table):
     '''
     Everything that isn't a primary key is a level.
@@ -9,8 +11,8 @@ def fact_measures(table):
     '''
     List the columns that are not foreign keys.
     '''
-    return {column.name: [column] for column in table.columns \
-            if len(column.foreign_keys) == 0}
+    return OrderedDict((column.name, [column]) for column in table.columns \
+                       if len(column.foreign_keys) == 0)
 
 def joins(table):
     '''
