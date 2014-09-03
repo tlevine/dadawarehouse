@@ -14,12 +14,16 @@ class CalendarDescription(Dimension):
     description = LabelColumn()
 
 class CalendarFile(Dimension):
-    code = Column(s.String(2), primary_key = True)
-    filename_id = FkColumn(CalendarFilename.pk)
-    description_id = FkColumn(CalendarDescription.pk)
+    pk = Column(s.String(2), primary_key = True)
+    filename = FkColumn(CalendarFilename.pk)
+    description = FkColumn(CalendarDescription.pk)
+
+class CalendarEventDescription(Dimension):
+    pk = PkColumn()
+    eventdescription = LabelColumn()
 
 class CalendarEvent(Fact):
     pk = PkColumn()
     calendar = Column(s.String(2), s.ForeignKey(CalendarFile.code))
-    date = Column(s.Date, s.ForeignKey(Date.pk))
-    description = FkColumn(CalendarDescription))
+    date = DateColumn()
+    description = FkColumn(CalendarEventDescription.pk)

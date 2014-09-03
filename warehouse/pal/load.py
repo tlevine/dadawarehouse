@@ -2,7 +2,7 @@ import os
 import datetime
 
 from .logger import logger
-from .model import CalendarFile, CalendarEvent
+import .model as m
 
 CALENDARS = [os.path.join(os.path.expanduser('~/.pal'), rest) for rest in [\
     'secrets-nsa/secret-calendar.txt',
@@ -13,14 +13,13 @@ CALENDARS = [os.path.join(os.path.expanduser('~/.pal'), rest) for rest in [\
     'p/postponed.txt',
 ]]
     
-def update(session):
+def update(session, filenames = FILENAMES):
     session.query(CalendarFile).delete()
     session.query(CalendarEvent).delete()
+
     for filename in CALENDARS:
         with open(filename) as fp:
-            calendar, events = parse(fp)
-        session.add(calendar)
-        session.add_all(events)
+            session.add_all(parse(fp))
         session.commit()
         logger.info('Inserted events from calendar %s' % filename)
 
@@ -31,6 +30,10 @@ def parse(fp, filename = None):
             filename = fp.name
         except NameError:
             raise ValueError('You must specify a filename.')
+
+    filename_record = CalendarFilename(filename = filename)
+    yield filename_record
+
     calendar = None
     events = []
 
@@ -40,15 +43,22 @@ def parse(fp, filename = None):
             pass
         elif calendar == None:
             calendar_code, _, calendar_description = line.partition(' ')
-            calendar = CalendarFile(code = calendar_code,
-                                description = calendar_description,
-                                filename = filename)
+
+            description_record = CalendarDescription(description = calendar_description)
+            yield description_record
+
+            calendar_record = CalendarFile(pk = calendar_code,
+                                           filename = filename_record,
+                                           description = description_record)
+            yield calendar_record
+
         else:
-            events.extend((CalendarEvent(calendar_code = calendar_code,
-                                 event_date = date,
-                                 event_description = description) \
-                           for date, description in entry(line)))
-    return calendar, events
+            for date, description in entry(line):
+                event_description = CalendarEventDescription(eventdescription = description)
+                yield event_description
+                yield CalendarEvent(calendar = calendar_record,
+                                    date = date,
+                                    description = event_description)
 
 def entry(line):
     'Read a pal calendar entry'
