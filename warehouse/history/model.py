@@ -2,14 +2,11 @@ import sqlalchemy as s
 
 from ..model import Fact, Dimension, Column, PkColumn, FkColumn, LabelColumn, Date, Time
 
-class ShellFilename(Dimension):
-    pk = PkColumn()
-    filename = LabelColumn()
-
 class ShellSession(Dimension):
-    pk = IdColumn(primary_key = True, s.ForeignKey(ShellFilename.pk))
-    date = Column(s.Date, s.ForeignKey(Date.pk))
-    time = Column(s.Time, s.ForeignKey(Time.pk))
+    pk = PkColumn()
+    date = DateColumn()
+    time = TimeColumn()
+    filename = LabelColumn()
 
 class CommandString(Dimension):
     pk = PkColumn()
@@ -17,7 +14,7 @@ class CommandString(Dimension):
 
 class Command(Fact):
     pk = PkColumn()
-    shell = FkColumn(ShellSession.shell)
-    date = Column(s.Date, s.ForeignKey(Date.pk))
-    time = Column(s.Time, s.ForeignKey(Time.pk))
-    command = FkColumn(CommandString)
+    shell = FkColumn(ShellSession.pk)
+    date = DateColumn()
+    time = TimeColumn()
+    command = FkColumn(CommandString.pk)
