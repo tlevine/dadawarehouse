@@ -4,7 +4,7 @@ import datetime
 from ..logger import logger
 import warehouse.model as m
 from .model import (CalendarFilename, CalendarDescription, CalendarFile,
-                    CalendarEventDescription, CalendarEvent, add_label)
+                    CalendarEventDescription, CalendarEvent)
 
 CALENDARS = [os.path.join(os.path.expanduser('~/.pal'), rest) for rest in [\
     'secrets-nsa/secret-calendar.txt',
@@ -23,7 +23,7 @@ def update(session, calendars = CALENDARS):
         with open(filename) as fp:
             labels, normals = parse(fp)
         for label in labels:
-            add_label(session, label)
+            m.add_label(session, label)
         session.add_all(normals)
         session.commit()
         logger.info('Inserted events from calendar %s' % filename)
@@ -39,7 +39,8 @@ def parse(fp, filename = None):
             filename = fp.name
         except NameError:
             raise ValueError('You must specify a filename.')
-    labels.append(CalendarFilename(filename = filename))
+    filename_record = CalendarFilename(filename = filename)
+    labels.append(filename_record)
 
     calendar = None
     for line in fp:
@@ -48,7 +49,8 @@ def parse(fp, filename = None):
             pass
         elif calendar == None:
             calendar_code, _, calendar_description = line.partition(' ')
-            labels.append(CalendarDescription(description = calendar_description))
+            description_record = CalendarDescription(description = calendar_description)
+            labels.append(description_record)
             normals.append(CalendarFile(pk = calendar_code,
                 filename = filename_record, description = description_record))
 
