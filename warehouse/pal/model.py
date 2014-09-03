@@ -2,28 +2,28 @@ import os
 
 import sqlalchemy as s
 
-from ..model import Fact, Dimension, Column, PkColumn, FkColumn, LabelColumn, Date, Time
+import ..model as m
 from sqlalchemy import ForeignKey, String
 
-class CalendarFilename(Dimension):
-    pk = PkColumn()
-    filename = LabelColumn()
+class CalendarFilename(m.Dimension):
+    pk = m.PkColumn()
+    filename = m.LabelColumn()
 
-class CalendarDescription(Dimension):
-    pk = PkColumn()
-    description = LabelColumn()
+class CalendarDescription(m.Dimension):
+    pk = m.PkColumn()
+    description = m.LabelColumn()
 
-class CalendarFile(Dimension):
-    pk = Column(s.String(2), primary_key = True)
-    filename = FkColumn(CalendarFilename.pk)
-    description = FkColumn(CalendarDescription.pk)
+class CalendarFile(m.Dimension):
+    pk = m.Column(String(2), primary_key = True)
+    filename = m.FkColumn(CalendarFilename.pk)
+    description = m.FkColumn(CalendarDescription.pk)
 
-class CalendarEventDescription(Dimension):
-    pk = PkColumn()
-    eventdescription = LabelColumn()
+class CalendarEventDescription(m.Dimension):
+    pk = m.PkColumn()
+    eventdescription = m.LabelColumn()
 
-class CalendarEvent(Fact):
-    pk = PkColumn()
-    calendar = Column(s.String(2), s.ForeignKey(CalendarFile.code))
-    date = DateColumn()
-    description = FkColumn(CalendarEventDescription.pk)
+class CalendarEvent(m.Fact):
+    pk = m.PkColumn()
+    calendar = m.Column(String(2), ForeignKey(CalendarFile.code))
+    date = m.DateColumn()
+    description = m.FkColumn(CalendarEventDescription.pk)
