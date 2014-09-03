@@ -4,9 +4,9 @@ from sqlalchemy import create_engine
 
 from doeund import doeund
 
-from .history.load import update as history
+#from .history.load import update as history
 from .pal.load import update as pal
-from .facebookchat.load import update as fb
+#from .facebookchat.load import update as fb
 
 CACHE_DIRECTORY = os.path.expanduser('~/.dadawarehouse')
 

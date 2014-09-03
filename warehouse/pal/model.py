@@ -2,7 +2,7 @@ import os
 
 import sqlalchemy as s
 
-import ..model as m
+import warehouse.model as m
 from sqlalchemy import ForeignKey, String
 
 class CalendarFilename(m.Dimension):
@@ -24,6 +24,6 @@ class CalendarEventDescription(m.Dimension):
 
 class CalendarEvent(m.Fact):
     pk = m.PkColumn()
-    calendar = m.Column(String(2), ForeignKey(CalendarFile.code))
+    calendar = m.Column(String(2), ForeignKey(CalendarFile.pk))
     date = m.DateColumn()
     description = m.FkColumn(CalendarEventDescription.pk)

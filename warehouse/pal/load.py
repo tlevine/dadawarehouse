@@ -3,6 +3,8 @@ import datetime
 
 from ..logger import logger
 import warehouse.model as m
+from .model import (CalendarFilename, CalendarDescription, CalendarFile,
+                    CalendarEventDescription, CalendarEvent)
 
 CALENDARS = [os.path.join(os.path.expanduser('~/.pal'), rest) for rest in [\
     'secrets-nsa/secret-calendar.txt',
