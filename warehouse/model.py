@@ -22,22 +22,22 @@ def LabelColumn(*args, **kwargs):
 
 def DateColumn(*args, **kwargs):
     'A date column with magic hierarchies'
-    return Column(s.Date, s.ForeignKey(Date.pk))
+    return Column(s.Date, s.ForeignKey('dim_date.pk'), *args, **kwargs)
 
 def TimeColumn(*args, **kwargs):
-    return Column(s.Time, s.ForeignKey(Time.pk))
+    return Column(s.Time, s.ForeignKey('dim_time.pk'), *args, **kwargs)
             
 class Date(Dimension):
     '''
     Dates with hierarchies
     '''
-    pk = Column(s.Date, primary_key = True)
+    pk = DateColumn(primary_key = True)
     year = Column(s.Integer)
     month = Column(s.Integer)
     day = Column(s.Integer)
 
 class Time(Dimension):
-    pk = IdColumn(s.Time, primary_key = True) # seconds from midnight
+    pk = TimeColumn(primary_key = True) # seconds from midnight
     hour = Column(s.Integer)
     minute = Column(s.Integer)
     second = Column(s.Integer)
