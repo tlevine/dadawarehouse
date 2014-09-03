@@ -78,3 +78,6 @@ To do
 
 * On update of a date or time column, make an appropriate entry in the
     date or time fact table if such an entry does not exist.
+* On update of any column referencing a label column (unique column that
+    is not the primary key in a two-column table), create the reference if
+    it does not already exist.

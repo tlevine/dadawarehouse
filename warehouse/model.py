@@ -22,10 +22,13 @@ def LabelColumn(*args, **kwargs):
 
 def DateColumn(*args, **kwargs):
     'A date column with magic hierarchies'
-    return Column(s.Date, s.ForeignKey('dim_date.pk'), *args, **kwargs)
+    return Column(s.Date, s.ForeignKey(Date.pk), *args, **kwargs)
 
 def TimeColumn(*args, **kwargs):
-    return Column(s.Time, s.ForeignKey('dim_time.pk'), *args, **kwargs)
+    return Column(s.Time, s.ForeignKey(Time.pk), *args, **kwargs)
+            
+def DateTimeColumn(*args, **kwargs):
+    return Column(s.Integer, s.ForeignKey(DateTime.pk), *args, **kwargs)
             
 class Date(Dimension):
     '''
@@ -41,6 +44,11 @@ class Time(Dimension):
     hour = Column(s.Integer)
     minute = Column(s.Integer)
     second = Column(s.Integer)
+
+class DateTime(Dimension):
+    pk = Column(s.Integer) # Epoch time in UTC
+    date = DateColumn()
+    time = TimeColumn()
 
 class Fact(_Fact):
     __abstract__ = True
