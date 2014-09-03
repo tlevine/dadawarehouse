@@ -2,7 +2,7 @@ import os
 
 from historian_reader.shell import historian
 
-from .model import Command # ...
+import .model as m
 from ..logger import logger
 
 def update(session):

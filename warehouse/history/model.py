@@ -1,20 +1,20 @@
 import sqlalchemy as s
 
-from ..model import Fact, Dimension, Column, PkColumn, FkColumn, LabelColumn, Date, Time
+import ..model as m
 
-class ShellSession(Dimension):
-    pk = PkColumn()
-    date = DateColumn()
-    time = TimeColumn()
-    filename = LabelColumn()
+class ShellSession(m.Dimension):
+    pk = m.PkColumn()
+    date = m.DateColumn()
+    time = m.TimeColumn()
+    filename = m.LabelColumn()
 
-class CommandString(Dimension):
-    pk = PkColumn()
-    command = LabelColumn()
+class CommandString(m.Dimension):
+    pk = m.PkColumn()
+    command = m.LabelColumn()
 
-class Command(Fact):
-    pk = PkColumn()
-    shell = FkColumn(ShellSession.pk)
-    date = DateColumn()
-    time = TimeColumn()
-    command = FkColumn(CommandString.pk)
+class Command(m.Fact):
+    pk = m.PkColumn()
+    shell = m.FkColumn(ShellSession.pk)
+    date = m.DateColumn()
+    time = m.TimeColumn()
+    command = m.FkColumn(CommandString.pk)
