@@ -44,7 +44,7 @@ class Time(Dimension):
 
 def add_label(session, record):
     for column in record.__table__.columns:
-        if column.unique and session.query(record.__table__).count(column) > 0
+        if column.unique and session.query(record.__table__).count(column) > 0:
             break
     else:
         session.add(record)

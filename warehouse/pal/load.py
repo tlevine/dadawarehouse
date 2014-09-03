@@ -50,7 +50,7 @@ def parse(fp, filename = None):
             calendar_code, _, calendar_description = line.partition(' ')
             labels.append(CalendarDescription(description = calendar_description))
             normals.append(CalendarFile(pk = calendar_code,
-                filename = filename_record, description = description_record)
+                filename = filename_record, description = description_record))
 
         else:
             for date, description in entry(line):
