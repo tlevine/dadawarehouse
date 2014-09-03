@@ -31,13 +31,13 @@ class Date(Dimension):
     '''
     Dates with hierarchies
     '''
-    pk = DateColumn(primary_key = True)
+    pk = Column(s.Date, primary_key = True)
     year = Column(s.Integer)
     month = Column(s.Integer)
     day = Column(s.Integer)
 
 class Time(Dimension):
-    pk = TimeColumn(primary_key = True) # seconds from midnight
+    pk = Column(s.Time, primary_key = True) # seconds from midnight
     hour = Column(s.Integer)
     minute = Column(s.Integer)
     second = Column(s.Integer)
