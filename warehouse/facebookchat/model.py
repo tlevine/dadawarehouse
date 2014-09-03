@@ -1,6 +1,6 @@
 import os
 
-import ..model as m
+import warehouse.model as m
 from sqlalchemy import String
 
 class FacebookUser(m.Dimension):
@@ -24,7 +24,7 @@ class FacebookMessage(m.Fact):
     filedate = m.DateColumn()
     user = m.FkColumn(FacebookUser.pk)
     date = m.DateColumn()
-    body = m.Column(s.String)
+    body = m.Column(String)
 
 class FacebookChatStatusChange(m.Fact):
     # Two-column primary key

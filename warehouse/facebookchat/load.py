@@ -5,7 +5,7 @@ import subprocess
 
 import sqlalchemy
 
-from .logger import logger
+from ..logger import logger
 from .model import FacebookChatStatus, FacebookMessage
 
 WAREHOUSE = os.path.expanduser('~/.dadawarehouse')

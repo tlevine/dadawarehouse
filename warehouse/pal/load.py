@@ -1,8 +1,8 @@
 import os
 import datetime
 
-from .logger import logger
-import .model as m
+from ..logger import logger
+import warehouse.model as m
 
 CALENDARS = [os.path.join(os.path.expanduser('~/.pal'), rest) for rest in [\
     'secrets-nsa/secret-calendar.txt',
@@ -13,11 +13,11 @@ CALENDARS = [os.path.join(os.path.expanduser('~/.pal'), rest) for rest in [\
     'p/postponed.txt',
 ]]
     
-def update(session, filenames = FILENAMES):
+def update(session, calendars = CALENDARS):
     session.query(CalendarFile).delete()
     session.query(CalendarEvent).delete()
 
-    for filename in CALENDARS:
+    for filename in calendars:
         with open(filename) as fp:
             session.add_all(parse(fp))
         session.commit()
