@@ -72,3 +72,9 @@ The rest of ``warehouse``
 
 Thing to consider
 http://docs.sqlalchemy.org/en/rel_0_9/orm/extensions/associationproxy.html
+
+To do
+=======
+
+* On update of a date or time column, make an appropriate entry in the
+    date or time fact table if such an entry does not exist.
