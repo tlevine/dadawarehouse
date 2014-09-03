@@ -41,3 +41,10 @@ class Time(Dimension):
     hour = Column(s.Integer)
     minute = Column(s.Integer)
     second = Column(s.Integer)
+
+def add_label(session, record):
+    for column in record.__table__.columns:
+        if column.unique and session.query(record.__table__).count(column) > 0
+            break
+    else:
+        session.add(record)

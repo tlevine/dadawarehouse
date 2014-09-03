@@ -4,7 +4,7 @@ import datetime
 from ..logger import logger
 import warehouse.model as m
 from .model import (CalendarFilename, CalendarDescription, CalendarFile,
-                    CalendarEventDescription, CalendarEvent)
+                    CalendarEventDescription, CalendarEvent, add_label)
 
 CALENDARS = [os.path.join(os.path.expanduser('~/.pal'), rest) for rest in [\
     'secrets-nsa/secret-calendar.txt',
@@ -21,46 +21,44 @@ def update(session, calendars = CALENDARS):
 
     for filename in calendars:
         with open(filename) as fp:
-            session.add_all(parse(fp))
+            labels, normals = parse(fp)
+        for label in labels:
+            add_label(session, label)
+        session.add_all(normals)
         session.commit()
         logger.info('Inserted events from calendar %s' % filename)
 
 def parse(fp, filename = None):
     'Read a pal calendar file.'
+    labels = []
+    normals = []
+
+    # Parse the filename.
     if filename == None:
         try:
             filename = fp.name
         except NameError:
             raise ValueError('You must specify a filename.')
-
-    filename_record = CalendarFilename(filename = filename)
-    yield filename_record
+    labels.append(CalendarFilename(filename = filename))
 
     calendar = None
-    events = []
-
     for line in fp:
         line = line.rstrip()
         if line.startswith('#'):
             pass
         elif calendar == None:
             calendar_code, _, calendar_description = line.partition(' ')
-
-            description_record = CalendarDescription(description = calendar_description)
-            yield description_record
-
-            calendar_record = CalendarFile(pk = calendar_code,
-                                           filename = filename_record,
-                                           description = description_record)
-            yield calendar_record
+            labels.append(CalendarDescription(description = calendar_description))
+            normals.append(CalendarFile(pk = calendar_code,
+                filename = filename_record, description = description_record)
 
         else:
             for date, description in entry(line):
                 event_description = CalendarEventDescription(eventdescription = description)
-                yield event_description
-                yield CalendarEvent(calendar = calendar_record,
-                                    date = date,
-                                    description = event_description)
+                labels.append(event_description)
+                normals.appendCalendarEvent(calendar = calendar_record,
+                    date = date, description = event_description)
+    return labels, normals
 
 def entry(line):
     'Read a pal calendar entry'
