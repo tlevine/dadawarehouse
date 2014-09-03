@@ -69,3 +69,6 @@ Structure of the repository
     Overall configuration of the data warehouse
 The rest of ``warehouse``
     Connectors to different data sources
+
+Thing to consider
+http://docs.sqlalchemy.org/en/rel_0_9/orm/extensions/associationproxy.html
