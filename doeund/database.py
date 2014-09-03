@@ -37,11 +37,11 @@ class Fact(Base):
     def __tablename__(Class):
         return 'fact_' + Class.__name__.lower()
 
-    def __repr__(self):
-        msg = '<Fact "%s" with measures %s and referencing dimensions %s>'
-        measures = list(fact_measures(self.__table__).keys())
-        dimensions = list(to_column.table.name for (_, to_column) in joins(self.__table))
-        return msg % (self.__tablename__, measures, dimensions)
+#   def __repr__(self):
+#       msg = '<Fact "%s" with measures %s and referencing dimensions %s>'
+#       measures = list(fact_measures(self.__table__).keys())
+#       dimensions = list(to_column.table.name for (_, to_column) in joins(self.__table))
+#       return msg % (self.__tablename__, measures, dimensions)
 
 class Dimension(Base):
     '''
@@ -57,9 +57,9 @@ class Dimension(Base):
     def __tablename__(Class):
         return 'dim_' + Class.__name__.lower()
 
-    def __repr__(self):
-        msg = '<Dimension "%s" with levels %s and referencing dimensions %s>'
-        measures = dim_levels(self.__table__)
-        dimensions = list(to_column.table.name for (_, to_column) in \
-                          joins(self.__table))
-        return msg % (self.__tablename__, measures, dimensions)
+#   def __repr__(self):
+#       msg = '<Dimension "%s" with levels %s and referencing dimensions %s>'
+#       measures = dim_levels(self.__table__)
+#       dimensions = list(to_column.table.name for (_, to_column) in \
+#                         joins(self.__table))
+#       return msg % (self.__tablename__, measures, dimensions)

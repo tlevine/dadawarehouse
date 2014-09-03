@@ -1,5 +1,5 @@
 import sqlalchemy as s
-from doeund import Fact, Dimension, Column as _Column
+from doeund import Fact as _Fact, Dimension, Column as _Column
 
 def Column(*args, **kwargs):
     'Column with good defaults'
@@ -42,9 +42,20 @@ class Time(Dimension):
     minute = Column(s.Integer)
     second = Column(s.Integer)
 
+class Fact(_Fact):
+    __abstract__ = True
+
 def add_label(session, record):
-    for column in record.__table__.columns:
-        if column.unique and session.query(record.__table__).count(column) > 0:
-            break
-    else:
+    table = record.__table__
+    columns = list(filter(lambda column: column.name != 'pk', table.columns))
+    if len(columns) != 1:
+        raise ValueError('The record must be for a table with a "pk" column and a label column.')
+    elif not columns[0].unique:
+        raise ValueError('The label column must be unique.')
+
+    column = columns[0]
+    value = getattr(record, column.name)
+    print(value)
+    exists = session.query(table).filter(column == value).count() > 0
+    if not exists:
         session.add(record)
