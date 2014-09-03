@@ -55,7 +55,6 @@ def add_label(session, record):
 
     column = columns[0]
     value = getattr(record, column.name)
-    print(value)
     exists = session.query(table).filter(column == value).count() > 0
     if not exists:
         session.add(record)
