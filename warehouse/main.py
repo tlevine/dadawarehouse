@@ -14,8 +14,8 @@ def load():
     engine = create_engine('postgres:///tlevine')
     session, _ = doeund(engine)
     fb(session)
-    history(session)
-    pal(session)
+   #history(session)
+   #pal(session)
 
 def query():
     _, cubes = doeund(create_engine('postgres:///tlevine'))
