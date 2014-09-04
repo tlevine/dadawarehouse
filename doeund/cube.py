@@ -18,6 +18,22 @@ Levels
     Everything else
 
 Treat the levels as components of the dimension.
+
+
+Slicing and dicing
+
+* point_cut
+* set_cut
+* range_cut
+
+Drill up, drill down
+http://pythonhosted.org/cubes/recipes/drilldown_tree.html
+
+Roll up
+http://pythonhosted.org/cubes/slicing_and_dicing.html#aggregate
+
+What's pivot for???
+
 '''
 import re
 from functools import partial
