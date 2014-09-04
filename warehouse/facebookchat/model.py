@@ -22,13 +22,14 @@ class FacebookUserNick(m.Fact):
 class FacebookMessage(m.Fact):
     pk = m.PkColumn()
     filedate = m.DateColumn()
-    user = m.FkColumn(FacebookUser.pk)
-    date = m.DateColumn()
+    user_id = m.FkColumn(FacebookUser.pk)
+    date_id = m.DateColumn()
     body = m.Column(String)
 
 class FacebookChatStatusChange(m.Fact):
     # Two-column primary key
     filedate = m.DateColumn(primary_key = True)
+    status_id = m.PkColumn()
     user = m.FkColumn(FacebookUser.pk)
     date = m.DateColumn()
     newstatus = m.FkColumn(FacebookChatStatus.pk)
