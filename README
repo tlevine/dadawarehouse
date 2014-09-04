@@ -81,3 +81,4 @@ To do
 * On update of any column referencing a label column (unique column that
     is not the primary key in a two-column table), create the reference if
     it does not already exist.
+* http://docs.sqlalchemy.org/en/rel_0_8/orm/session.html#unitofwork-cascades
