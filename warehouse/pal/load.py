@@ -36,22 +36,22 @@ def parse(fp, filename = None):
         except NameError:
             raise ValueError('You must specify a filename.')
 
-    calendar_code = None
+    calendar_file = None
     for line in fp:
         line = line.rstrip()
         if line.startswith('#'):
             pass
         elif calendar_code == None:
             calendar_code, _, calendar_description = line.partition(' ')
-            yield CalendarFile(pk = calendar_code,
-                               filename = filename,
-                               description = calendar_description)
+            calendar_file = CalendarFile(pk = calendar_code,
+                                         filename = filename,
+                                         description = calendar_description)
 
         else:
             for date, description in entry(line):
-                yield CalendarEvent(calendar = calendar_code,
-                                    date = date,
-                                    description = description)
+                calendar_file.events.append(
+                    CalendarEvent(date_id = date, description = description))
+        yield calendar_file
 
 def entry(line):
     'Read a pal calendar entry'
