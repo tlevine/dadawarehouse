@@ -20,7 +20,5 @@ def create_temporal(session, temporal):
             session.commit()
         except IntegrityError:
             session.rollback()
-        except FlushError:
-            session.rollback()
         except:
             raise
