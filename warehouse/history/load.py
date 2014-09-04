@@ -11,12 +11,10 @@ def update(session):
     previous_shells = (row[0] for row in session.query(ShellSession.filename))
     for log in historian(directory = HISTORY, skip = previous_shells):
         shell_session = ShellSession(filename = log['session'],
-                                     date_id = log['session_date'].date(),
-                                     time_id = log['session_date'].time())
+                                     datetime = log['session_date'])
         for command_datetime, command_string in log['commands']:
             shell_session.commands.append(
-                Command(date_id = command_datetime.date(),
-                        time_id = command_datetime.time(),
+                Command(datetime = command_datetime,
                         command = command_string))
         session.add(shell_session)
         session.commit()

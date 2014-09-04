@@ -50,7 +50,7 @@ def parse(fp, filename = None):
         else:
             for date, description in entry(line):
                 calendar_file.events.append(
-                    CalendarEvent(date_id = date,
+                    CalendarEvent(date = date,
                                   description = description))
     return calendar_file
 
