@@ -38,7 +38,7 @@ def convert_log(engine, filedate):
         yield FacebookChatStatusChange(
             filedate = filedate,
             rowid = rowid,
-            user = parse_uid(uid),
+            user_id = parse_uid(uid),
             datetime = datetime.datetime.fromtimestamp(ts),
             status = status)
 
@@ -47,7 +47,7 @@ def convert_log(engine, filedate):
         yield FacebookMessage(
             filedate = filedate,
             rowid = rowid,
-            user = parse_uid(uid),
+            user_id = parse_uid(uid),
             datetime = datetime.datetime.fromtimestamp(ts),
             body = body)
 
@@ -65,9 +65,9 @@ def update(session):
                     os.path.join(LOCAL_CHAT, filename))
                 for uid, nicks in get_user_nicks(engine).items():
                     current_nick = nicks[-1]
-                    user = session.merge(FacebookUser(pk = uid, current_nick = current_nick))
+                    user = session.merge(FacebookUser(pk = parse_uid(uid), current_nick = current_nick))
                     for nick in nicks:
-                        session.merge(FacebookUserNick(user_id = uid, nick = nick))
+                        session.merge(FacebookUserNick(user_id = parse_uid(uid), nick = nick))
                     session.commit()
                 session.add_all(convert_log(engine, filedate))
                 session.commit()
