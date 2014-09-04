@@ -19,18 +19,3 @@ def PkColumn(*args, **kwargs):
 def LabelColumn(*args, **kwargs):
     'A unique string column, for values in a two-column lookup table'
     return Column(s.String, unique = True, *args, **kwargs)
-
-'''
-from sqlalchemy import event, DDL
-trig_ddl = DDL("""
-    CREATE TRIGGER cascade_insert_%(foreign_key_table)s
-      AFTER INSERT ON %(foreign_key_table)s
-      FOR EACH STATEMENT
-      BEGIN
-      INSERT IGNORE INTO %(reference_table)s (pk)
-        SELECT DISTINCT %(column)s FROM %(foreign_key_table)s;
-      END;
-""")
-tbl = Customer.__table__
-event.listen(tbl, 'after_create', trig_ddl.execute_if(dialect='postgresql'))
-'''

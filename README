@@ -82,3 +82,4 @@ To do
     is not the primary key in a two-column table), create the reference if
     it does not already exist.
 * http://docs.sqlalchemy.org/en/rel_0_8/orm/session.html#unitofwork-cascades
+* https://bitbucket.org/zzzeek/sqlalchemy/wiki/UsageRecipes/UniqueObject
