@@ -10,6 +10,7 @@ setup(name='dadawarehouse',
       install_requires = [
           'historian>=0.0.2',
           'SQLAlchemy>=0.9.4',
+          'psycopg2>=2.5.4',
       ],
       tests_require = ['nose'],
       scripts = [os.path.join('bin', 'dadawarehouse')],

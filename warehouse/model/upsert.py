@@ -25,3 +25,6 @@ def upsert_temporal(session, temporal):
         record = Dimension(pk = temporal)
         session.add(record)
     return record
+
+def insert_label(session, foreign_key):
+    session.query(foreign_key.

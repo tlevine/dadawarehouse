@@ -13,4 +13,7 @@ class DateTime(Dimension):
     time_id = TimeColumn(default = d(lambda pk: pk.time()))
 
 def DateTimeColumn(*args, **kwargs):
-    return Column(s.DateTime, s.ForeignKey(DateTime.pk), *args, **kwargs)
+    _kwargs = dict(kwargs)
+    if 'onupdate' not in _kargs:
+        _kwargs['onupdate'] = 'CASCADE'
+    return Column(s.DateTime, s.ForeignKey(DateTime.pk), *args, **_kwargs)
