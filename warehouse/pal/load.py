@@ -20,7 +20,7 @@ def update(session, calendars = CALENDARS):
 
     for filename in calendars:
         with open(filename) as fp:
-            session.add(parse(fp))
+            session.add_all(parse(fp))
         session.commit()
         logger.info('Inserted events from calendar %s' % filename)
 
@@ -48,10 +48,13 @@ def parse(fp, filename = None):
                                          description = calendar_description)
 
         else:
-            for date, description in entry(line):
+            for _date, description in entry(line):
+                date = m.Date(pk = _date)
+                yield date
                 calendar_file.events.append(
-                    CalendarEvent(date_id = date, description = description))
-    return calendar_file
+                    CalendarEvent(date_id = date,
+                                  description = description))
+    yield calendar_file
 
 def entry(line):
     'Read a pal calendar entry'

@@ -1,4 +1,5 @@
 from sqlalchemy.orm import sessionmaker as _sessionmaker
+from sqlalchemy.exc import ProgrammingError
 
 from .database import Fact, Dimension, Column, Base as _Base
 from .cube import Cube
@@ -12,7 +13,10 @@ def doeund(engine, refresh = False):
     '''
     if refresh:
         for table in _Base.metadata.sorted_tables:
-            engine.execute(table.delete())
+            try:
+                engine.execute(table.delete())
+            except ProgrammingError:
+                pass
     _Base.metadata.create_all(engine) 
     session = _sessionmaker(bind=engine)()
     cubes = {name: Cube(session, table) for name, table in \

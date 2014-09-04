@@ -5,7 +5,7 @@ from doeund import Fact as _Fact, Dimension
 from .base import Column, LabelColumn, PkColumn, FkColumn
 from .util import d
 
-class PlainDate(Dimension):
+class Day(Dimension):
     '''
     Dates with hierarchies
     '''
@@ -28,7 +28,7 @@ class DayOfWeek(Dimension):
     dayofweek = LabelColumn(default = d(lambda pk: WEEKDAYS[pk]))
 
 class Date(Dimension):
-    pk = Column(s.Date, s.ForeignKey(PlainDate.pk), primary_key = True,
+    pk = Column(s.Date, s.ForeignKey(Day.pk), primary_key = True,
                 onupdate = 'CASCADE')
     dayofweek_id = FkColumn(DayOfWeek.pk, default = d(lambda pk: pk.weekday()))
 
