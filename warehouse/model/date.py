@@ -25,7 +25,7 @@ WEEKDAYS = [
 ]
 class DayOfWeek(Dimension):
     pk = PkColumn()
-    dayofweek = LabelColumn(default = d(lambda pk: WEEKDAYS[pk]))
+    dayofweek = Column(s.String, default = d(lambda pk: WEEKDAYS[pk]))
 
 class Date(Dimension):
     pk = Column(s.Date, s.ForeignKey(Day.pk), primary_key = True)

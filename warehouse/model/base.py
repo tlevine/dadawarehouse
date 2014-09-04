@@ -18,4 +18,5 @@ def PkColumn(*args, **kwargs):
 
 def LabelColumn(*args, **kwargs):
     'A unique string column, for values in a two-column lookup table'
-    return Column(s.String, unique = True, *args, **kwargs)
+    # Not unique because it works better somewhere
+    return Column(s.String, *args, unique = True, **kwargs)

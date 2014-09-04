@@ -15,9 +15,9 @@ def update(session):
                                      datetime_id = log['session_date'])
         for command_datetime, command_string in log['commands']:
             m.create_temporal(session, command_datetime)
-            shell_session.commands.append(
-                Command(datetime_id = command_datetime,
-                        command = command_string))
-        session.add(shell_session)
+       #    shell_session.commands.append(
+       #        Command(datetime_id = command_datetime,
+       #                command = command_string))
+       #session.add(shell_session)
         session.commit()
         logger.info('Inserted commands from shell "%s"' % log['session'])

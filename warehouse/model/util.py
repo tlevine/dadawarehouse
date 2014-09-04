@@ -1,4 +1,5 @@
 def d(function):
     'Make a "default" function.'
-    def func(context):
+    def default(context):
         return function(context.current_parameters['pk'])
+    return default
