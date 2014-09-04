@@ -22,7 +22,7 @@ def load():
 #   session, _ = doeund(engine, refresh = True)
     session, _ = doeund(engine)
    #fb(session)
-    history(session)
+   #history(session)
     pal(session)
 
 def query():
