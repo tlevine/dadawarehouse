@@ -13,10 +13,15 @@ CACHE_DIRECTORY = os.path.expanduser('~/.dadawarehouse')
 def load():
     engine = create_engine('postgres:///tlevine')
     session, _ = doeund(engine)
-    fb(session)
+   #fb(session)
    #history(session)
-   #pal(session)
+    pal(session)
 
-def query():
+def example():
     _, cubes = doeund(create_engine('postgres:///tlevine'))
-    return cubes
+    cube = cubes['fact_facebookchatstatuschange'] #.dimensions['facebookuser']
+    print('When Thomas Levines went online and offline:')
+    print(cube.point_cut('facebookuser', ['Thomas Levine']).all())
+
+if __name__ == '__main__':
+    session, cubes = doeund(create_engine('postgres:///tlevine'))
