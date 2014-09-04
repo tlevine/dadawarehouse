@@ -22,8 +22,6 @@ def update(session, calendars = CALENDARS):
     for filename in calendars:
         with open(filename) as fp:
             calendar_file = parse(fp)
-        for event in calendar_file.events:
-            m.create_temporal(session, event.date_id)
         session.add(calendar_file)
         session.commit()
         logger.info('Inserted events from calendar %s' % filename)

@@ -1,3 +1,5 @@
+import datetime
+
 import sqlalchemy as s
 
 from doeund import Fact as _Fact, Dimension
@@ -13,5 +15,8 @@ class Time(Dimension):
 def TimeColumn(*args, **kwargs):
     return Column(s.Time, s.ForeignKey(Time.pk), *args, **kwargs)
 
-def create_time(time):
-    return [Time(pk = time)]
+def create_times():
+    for hour in range(24):
+        for minute in range(60):
+            for second in range(60):
+                yield Time(pk = datetime.time(hour, minute, second))

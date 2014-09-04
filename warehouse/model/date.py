@@ -1,3 +1,5 @@
+import datetime
+
 import sqlalchemy as s
 
 from doeund import Fact as _Fact, Dimension
@@ -34,5 +36,14 @@ class Date(Dimension):
 def DateColumn(*args, **kwargs):
     return Column(s.Date, s.ForeignKey(Date.pk), *args, **kwargs)
 
-def create_date(date):
-    return [Day(pk = date), DayOfWeek(pk = date.weekday()), Date(pk = date)]
+def create_dates(from_date = datetime.date(2010,1,1),
+                 to_date = datetime.date.today()):
+    for i in range(len(WEEKDAYS)):
+        yield DayOfWeek(pk = i)
+
+    one = datetime.timedelta(days = 1)
+    today = from_date - one
+    while today <= to_date:
+        today += one
+        yield Day(pk = today)
+        yield Date(pk = today)

@@ -5,12 +5,14 @@ import warehouse.model as m
 
 class ShellSession(m.Dimension):
     pk = m.PkColumn()
-    datetime_id = m.DateTimeColumn()
+    date_id = m.DateColumn()
+    time_id = m.TimeColumn()
     filename = m.LabelColumn()
     commands = relationship('Command')
 
 class Command(m.Fact):
     pk = m.PkColumn()
     shellsession_id = m.FkColumn(ShellSession.pk)
-    datetime_id = m.DateTimeColumn()
+    date_id = m.DateColumn()
+    time_id = m.TimeColumn()
     command = m.Column(s.String)
