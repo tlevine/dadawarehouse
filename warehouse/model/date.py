@@ -33,8 +33,4 @@ class Date(Dimension):
     dayofweek_id = FkColumn(DayOfWeek.pk, default = d(lambda pk: pk.weekday()))
 
 def DateColumn(*args, **kwargs):
-    'A date column with magic hierarchies'
-    _kwargs = dict(kwargs)
-    if 'onupdate' not in _kargs:
-        _kwargs['onupdate'] = 'CASCADE'
-    return Column(s.Date, s.ForeignKey(Date.pk), *args, **_kwargs)
+    return Column(s.Date, s.ForeignKey(Date.pk), *args, **kwargs)

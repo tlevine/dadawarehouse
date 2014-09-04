@@ -11,7 +11,4 @@ class Time(Dimension):
     minute = Column(s.Integer, default = d(lambda pk: pk.minute))
 
 def TimeColumn(*args, **kwargs):
-    _kwargs = dict(kwargs)
-    if 'onupdate' not in _kargs:
-        _kwargs['onupdate'] = 'CASCADE'
-    return Column(s.Time, s.ForeignKey(Time.pk), *args, **_kwargs)
+    return Column(s.Time, s.ForeignKey(Time.pk), *args, **kwargs)

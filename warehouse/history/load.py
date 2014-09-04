@@ -11,7 +11,7 @@ def update(session):
     previous_shells = (row[0] for row in session.query(ShellSession.filename))
     for log in historian(directory = HISTORY, skip = previous_shells):
         shell_session = ShellSession(filename = log['session'],
-            datetime = m.DateTime(pk = log['session_date']))
+            datetime_id = m.DateTime(pk = log['session_date']))
         shell_session.commands.extend(
             Command(datetime_id = command_datetime,
                     command = command_string,
