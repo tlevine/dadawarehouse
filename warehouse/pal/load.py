@@ -3,7 +3,7 @@ import datetime
 
 from ..logger import logger
 import warehouse.model as m
-from .model import CalendarFile, CalendarEvent, CalendarEventDescription
+from .model import CalendarFile, CalendarEvent
 
 CALENDARS = [os.path.join(os.path.expanduser('~/.pal'), rest) for rest in [\
     'secrets-nsa/secret-calendar.txt',
@@ -50,8 +50,7 @@ def parse(fp, filename = None):
         else:
             for date, description in entry(line):
                 calendar_file.events.append(
-                    CalendarEvent(date_id = date, description =
-                        CalendarEventDescription(description = description)))
+                    CalendarEvent(date_id = date, description = description))
     return calendar_file
 
 def entry(line):
