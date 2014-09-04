@@ -17,6 +17,7 @@ CALENDARS = [os.path.join(os.path.expanduser('~/.pal'), rest) for rest in [\
 def update(session, calendars = CALENDARS):
     session.query(CalendarEvent).delete()
     session.query(CalendarFile).delete()
+    session.commit()
 
     for filename in calendars:
         with open(filename) as fp:
@@ -29,8 +30,6 @@ def update(session, calendars = CALENDARS):
 
 def parse(fp, filename = None):
     'Read a pal calendar file.'
-    labels = []
-    normals = []
 
     # Parse the filename.
     if filename == None:
