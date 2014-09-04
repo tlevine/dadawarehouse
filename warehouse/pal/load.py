@@ -20,7 +20,7 @@ def update(session, calendars = CALENDARS):
 
     for filename in calendars:
         with open(filename) as fp:
-            session.add_all(parse(fp))
+            session.add(parse(fp))
         session.commit()
         logger.info('Inserted events from calendar %s' % filename)
 
@@ -41,7 +41,7 @@ def parse(fp, filename = None):
         line = line.rstrip()
         if line.startswith('#'):
             pass
-        elif calendar_code == None:
+        elif calendar_file == None:
             calendar_code, _, calendar_description = line.partition(' ')
             calendar_file = CalendarFile(pk = calendar_code,
                                          filename = filename,
@@ -51,7 +51,7 @@ def parse(fp, filename = None):
             for date, description in entry(line):
                 calendar_file.events.append(
                     CalendarEvent(date_id = date, description = description))
-        yield calendar_file
+    return calendar_file
 
 def entry(line):
     'Read a pal calendar entry'

@@ -2,7 +2,7 @@ import sqlalchemy as s
 
 from doeund import Fact as _Fact, Dimension
 
-from .base import Column, LabelColumn
+from .base import Column, LabelColumn, PkColumn, FkColumn
 from .util import d
 
 class PlainDate(Dimension):
@@ -25,7 +25,7 @@ WEEKDAYS = [
 ]
 class DayOfWeek(Dimension):
     pk = PkColumn()
-    dayofweek = LabelColumn(default = d(lambda pk: WEEKDAYS[pk])
+    dayofweek = LabelColumn(default = d(lambda pk: WEEKDAYS[pk]))
 
 class Date(Dimension):
     pk = Column(s.Date, s.ForeignKey(PlainDate.pk), primary_key = True)
