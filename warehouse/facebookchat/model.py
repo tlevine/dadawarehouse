@@ -10,14 +10,14 @@ class LogSqlite(Fact):
 
     # Two-column primary key
     filedate = Column(Date, primary_key = True)
-    statuschange_id = Column(Integer, primary_key = True)
+    rowid = Column(Integer, primary_key = True)
 
     user = Column(Integer)
     current_nick = Column(String)
     datetime = Column(DateTime)
 
-class FacebookMessage(Fact):
+class FacebookMessage(LogSqlite):
     body = Column(String)
 
-class FacebookChatStatusChange(Fact):
-    status = Column(Enum('avail','notavail'))
+class FacebookChatStatusChange(LogSqlite):
+    status = Column(Enum('avail','notavail', name = 'faceboook_chat_status'))
