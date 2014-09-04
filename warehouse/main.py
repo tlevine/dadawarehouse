@@ -19,7 +19,8 @@ def connect_sqlite(cache_directory):
 
 def load():
     engine = create_engine('postgres:///tlevine')
-    session, _ = doeund(engine, refresh = True)
+#   session, _ = doeund(engine, refresh = True)
+    session, _ = doeund(engine)
    #fb(session)
    #history(session)
     pal(session)

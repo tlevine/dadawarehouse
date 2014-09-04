@@ -15,12 +15,15 @@ CALENDARS = [os.path.join(os.path.expanduser('~/.pal'), rest) for rest in [\
 ]]
     
 def update(session, calendars = CALENDARS):
-    session.query(CalendarFile).delete()
     session.query(CalendarEvent).delete()
+    session.query(CalendarFile).delete()
 
     for filename in calendars:
         with open(filename) as fp:
-            session.add_all(parse(fp))
+            calendar_file = parse(fp)
+        for event in calendar_file.events:
+            m.create_temporal(session, event.date_id)
+        session.add(calendar_file)
         session.commit()
         logger.info('Inserted events from calendar %s' % filename)
 
@@ -48,13 +51,11 @@ def parse(fp, filename = None):
                                          description = calendar_description)
 
         else:
-            for _date, description in entry(line):
-                date = m.Date(pk = _date)
-                yield date
+            for date, description in entry(line):
                 calendar_file.events.append(
                     CalendarEvent(date_id = date,
                                   description = description))
-    yield calendar_file
+    return calendar_file
 
 def entry(line):
     'Read a pal calendar entry'

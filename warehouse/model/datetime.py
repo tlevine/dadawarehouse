@@ -3,8 +3,8 @@ import sqlalchemy as s
 from doeund import Fact as _Fact, Dimension
 
 from .base import Column
-from .date import DateColumn
-from .time import TimeColumn
+from .date import DateColumn, create_date
+from .time import TimeColumn, create_time
 from .util import d
 
 class DateTime(Dimension):
@@ -14,3 +14,6 @@ class DateTime(Dimension):
 
 def DateTimeColumn(*args, **kwargs):
     return Column(s.DateTime, s.ForeignKey(DateTime.pk), *args, **kwargs)
+
+def create_datetime(datetime):
+    return create_date(datetime.date()) + create_time(datetime.time())

@@ -12,3 +12,6 @@ class Time(Dimension):
 
 def TimeColumn(*args, **kwargs):
     return Column(s.Time, s.ForeignKey(Time.pk), *args, **kwargs)
+
+def create_time(time):
+    return [Time(pk = time)]

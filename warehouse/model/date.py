@@ -28,9 +28,11 @@ class DayOfWeek(Dimension):
     dayofweek = LabelColumn(default = d(lambda pk: WEEKDAYS[pk]))
 
 class Date(Dimension):
-    pk = Column(s.Date, s.ForeignKey(Day.pk), primary_key = True,
-                onupdate = 'CASCADE')
+    pk = Column(s.Date, s.ForeignKey(Day.pk), primary_key = True)
     dayofweek_id = FkColumn(DayOfWeek.pk, default = d(lambda pk: pk.weekday()))
 
 def DateColumn(*args, **kwargs):
     return Column(s.Date, s.ForeignKey(Date.pk), *args, **kwargs)
+
+def create_date(date):
+    return [Day(pk = date), DayOfWeek(pk = date.weekday()), Date(pk = date)]
