@@ -17,6 +17,6 @@ class CommandString(m.Dimension):
 class Command(m.Fact):
     pk = m.PkColumn()
     shell_id = m.FkColumn(ShellSession.pk)
-    date = m.DateColumn()
-    time = m.TimeColumn()
-    command = m.FkColumn(CommandString.pk)
+    date_id = m.DateColumn()
+    time_id = m.TimeColumn()
+    command_id = m.FkColumn(CommandString.pk)
