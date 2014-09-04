@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 
 from doeund import doeund
 
-#from .history.load import update as history
+from .history.load import update as history
 from .pal.load import update as pal
 #from .facebookchat.load import update as fb
 
@@ -20,7 +20,7 @@ def connect(cache_directory):
 def load():
     session, _ = connect(CACHE_DIRECTORY)
    #fb(session)
-   #history(session)
+    history(session)
     pal(session)
 
 def query():

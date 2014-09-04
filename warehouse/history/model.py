@@ -1,22 +1,18 @@
 import sqlalchemy as s
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship
 
-import ..model as m
+import warehouse.model as m
 
 class ShellSession(m.Dimension):
     pk = m.PkColumn()
-    date = m.DateColumn()
-    time = m.TimeColumn()
+    datetime_id = m.DateTimeColumn()
+    datetime = relationship('DateTime')
     filename = m.LabelColumn()
     commands = relationship('Command')
 
-class CommandString(m.Dimension):
-    pk = m.PkColumn()
-    command = m.LabelColumn()
-
 class Command(m.Fact):
     pk = m.PkColumn()
-    shell_id = m.FkColumn(ShellSession.pk)
-    date_id = m.DateColumn()
-    time_id = m.TimeColumn()
-    command_id = m.FkColumn(CommandString.pk)
+    shellsession_id = m.FkColumn(ShellSession.pk)
+    datetime_id = m.DateTimeColumn()
+    datetime = relationship('DateTime')
+    command = m.Column(s.String)
