@@ -13,7 +13,7 @@ def update(session):
         shell_session = ShellSession(filename = log['session'],
             datetime = m.DateTime(pk = log['session_date']))
         shell_session.commands.extend(
-            Command(datetime = m.DateTime(pk = command_datetime),
+            Command(datetime_id = command_datetime,
                     command = command_string,
             ) for command_datetime, command_string in log['commands'])
         session.add(shell_session)
