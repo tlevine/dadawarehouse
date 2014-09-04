@@ -23,16 +23,27 @@ UID = re.compile(r'xmpp:-([0-9]+)@chat.facebook.com')
 def parse_uid(uid):
     return int(re.match(UID, uid).group(1))
 
+def users(engine):
+    sql = 'SELECT DISTINCT uid FROM (SELECT uid FROM log_status UNION SELECT uid FROM log_msg);'
+    for row in engine.execute(sql).fetchall():
+        yield row[0]
+
+def user_nicks(engine):
+    sql = 'SELECT DISTINCT * FROM (SELECT uid, nick FROM log_status UNION SELECT uid, nick from log_msg);'
+    for row in engine.execute(sql).fetchall():
+        uid, nick = row
+        yield FacebookUserNick(
+
 def convert_log(engine, file_date):
     for row in engine.execute('SELECT rowid, uid, nick, ts, status FROM log_status').fetchall():
         rowid, uid, nick, ts, status = row
-        yield FacebookChatStatus(
-            status_id = rowid,
-            file_date = file_date,
+        yield FacebookChatStatusChange(
+            filedate = file_date,
+            statuschange_id = rowid,
             user_id = parse_uid(uid),
-            current_nick = nick,
             date = datetime.datetime.fromtimestamp(ts),
             status = status)
+
     for row in engine.execute('SELECT rowid, uid, nick, ts, body FROM log_msg').fetchall():
         rowid, uid, nick, ts, body = row
         yield FacebookMessage(

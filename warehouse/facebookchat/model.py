@@ -1,35 +1,23 @@
 import os
 
-import warehouse.model as m
-from sqlalchemy import String
+from sqlalchemy.orm import relationship
+from sqlalchemy import String, Integer, Date, DateTime, Enum, ForeignKey
 
-class FacebookUser(m.Dimension):
-    pk = m.PkColumn()
+from warehouse.model import Fact, Dimension, Column
 
-class FacebookNick(m.Dimension):
-    pk = m.PkColumn()
-    nick = m.LabelColumn()
+class LogSqlite(Fact):
+    __abstract__ = True
 
-class FacebookChatStatus(m.Dimension):
-    pk = m.PkColumn()
-    status = m.LabelColumn()
-
-class FacebookUserNick(m.Fact):
-    pk = m.PkColumn()
-    user = m.FkColumn(FacebookUser.pk)
-    nick = m.FkColumn(FacebookNick.pk)
-
-class FacebookMessage(m.Fact):
-    pk = m.PkColumn()
-    filedate = m.DateColumn()
-    user_id = m.FkColumn(FacebookUser.pk)
-    date_id = m.DateColumn()
-    body = m.Column(String)
-
-class FacebookChatStatusChange(m.Fact):
     # Two-column primary key
-    filedate = m.DateColumn(primary_key = True)
-    status_id = m.PkColumn()
-    user = m.FkColumn(FacebookUser.pk)
-    date = m.DateColumn()
-    newstatus = m.FkColumn(FacebookChatStatus.pk)
+    filedate = Column(Date, primary_key = True)
+    statuschange_id = Column(Integer, primary_key = True)
+
+    user = Column(Integer)
+    current_nick = Column(String)
+    datetime = Column(DateTime)
+
+class FacebookMessage(Fact):
+    body = Column(String)
+
+class FacebookChatStatusChange(Fact):
+    status = Column(Enum('avail','notavail'))
