@@ -83,3 +83,30 @@ To do
     it does not already exist.
 * http://docs.sqlalchemy.org/en/rel_0_8/orm/session.html#unitofwork-cascades
 * https://bitbucket.org/zzzeek/sqlalchemy/wiki/UsageRecipes/UniqueObject
+
+
+Queries that I want to exist
+==============================
+Import stuff just in case.
+
+    import dada
+
+Produce a cube/table with the fields "language" (R or shell),
+"year", "month", "hour", computer (laptop, nsa, &c.), arg0
+(``$0``), "arg1" (``$1``) and, finally, "count", where count
+is the number of records that fit in the cell specified by
+the other fields.
+
+    cubes['command']\
+        .set_cut('language', [['R'],['shell']])\
+        .roll_up({'time': ['hour'],
+                  'date': ['year', 'month'],
+                  'computer': None # Use smallest granularity, with all levels.
+                  'args': ['arg0', 'arg1']},
+                 dada.rollups.count)
+
+Convert Facebook status changes to hourly buckets of time on Facebook.
+
+    cubes['timeonfacebook']\
+        .point_cut('current_nick', ['Thomas Levine'])
+        .roll_up({'time': ['hour', 'minute']}, dada.rollups.sum)
