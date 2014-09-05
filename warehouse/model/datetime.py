@@ -1,4 +1,5 @@
 import sqlalchemy as s
+from sqlalchemy.orm import relationship
 
 from doeund import Dimension
 
@@ -10,13 +11,19 @@ from .util import d
 class DateTime(Dimension):
     pk = Column(s.DateTime, primary_key = True)
     date_id = Column(s.Date, s.ForeignKey(Date.pk), default = d(lambda pk: pk.date()))
+    date = relationship(Date)
+
     time_id = Column(s.Time, s.ForeignKey(Time.pk), default = d(lambda pk: pk.time()))
+    time = relationship(Time)
+
+    def link(self, session):
+        date = Date(pk = self.pk.date()).link(session)
+        self.date = date
+
+        time = Time(pk = self.pk.time()).link(session)
+        self.time = time
+
+        return session.merge(self)
 
 def DateTimeColumn(*args, **kwargs):
     return Column(s.DateTime, s.ForeignKey(DateTime.pk), *args, **kwargs)
-
-def create_datetime(session, datetime_object):
-    date = create_date(session, datetime_object.date())
-    time = create_time(session, datetime_object.time())
-    datetime = DateTime(pk = datetime_object, date_id = date.pk, time_id = time.pk)
-    return session.merge(datetime)
