@@ -12,9 +12,9 @@ CACHE_DIRECTORY = os.path.expanduser('~/.dadawarehouse')
 
 def load():
     engine = create_engine('postgres:///tlevine')
-    session, _ = doeund(engine)
+    session, _ = doeund(engine, refresh = True)
    #fb(session)
-   #history(session)
+    history(session)
     pal(session)
 
 def example():

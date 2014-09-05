@@ -5,10 +5,10 @@ import warehouse.model as m
 
 class CommandBody(m.Dimension):
     pk = m.PkColumn()
-    arg0 = Column(s.String, nullable = True)
-    arg1 = Column(s.String, nullable = True)
-    arg2 = Column(s.String, nullable = True)
-    full_command = Column(s.String, unique = True)
+    arg0 = m.Column(s.String, nullable = True)
+    arg1 = m.Column(s.String, nullable = True)
+    arg2 = m.Column(s.String, nullable = True)
+    full_command = m.Column(s.String, unique = True)
 
 class ShellSession(m.Dimension):
     pk = m.PkColumn()
@@ -20,5 +20,5 @@ class Command(m.Fact):
     pk = m.PkColumn()
     shellsession_id = m.FkColumn(ShellSession.pk)
     datetime = m.Column(s.DateTime)
-    command_id = FkColumn(CommandBody.pk)
+    command_id = m.FkColumn(CommandBody.pk)
     command = relationship(CommandBody)

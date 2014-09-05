@@ -1,4 +1,5 @@
 import os
+import shlex
 
 from historian_reader.shell import historian
 
@@ -15,6 +16,7 @@ def update(session):
         for command_datetime, command_string in log['commands']:
             command_body = session.query(CommandBody)\
                .filter(CommandBody.full_command == command_string).first()
+            assert False, command_body
             if command_body == None:
                 arg0, arg1, arg2 = (shlex.split(command_string) + [None] * 3)[:3]
                 command_body = CommandBody(arg0 = arg0, arg1 = arg1,
