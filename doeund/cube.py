@@ -99,3 +99,10 @@ class Cube:
 
     def roll_up(self, dimensions, *aggregations):
         raise NotImplementedError
+        for key, hierarchy in dimensions.items())
+            columns, hierarchies = zip(*zip(self._hierarchy, path))
+        query = self._query.group_by(*columns)
+
+        subcube = Cube(*self._args)
+        subcube.dimensions = OrderedDict((key,
+            Dimension(query, hierarchy, responses))\
