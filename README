@@ -126,6 +126,12 @@ available. For example, the following is true.
     cubes['command'].dimensions['date'].levels() == \
     cubes['command'].dimensions['date'].levels(['year', 'month', 'day'])
 
+``.rollup`` takes an aggregation function as its first argument and
+the same sort of optional argument as ``.levels`` does as its second
+argument.
+
+    cubes['command'].dimensions['date'].rollup(dada.count, ['year', 'month'])
+
 Produce a cube/table with the fields "language" (R or shell),
 "year", "month", "hour", computer (laptop, nsa, &c.), arg0
 (``$0``), "arg1" (``$1``) and, finally, "count", where count
@@ -134,14 +140,14 @@ the other fields.
 
     cubes['command']\
         .set_cut('language', [['R'],['shell']])\
-        .roll_up({'time': ['hour'],
-                  'date': ['year', 'month'],
-                  'computer': None # Use smallest granularity, with all levels.
-                  'args': ['arg0', 'arg1']},
+        .rollup({'time': ['hour'],
+                 'date': ['year', 'month'],
+                 'computer': None # Use smallest granularity, with all levels.
+                 'args': ['arg0', 'arg1']},
                  dada.rollups.count)
 
 Convert Facebook status changes to hourly buckets of time on Facebook.
 
     cubes['timeonfacebook']\
         .point_cut('current_nick', ['Thomas Levine'])\
-        .roll_up({'time': ['hour', 'minute']}, dada.rollups.sum)
+        .rollup({'time': ['hour', 'minute']}, dada.rollups.sum)
