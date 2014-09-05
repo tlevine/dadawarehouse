@@ -3,7 +3,7 @@ import datetime
 
 from ..logger import logger
 import warehouse.model as m
-from .model import CalendarFile, CalendarEvent
+from .model import CalendarFile, CalendarEvent, CalendarEventDescription
 
 CALENDARS = [os.path.join(os.path.expanduser('~/.pal'), rest) for rest in [\
     'secrets-nsa/secret-calendar.txt',
@@ -15,13 +15,24 @@ CALENDARS = [os.path.join(os.path.expanduser('~/.pal'), rest) for rest in [\
 ]]
     
 def update(session, calendars = CALENDARS):
+    session.query(CalendarEventDescription).delete()
     session.query(CalendarEvent).delete()
     session.query(CalendarFile).delete()
     session.commit()
 
     for filename in calendars:
         with open(filename) as fp:
-            calendar_file = parse(fp)
+            calendar_file, events = parse(fp)
+        for date, description_string in events:
+            description = session.query(CalendarEventDescription)\
+                .filter(CalendarEventDescription.description == description_string)\
+                .first()
+            if description == None:
+                description = CalendarEventDescription(description = description_string)
+                session.add(description)
+                session.commit()
+            calendar_file.events.append(CalendarEvent(date = date, description = description))
+
         session.add(calendar_file)
         session.commit()
         logger.info('Inserted events from calendar %s' % filename)
@@ -37,6 +48,7 @@ def parse(fp, filename = None):
             raise ValueError('You must specify a filename.')
 
     calendar_file = None
+    events = []
     for line in fp:
         line = line.rstrip()
         if line.startswith('#'):
@@ -48,11 +60,8 @@ def parse(fp, filename = None):
                                          description = calendar_description)
 
         else:
-            for date, description in entry(line):
-                calendar_file.events.append(
-                    CalendarEvent(date = date,
-                                  description = description))
-    return calendar_file
+            events.extend(entry(line))
+    return calendar_file, events
 
 def entry(line):
     'Read a pal calendar entry'
