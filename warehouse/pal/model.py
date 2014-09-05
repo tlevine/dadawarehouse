@@ -19,6 +19,7 @@ class CalendarEventDescription(m.Dimension):
 class CalendarEvent(m.Fact):
     pk = m.PkColumn()
     file_id = m.Column(String(2), ForeignKey(CalendarFile.pk))
-    date = m.Column(Date)
+    date_id = m.DateColumn()
+    date = relationship(m.Date)
     description_id = m.FkColumn(CalendarEventDescription.pk)
     description = relationship(CalendarEventDescription)

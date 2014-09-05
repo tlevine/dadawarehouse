@@ -1,6 +1,7 @@
 import datetime
 
 import sqlalchemy as s
+from sqlalchemy.orm import relationship
 
 from doeund import Dimension
 
@@ -31,7 +32,15 @@ class DayOfWeek(Dimension):
 
 class Date(Dimension):
     pk = Column(s.Date, s.ForeignKey(Day.pk), primary_key = True)
+    day = relationship(Day)
     dayofweek_id = FkColumn(DayOfWeek.pk, default = d(lambda pk: pk.weekday()))
+    dayofweek = relationship(DayOfWeek)
 
 def DateColumn(*args, **kwargs):
     return Column(s.Date, s.ForeignKey(Date.pk), *args, **kwargs)
+
+def create_date(session, date_object):
+    dayofweek = session.merge(DayOfWeek(pk = date_object.weekday()))
+    day = session.merge(Day(pk = date_object))
+    date = Date(pk = date_object, dayofweek_id = date_object.weekday())
+    return session.merge(date)

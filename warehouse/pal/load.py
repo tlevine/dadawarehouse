@@ -23,7 +23,7 @@ def update(session, calendars = CALENDARS):
     for filename in calendars:
         with open(filename) as fp:
             calendar_file, events = parse(fp)
-        for date, description_string in events:
+        for date_python, description_string in events:
             description = session.query(CalendarEventDescription)\
                 .filter(CalendarEventDescription.description == description_string)\
                 .first()
@@ -31,6 +31,7 @@ def update(session, calendars = CALENDARS):
                 description = CalendarEventDescription(description = description_string)
                 session.add(description)
                 session.commit()
+            date = m.create_date(session, date_python)
             calendar_file.events.append(CalendarEvent(date = date, description = description))
 
         session.add(calendar_file)
