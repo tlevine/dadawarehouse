@@ -41,6 +41,13 @@ from functools import partial
 from sqlalchemy import and_, or_
 from .inference import dim_levels, fact_measures, joins
 
+class Dimension:
+    def levels(self, *path):
+        raise NotImplementedError
+
+    def responses(self):
+        raise NotImplementedError
+
 class Cube:
     def __init__(self, session, fact_table):
         '''
@@ -93,3 +100,6 @@ class Cube:
             query = self._query.filter(level <= value)
 
         return query
+
+    def roll_up(self, dimensions, *aggregations):
+        raise NotImplementedError
