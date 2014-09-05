@@ -9,6 +9,7 @@ import sqlalchemy
 from ..logger import logger
 from .model import FacebookUser, FacebookUserNick, \
                    FacebookChatStatusChange, FacebookMessage
+from ..model import Date, DateTime
 
 WAREHOUSE = os.path.expanduser('~/.dadawarehouse')
 LOCAL_CHAT = os.path.join(WAREHOUSE, 'facebookchat')
@@ -34,19 +35,19 @@ def convert_log(engine, filedate):
     for row in engine.execute('SELECT rowid, uid, nick, ts, status FROM log_status').fetchall():
         rowid, uid, nick, ts, status = row
         yield FacebookChatStatusChange(
-            filedate = filedate,
+            filedate = Date(pk = filedate),
             rowid = rowid,
             user = FacebookUser(pk = parse_uid(uid), current_nick = nick),
-            datetime = datetime.datetime.fromtimestamp(ts),
+            datetime = DateTime(pk = datetime.datetime.fromtimestamp(ts)),
             status = status)
 
     for row in engine.execute('SELECT rowid, uid, nick, ts, body FROM log_msg').fetchall():
         rowid, uid, nick, ts, body = row
         yield FacebookMessage(
-            filedate = filedate,
+            filedate = Date(pk = filedate),
             rowid = rowid,
             user = FacebookUser(pk = parse_uid(uid), current_nick = nick),
-            datetime = datetime.datetime.fromtimestamp(ts),
+            datetime = DateTime(pk = datetime.datetime.fromtimestamp(ts)),
             body = body)
 
 def update(session):
@@ -61,6 +62,12 @@ def update(session):
                 logger.info('Importing %s' % filename)
                 engine = sqlalchemy.create_engine('sqlite:///' +
                     os.path.join(LOCAL_CHAT, filename))
+
+                # These four lines are for testing.
+                session.add(next(get_user_nicks(engine)))
+                session.commit()
+                assert False
+
                 session.add_all(user_nick.link(session) for user_nick in get_user_nicks(engine))
                 session.add_all(log_event.link(session) for log_event in convert_log(engine, filedate))
                 session.commit()

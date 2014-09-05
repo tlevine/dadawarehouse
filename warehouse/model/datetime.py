@@ -17,12 +17,8 @@ class DateTime(Dimension):
     time = relationship(Time)
 
     def link(self, session):
-        date = Date(pk = self.pk.date()).link(session)
-        self.date = date
-
-        time = Time(pk = self.pk.time()).link(session)
-        self.time = time
-
+        self.date = Date(pk = self.pk.date()).link(session)
+        self.time = Time(pk = self.pk.time()).link(session)
         return session.merge(self)
 
 def DateTimeColumn(*args, **kwargs):
