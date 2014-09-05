@@ -108,5 +108,5 @@ the other fields.
 Convert Facebook status changes to hourly buckets of time on Facebook.
 
     cubes['timeonfacebook']\
-        .point_cut('current_nick', ['Thomas Levine'])
+        .point_cut('current_nick', ['Thomas Levine'])\
         .roll_up({'time': ['hour', 'minute']}, dada.rollups.sum)
