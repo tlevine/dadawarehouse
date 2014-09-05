@@ -63,9 +63,11 @@ def update(session):
                 engine = sqlalchemy.create_engine('sqlite:///' +
                     os.path.join(LOCAL_CHAT, filename))
 
-                # These four lines are for testing.
-                session.add(next(get_user_nicks(engine)))
-                session.commit()
+                # This paragraph is for testing.
+               #session.add(next(convert_log(engine)))
+               #session.commit()
+               #session.add(next(get_user_nicks(engine)))
+               #session.commit()
                 assert False
 
                 session.add_all(user_nick.link(session) for user_nick in get_user_nicks(engine))

@@ -25,7 +25,7 @@ class FacebookUserNick(Fact):
 
 class FacebookMessage(Fact):
     # Two-column primary key
-    filedate = m.DateColumn(primary_key = True)
+    filedate_id = m.DateColumn(primary_key = True)
     filedate = relationship(m.Date)
     rowid = m.Column(s.Integer, primary_key = True)
 
