@@ -15,7 +15,7 @@ def load():
     engine = create_engine('sqlite:////tmp/dada.sqlite')
     session, _ = doeund(engine)
    #fb(session)
-   #history(session)
+    history(session)
     pal(session)
 
 def example():
