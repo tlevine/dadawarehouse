@@ -63,3 +63,14 @@ class Dimension(Base):
 #       dimensions = list(to_column.table.name for (_, to_column) in \
 #                         joins(self.__table))
 #       return msg % (self.__tablename__, measures, dimensions)
+
+def merge_on_unique(Class, session, unique_column, value):
+    '''
+    Merge on a single unique column, assuming that that is the only
+    column in the table that needs to be specified.
+    '''
+    x = session.query(Class).filter(unique_column == value).first()
+    if x == None:
+        x = Class(**{unique_column.name: value})
+        session.add(x)
+    return x
