@@ -126,11 +126,28 @@ available. For example, the following is true.
     cubes['command'].dimensions['date'].levels() == \
     cubes['command'].dimensions['date'].levels(['year', 'month', 'day'])
 
-``.rollup`` takes an aggregation function as its first argument and
-the same sort of optional argument as ``.levels`` does as its second
-argument.
+Hmm actually, I think ``.levels`` should be removed entirely; just use
+``.rollup``, and when there are no arguments, do what is shown above.
 
-    cubes['command'].dimensions['date'].rollup(dada.count, ['year', 'month'])
+``.rollup`` takes the same sort of argument as ``.levels`` does as its
+first argument, except that it is required. You are only required to provide
+one argument, and in that case, a ``.rollup`` call is equivalent to a 
+``.levels`` call.
+
+    >>> cubes['command'].dimensions['date'].rollup(['year', 'month'])
+    [[2014, 'September'], [2014, 'August'], [2014, 'July'], ...]
+
+But you can also specify aggregation functions as further arguments
+
+    import dada.rollups as r
+    >>> cubes['command'].dimensions['date'].rollup(['year'], r.count, r.sum, r.median)
+    [[2014, 32, 41, 3], ...]
+
+The aggregations are applied to *everything* within the sub-cubes; to apply
+the aggregations to only one dimension, for example, slice or dice the column
+before applying the aggregation.
+
+    >>> cubes['command'].dimensions['date'].rollup(['year'], r.count, r.sum, r.median)
 
 Produce a cube/table with the fields "language" (R or shell),
 "year", "month", "hour", computer (laptop, nsa, &c.), arg0
