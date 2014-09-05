@@ -69,16 +69,7 @@ class Cube:
     def __repr__(self):
         return '<Cube for table "%s">' % self._args[1]
 
-    def point_cut(self, dimension, path):
-        # Copy the query
-        query = self._query.all()
-
-        # Drill down as deep as the path allows.
-        for level, value in zip(self.dimensions[dimension], path):
-            query = self._query.filter(level == value)
-        return query
-
-    def set_cut(self, dimension, paths):
+    def set_cut(self, dimension, *paths):
         def match_path(dimension, path):
             # An AND-joined query to match the full path
             return and_(*(level == value for level, value in \
