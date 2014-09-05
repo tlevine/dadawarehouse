@@ -42,10 +42,11 @@ from sqlalchemy import and_, or_
 from .inference import dim_levels, fact_measures, joins
 
 class Dimension:
-    def levels(self, *path):
-        raise NotImplementedError
+    def __init__(self, responses, columns):
+        self.responses = responses
+        self._columns = columns
 
-    def responses(self):
+    def levels(self, *path):
         raise NotImplementedError
 
 class Cube:
@@ -57,7 +58,8 @@ class Cube:
 
         # A dictionary of string keys and list-of-Column-object values,
         # traversing recursively into the full snowflake of dimensions
-        self.dimensions = fact_measures(fact_table)
+        dimensions = fact_measures(fact_table)
+        responses = list(dimensions.keys())
 
         # Flatten the table, and record dimensions
         self._query = session.query(fact_table)
@@ -69,9 +71,11 @@ class Cube:
                 self._query = self._query.join(to_table, from_column == to_column)
 
                 dim_name = re.sub(r'^dim_', '', to_table.name)
-                self.dimensions[dim_name] = dim_levels(to_table)
+                dimensions[dim_name] = dim_levels(to_table)
 
                 tables.append(to_table)
+        self.dimensions = OrderedDict((key, Dimension(responses, all_dimensions))\
+                                       for key, all_dimensions in dimensions.items())
 
     def __repr__(self):
         return '<Cube for table "%s">' % self._args[1]
