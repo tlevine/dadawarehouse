@@ -24,10 +24,10 @@ def update(session):
         parse_subject(subject)
 
 class actions:
-    followed = re.compile(r'(^[^(]+)\(@([^)]+) is now following you on Twitter!$')
-    mentioned = re.compile(r'(^[^(]+)\(@([^)]+) mentioned you on Twitter!$')
-    replied = re.compile(r'(^[^(]+)\(@([^)]+) replied to one of your Tweets!')
-    favorited = re.compile(r'(^[^(]+)\(@([^)]+) favorited one of your Tweets!')
+    followed = re.compile(r'(^[^(]+) \(@([^)]+)\) is now following you on Twitter!$')
+    mentioned = re.compile(r'(^[^(]+) \(@([^)]+)\) mentioned you on Twitter!$')
+    replied = re.compile(r'(^[^(]+) \(@([^)]+)\) replied to one of your Tweets!')
+    favorited = re.compile(r'(^[^(]+) \(@([^)]+)\) favorited one of your Tweets!')
     multiple = re.compile('Thomas Levine, you have new followers on Twitter!')
 
 def parse_subject(subject):
