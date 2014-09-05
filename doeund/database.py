@@ -25,8 +25,6 @@ class Column(_Column):
             info['label'] = _kwargs.pop('label')
         if 'aggregations' in _kwargs:
             info['aggregations'] = _kwargs.pop('aggregations')
-        if 'cascade' not in _kwargs:
-            _kwargs['cascade'] = 'save-update, merge, delete, delete-orphan'
         _Column.__init__(self, *args, info = info, **_kwargs)
 
 class Fact(Base):

@@ -11,8 +11,9 @@ from warehouse.facebookchat.load import update as fb
 CACHE_DIRECTORY = os.path.expanduser('~/.dadawarehouse')
 
 def load():
-    engine = create_engine('postgres:///tlevine')
-    session, _ = doeund(engine, refresh = True)
+  # engine = create_engine('postgres:///tlevine')
+    engine = create_engine('sqlite:////tmp/dada.sqlite')
+    session, _ = doeund(engine)
    #fb(session)
     history(session)
     pal(session)
