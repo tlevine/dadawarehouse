@@ -64,11 +64,11 @@ def update(session):
                     os.path.join(LOCAL_CHAT, filename))
 
                 # This paragraph is for testing.
-                session.add(next(convert_log(engine, filedate)))
-                session.commit()
-                session.add(next(get_user_nicks(engine)))
-                session.commit()
-                assert False
+              # session.add(next(convert_log(engine, filedate)).link(session))
+              # session.commit()
+              # session.add(next(get_user_nicks(engine)).link(session))
+              # session.commit()
+              # assert False
 
                 session.add_all(user_nick.link(session) for user_nick in get_user_nicks(engine))
                 session.add_all(log_event.link(session) for log_event in convert_log(engine, filedate))
