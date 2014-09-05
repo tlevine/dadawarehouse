@@ -97,12 +97,16 @@ class Cube:
         # Apply the criteria
         return self._query.filter(filter_criteria)
 
+'''
     def roll_up(self, dimensions, *aggregations):
         raise NotImplementedError
-        for key, hierarchy in dimensions.items())
-            columns, hierarchies = zip(*zip(self._hierarchy, path))
-        query = self._query.group_by(*columns)
+        columns = []
+        for key, path in dimensions.items())
+            sub_hierarchy, _ = zip(*zip(self.hierarchy, path))
+            columns.extend(getattr(
+        query = self._query.group_by(*sub_hierarchy)
 
         subcube = Cube(*self._args)
         subcube.dimensions = OrderedDict((key,
             Dimension(query, hierarchy, responses))\
+'''
