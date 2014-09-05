@@ -14,3 +14,6 @@ class Time(Dimension):
 
 def TimeColumn(*args, **kwargs):
     return Column(s.Time, s.ForeignKey(Time.pk), *args, **kwargs)
+
+def create_time(session, time_object):
+    return session.merge(Time(pk = time_object))

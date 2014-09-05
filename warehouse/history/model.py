@@ -12,13 +12,15 @@ class CommandBody(m.Dimension):
 
 class ShellSession(m.Dimension):
     pk = m.PkColumn()
-    datetime = m.Column(s.DateTime)
+    datetime_id = m.DateTimeColumn()
+    datetime = relationship(m.DateTime)
     filename = m.LabelColumn()
     commands = relationship('Command')
 
 class Command(m.Fact):
     pk = m.PkColumn()
     shellsession_id = m.FkColumn(ShellSession.pk)
-    datetime = m.Column(s.DateTime)
+    datetime_id = m.DateTimeColumn()
+    datetime = relationship(m.DateTime)
     command_id = m.FkColumn(CommandBody.pk)
     command = relationship(CommandBody)

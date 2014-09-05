@@ -12,7 +12,7 @@ def update(session):
     previous_shells = (row[0] for row in session.query(ShellSession.filename))
     for log in historian(directory = HISTORY, skip = previous_shells):
         shell_session = ShellSession(filename = log['session'],
-                                     datetime = log['session_date'])
+             datetime = m.create_datetime(session, log['session_date']))
         for command_datetime, command_string in log['commands']:
             command_body = session.query(CommandBody)\
                .filter(CommandBody.full_command == command_string).first()
@@ -23,7 +23,7 @@ def update(session):
                 session.add(command_body)
                 session.commit()
             shell_session.commands.append(
-                Command(datetime = command_datetime,
+                Command(datetime = m.create_datetime(session, command_datetime),
                         command = command_body))
         session.add(shell_session)
         session.commit()
