@@ -1,3 +1,5 @@
+import os, subprocess, json
+
 NOTMUCH = ['notmuch', 'show', '--format=json', 'from:twitter.com']
 TMP = '/tmp/twitter'
 
@@ -11,7 +13,7 @@ def emails():
 
     result = json.load(fp)
     fp.close()
-    return result
+    return result[1:] # The first is empty?
 
 def update(session):
     emails()
