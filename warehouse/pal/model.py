@@ -37,7 +37,7 @@ class CalendarEvent(d.Fact):
         '''
         Link to dependencies.
         '''
-        event_date = m.create_date(session, self.date)
+        event_date = m.Date(pk = self.date).link(session)
         event_description = CalendarEventDescription(
             description = self.description).link(session)
         self.date = event_date
