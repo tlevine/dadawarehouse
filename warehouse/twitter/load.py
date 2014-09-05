@@ -20,4 +20,4 @@ def update(session):
     for email in emails():
         subject = email[0][0]['headers']['Subject']
         date = datetime.datetime.fromtimestamp(email[0][0]['timestamp'])
-        break
+        print(subject)
