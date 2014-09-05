@@ -42,12 +42,16 @@ from sqlalchemy import and_, or_
 from .inference import dim_levels, fact_measures, joins
 
 class Dimension:
-    def __init__(self, responses, columns):
+    def __init__(self, query, hierarchy, responses):
+        self._query = query
+        self._hierarchy = hierarchy
         self.responses = responses
-        self._columns = columns
 
     def levels(self, *path):
-        raise NotImplementedError
+        query = self._query.all()
+        columns, _ = zip(*zip(self._hierarchy, path))
+        for record in query.group_by(*columns):
+            yield tuple(*(getattr(record, column.name) for column in columns))
 
 class Cube:
     def __init__(self, session, fact_table):
@@ -74,8 +78,9 @@ class Cube:
                 dimensions[dim_name] = dim_levels(to_table)
 
                 tables.append(to_table)
-        self.dimensions = OrderedDict((key, Dimension(responses, all_dimensions))\
-                                       for key, all_dimensions in dimensions.items())
+        self.dimensions = OrderedDict((key,
+            Dimension(_query.all(), hierarchy, responses))\
+            for key, hierarchy in dimensions.items())
 
     def __repr__(self):
         return '<Cube for table "%s">' % self._args[1]
