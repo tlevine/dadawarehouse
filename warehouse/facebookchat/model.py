@@ -1,36 +1,52 @@
 import os
 
 from sqlalchemy.orm import relationship
-from sqlalchemy import String, Integer, BigInteger, Date, DateTime, Enum, ForeignKey
+import sqlalchemy as s
 
-from doeund import Fact, Dimension
+from doeund import Fact, Dimension, merge_on_unique
 
-from warehouse.model import Column
+import warehouse.model as m
 
 class FacebookUser(Dimension):
-    pk = Column(String, primary_key = True)
-    current_nick = Column(String)
+    pk = m.Column(s.String, primary_key = True)
+    current_nick = m.Column(s.String)
+    def link(self, session):
+        return merge_on_unique(FacebookUser, session,
+            FacebookUser.pk, self.pk)
 
 class FacebookUserNick(Fact):
-    user_id = Column(String, ForeignKey(FacebookUser.pk), primary_key = True)
-    nick = Column(String, primary_key = True)
+    pk = m.PkColumn()
+    user_id = m.Column(s.String, s.ForeignKey(FacebookUser.pk))
+    user = relationship(FacebookUser)
+    nick = m.Column(s.String)
+    def link(self, session):
+        self.user = self.user.link(session)
+        return self
 
 class FacebookMessage(Fact):
     # Two-column primary key
-    filedate = Column(Date, primary_key = True)
-    rowid = Column(Integer, primary_key = True)
+    filedate = m.DateColumn(primary_key = True)
+    rowid = m.Column(s.Integer, primary_key = True)
 
-    user_id = Column(String, ForeignKey(FacebookUser.pk))
-    datetime = Column(DateTime)
+    user_id = m.Column(s.String, s.ForeignKey(FacebookUser.pk))
+    user = relationship(FacebookUser)
+    datetime = m.DateTimeColumn()
+    body = m.Column(s.String)
 
-    body = Column(String)
+    def link(self, session):
+        self.user = self.user.link(session)
+        return self
 
 class FacebookChatStatusChange(Fact):
     # Two-column primary key
-    filedate = Column(Date, primary_key = True)
-    rowid = Column(Integer, primary_key = True)
+    filedate = m.DateColumn(primary_key = True)
+    rowid = m.Column(s.Integer, primary_key = True)
 
-    user_id = Column(String, ForeignKey(FacebookUser.pk))
-    datetime = Column(DateTime)
+    user_id = m.Column(s.String, s.ForeignKey(FacebookUser.pk))
+    user = relationship(FacebookUser)
+    datetime = m.DateTimeColumn()
+    status = m.Column(s.Enum('avail','notavail', name = 'faceboook_chat_status'))
 
-    status = Column(Enum('avail','notavail', name = 'faceboook_chat_status'))
+    def link(self, session):
+        self.user = self.user.link(session)
+        return self

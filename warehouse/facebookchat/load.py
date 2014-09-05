@@ -26,11 +26,9 @@ def parse_uid(uid):
     return str(int(re.match(UID, uid).group(1)))
 
 def get_user_nicks(engine):
-    results = defaultdict(lambda: [])
-    for row in engine.execute('SELECT DISTINCT * FROM (SELECT uid, nick FROM log_status UNION SELECT uid, nick FROM log_msg);'):
-        uid, nick = row
-        results[uid].append(nick)
-    return results
+    for uid, nick in engine.execute('SELECT DISTINCT * FROM (SELECT uid, nick FROM log_status UNION SELECT uid, nick FROM log_msg);'):
+        user = FacebookUser(pk = parse_uid(uid), current_nick = nick)
+        yield FacebookUserNick(user = user, nick = nick)
 
 def convert_log(engine, filedate):
     for row in engine.execute('SELECT rowid, uid, nick, ts, status FROM log_status').fetchall():
@@ -38,7 +36,7 @@ def convert_log(engine, filedate):
         yield FacebookChatStatusChange(
             filedate = filedate,
             rowid = rowid,
-            user_id = parse_uid(uid),
+            user = FacebookUser(pk = parse_uid(uid), current_nick = nick),
             datetime = datetime.datetime.fromtimestamp(ts),
             status = status)
 
@@ -47,12 +45,12 @@ def convert_log(engine, filedate):
         yield FacebookMessage(
             filedate = filedate,
             rowid = rowid,
-            user_id = parse_uid(uid),
+            user = FacebookUser(pk = parse_uid(uid), current_nick = nick),
             datetime = datetime.datetime.fromtimestamp(ts),
             body = body)
 
 def update(session):
-    download()
+   #download()
     for filename in os.listdir(LOCAL_CHAT):
         try:
             filedate = datetime.datetime.strptime(filename, '%Y-%m-%d.db').date()
@@ -63,13 +61,8 @@ def update(session):
                 logger.info('Importing %s' % filename)
                 engine = sqlalchemy.create_engine('sqlite:///' +
                     os.path.join(LOCAL_CHAT, filename))
-                for uid, nicks in get_user_nicks(engine).items():
-                    current_nick = nicks[-1]
-                    user = session.merge(FacebookUser(pk = parse_uid(uid), current_nick = current_nick))
-                    for nick in nicks:
-                        session.merge(FacebookUserNick(user_id = parse_uid(uid), nick = nick))
-                    session.commit()
-                session.add_all(convert_log(engine, filedate))
+                session.add_all(user_nick.link(session) for user_nick in get_user_nicks(engine))
+                session.add_all(log_event.link(session) for log_event in convert_log(engine, filedate))
                 session.commit()
                 logger.info('Finished %s' % filename)
             else:

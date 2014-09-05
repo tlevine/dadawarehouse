@@ -69,6 +69,8 @@ def merge_on_unique(Class, session, unique_column, value):
     Merge on a single unique column, assuming that that is the only
     column in the table that needs to be specified.
     '''
+    if value == None:
+        raise ValueError('Value may not be None.')
     x = session.query(Class).filter(unique_column == value).first()
     if x == None:
         x = Class(**{unique_column.name: value})
