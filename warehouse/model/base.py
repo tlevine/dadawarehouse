@@ -1,5 +1,5 @@
 import sqlalchemy as s
-from doeund import Fact, Dimension, Column as _Column
+from doeund import Column as _Column
 
 def Column(*args, **kwargs):
     'Column with good defaults'
