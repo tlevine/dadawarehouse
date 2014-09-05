@@ -56,7 +56,7 @@ def update(session):
         try:
             filedate = datetime.datetime.strptime(filename, '%Y-%m-%d.db').date()
             is_new = session.query(FacebookChatStatusChange).\
-                filter(FacebookChatStatusChange.filedate == filedate).\
+                filter(FacebookChatStatusChange.filedate_id == filedate).\
                 count() == 0
             if is_new:
                 logger.info('Importing %s' % filename)
@@ -64,10 +64,10 @@ def update(session):
                     os.path.join(LOCAL_CHAT, filename))
 
                 # This paragraph is for testing.
-               #session.add(next(convert_log(engine)))
-               #session.commit()
-               #session.add(next(get_user_nicks(engine)))
-               #session.commit()
+                session.add(next(convert_log(engine, filedate)))
+                session.commit()
+                session.add(next(get_user_nicks(engine)))
+                session.commit()
                 assert False
 
                 session.add_all(user_nick.link(session) for user_nick in get_user_nicks(engine))
