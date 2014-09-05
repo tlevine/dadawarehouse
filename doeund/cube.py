@@ -35,21 +35,22 @@ http://pythonhosted.org/cubes/slicing_and_dicing.html#aggregate
 What's pivot for???
 
 '''
+from collections import OrderedDict
 import re
+import itertools
 from functools import partial
 
 from sqlalchemy import and_, or_
 from .inference import dim_levels, fact_measures, joins
 
 class Dimension:
-    def __init__(self, query, hierarchy, responses):
+    def __init__(self, query, hierarchy):
         self._query = query
-        self._hierarchy = hierarchy
-        self.responses = responses
+        self.hierarchy = hierarchy
 
     def levels(self, *path):
-        query = self._query.all()
-        columns, _ = zip(*zip(self._hierarchy, path))
+        query = self._query
+        columns, _ = zip(*zip(self.hierarchy, path))
         for record in query.group_by(*columns):
             yield tuple(*(getattr(record, column.name) for column in columns))
 
@@ -63,7 +64,7 @@ class Cube:
         # A dictionary of string keys and list-of-Column-object values,
         # traversing recursively into the full snowflake of dimensions
         dimensions = fact_measures(fact_table)
-        responses = list(dimensions.keys())
+        self.responses = list(dimensions.keys())
 
         # Flatten the table, and record dimensions
         self._query = session.query(fact_table)
@@ -79,7 +80,7 @@ class Cube:
 
                 tables.append(to_table)
         self.dimensions = OrderedDict((key,
-            Dimension(_query.all(), hierarchy, responses))\
+            Dimension(self._query, hierarchy))\
             for key, hierarchy in dimensions.items())
 
     def __repr__(self):
@@ -97,16 +98,27 @@ class Cube:
         # Apply the criteria
         return self._query.filter(filter_criteria)
 
-'''
     def roll_up(self, dimensions, *aggregations):
-        raise NotImplementedError
-        columns = []
-        for key, path in dimensions.items())
-            sub_hierarchy, _ = zip(*zip(self.hierarchy, path))
-            columns.extend(getattr(
-        query = self._query.group_by(*sub_hierarchy)
+        '''
+        Like this ::
+
+            .rollup({'date': 2, # year, month
+                     'time': None, # as many levels as there are
+                    }, doeund.rollups.count('pk'))
+        '''
+        subcube_hierarchies = OrderedDict()
+        for key, n in dimensions.items())
+            if n:
+                sub_hierarchy = self.dimensions[key].hierarchy[:n]
+            else:
+                sub_hierarchy = self.dimensions[key].hierarchy
+            subcube_hierarchies[key] = sub_hierarchy
+
+        groupings = itertools.chain(*subcube_hierarchies.values())
+        query = self._query.group_by(*groupings)
 
         subcube = Cube(*self._args)
         subcube.dimensions = OrderedDict((key,
-            Dimension(query, hierarchy, responses))\
-'''
+            Dimension(query, hierarchy))\
+            for key, hierarchy in subcube_hierarchies.items())
+        return subcube
