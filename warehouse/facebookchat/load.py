@@ -19,8 +19,8 @@ RSYNC = ['rsync', '--archive', '--sparse'] #, '--verbose']
 def download():
     if not os.path.isdir(LOCAL_CHAT):
         os.mkdir(LOCAL_CHAT)
-    scp = subprocess.Popen(RSYNC + [REMOTE_CHAT, LOCAL_CHAT])
-    scp.wait()
+    rsync = subprocess.Popen(RSYNC + [REMOTE_CHAT, LOCAL_CHAT])
+    rsync.wait()
 
 UID = re.compile(r'xmpp:-([0-9]+)@chat.facebook.com')
 def parse_uid(uid):
