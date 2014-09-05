@@ -91,6 +91,41 @@ Import stuff just in case.
 
     import dada
 
+List the cubes that are available.
+
+    cubes.keys()
+
+List the dimensions that are available.
+
+    cubes['command'].dimensions.keys()
+
+List the hierarchy within each dimension.
+
+    >>> cubes['command'].dimensions['date'].hierarchy()
+    ['year', 'month', 'day']
+
+Different hierarchies of the same "dimension" are modeled as separate
+dimension tables and are considered different dimensions.
+
+    >>> cubes['command'].dimensions['dayofweek'].hierarchy()
+    ['dayofweek']
+
+List the levels of a hierarchy.
+
+    >>> cubes['command'].dimensions['dayofweek'].levels()
+    ['Monday', 'Tuesday', ... ]
+
+You can also specify a partial hierarchy as the argument to levels.
+
+    >>> cubes['command'].dimensions['date'].levels(['year', 'month'])
+    [[2014, 'September'], [2014, 'August'], [2014, 'July'], ...]
+
+By default, ``.levels`` splits the dimension at the finest granularity
+available. For example, the following is true.
+
+    cubes['command'].dimensions['date'].levels() == \
+    cubes['command'].dimensions['date'].levels(['year', 'month', 'day'])
+
 Produce a cube/table with the fields "language" (R or shell),
 "year", "month", "hour", computer (laptop, nsa, &c.), arg0
 (``$0``), "arg1" (``$1``) and, finally, "count", where count
