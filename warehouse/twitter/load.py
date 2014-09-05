@@ -1,4 +1,5 @@
 import os, subprocess, json
+import datetime
 
 NOTMUCH = ['notmuch', 'show', '--format=json', 'from:twitter.com']
 TMP = '/tmp/twitter'
@@ -16,4 +17,7 @@ def emails():
     return result[1:] # The first is empty?
 
 def update(session):
-    emails()
+    for email in emails():
+        subject = email[0][0]['headers']['Subject']
+        date = datetime.datetime.fromtimestamp(email[0][0]['timestamp'])
+        break
