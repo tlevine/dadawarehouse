@@ -22,19 +22,11 @@ def update(session, calendars = CALENDARS):
 
     for filename in calendars:
         with open(filename) as fp:
-            calendar_file, events = parse(fp)
-        for date_python, description_string in events:
-            description = session.query(CalendarEventDescription)\
-                .filter(CalendarEventDescription.description == description_string)\
-                .first()
-            if description == None:
-                description = CalendarEventDescription(description = description_string)
-                session.add(description)
-                session.commit()
-            date = m.create_date(session, date_python)
-            calendar_file.events.append(CalendarEvent(date = date, description = description))
-
-        session.add(calendar_file)
+            _calendar_file, events = parse(fp)
+        calendar_file = CalendarFile.get(session, *_calendar_file)
+        session.add_all(
+            CalendarEvent.new(session, calendar_file, date, description) \
+            for date, description in events)
         session.commit()
         logger.info('Inserted events from calendar %s' % filename)
 
@@ -56,10 +48,7 @@ def parse(fp, filename = None):
             pass
         elif calendar_file == None:
             calendar_code, _, calendar_description = line.partition(' ')
-            calendar_file = CalendarFile(pk = calendar_code,
-                                         filename = filename,
-                                         description = calendar_description)
-
+            calendar_file = calendar_code, filename, calendar_description
         else:
             events.extend(entry(line))
     return calendar_file, events
