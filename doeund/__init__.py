@@ -1,7 +1,7 @@
 from sqlalchemy.orm import sessionmaker as _sessionmaker
 from sqlalchemy.exc import ProgrammingError
 
-from .database import Fact, Dimension, Column, Base as _Base
+from .database import Fact, Dimension, Column, Base as _Base, merge_on_unique
 from .cube import Cube
 
 def doeund(engine, refresh = False):

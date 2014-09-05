@@ -21,8 +21,8 @@ class CalendarEventDescription(d.Dimension):
     description = m.LabelColumn()
 
     def merge(self, session):
-        return merge_on_unique(self.__class__, session, description,
-                               self.description)
+        return d.merge_on_unique(self.__class__, session,
+            CalendarEventDescription.description, self.description)
 
 class CalendarEvent(d.Fact):
     pk = m.PkColumn()
@@ -33,13 +33,13 @@ class CalendarEvent(d.Fact):
     description_id = m.FkColumn(CalendarEventDescription.pk)
     description = relationship(CalendarEventDescription)
     
-    def add(self, session):
+    def link(self, session):
         '''
-        calendar_file is an SQLAlchemy record object thingy.
+        Link to dependencies.
         '''
         event_date = m.create_date(session, self.date)
         event_description = CalendarEventDescription(
-            description = event_description).merge(session)
+            description = self.description).merge(session)
         self.date = event_date
         self.description = event_description
-        session.add(self)
+        return self

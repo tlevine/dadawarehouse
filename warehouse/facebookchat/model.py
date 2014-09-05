@@ -3,7 +3,9 @@ import os
 from sqlalchemy.orm import relationship
 from sqlalchemy import String, Integer, BigInteger, Date, DateTime, Enum, ForeignKey
 
-from warehouse.model import Fact, Dimension, Column
+from doeund import Fact, Dimension
+
+from warehouse.model import Column
 
 class FacebookUser(Dimension):
     pk = Column(String, primary_key = True)
