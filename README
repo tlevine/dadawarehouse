@@ -146,16 +146,25 @@ dimensions.
 You can also specify aggregation functions as further arguments
 
     import dada.rollups as r
-    >>> cubes['command'].rollup({'date': ['year']}, r.count, r.sum, r.median)
-    [[2014, 32, 41, 3], ...]
+    >>> cubes['command'].rollup({'date': ['year']}, r.count('pk'))
+    [[2014, 32], ...]
 
-The aggregations are applied to *everything* within the sub-cubes; to apply
-the aggregations to only one dimension, for example, slice or dice the column
-before applying the aggregation.
+``dada.rollups.count`` returns the number of rows in the fact table that
+fit within the particular sub-cube (one cube per year, in this case).
+Theoretically, though, think of this as the number of rows in a single
+column (like the primary key column, ``pk``) of that fact table, because
+this will make the other rollups make more sense.
 
-    >>> cubes['command']\
-        .set_cut('language', ['R'], ['shell'])\
-        .rollup({'date': ['year']}, r.count, r.sum, r.median)
+If you are using only categorical data, count might be all that you need.
+But there are other rollups that work the same way. Here we look at how
+many Facebook chat sessions each person had, how long they were in total,
+and how long they were on median, by person.
+
+    >>> cubes['facebookchatsessions']\
+        .rollup({'date': ['year', 'month'], 'person': None},
+                r.count('pk'), r.sum('length'), r.median('length'))
+
+Here are some more examples.
 
 Produce a cube/table with the fields "language" (R or shell),
 "year", "month", "hour", computer (laptop, nsa, &c.), arg0
@@ -169,13 +178,7 @@ the other fields.
                  'date': ['year', 'month'],
                  'computer': None # Use smallest granularity, with all levels.
                  'args': ['arg0', 'arg1']},
-                 dada.rollups.count)
-
-Convert Facebook status changes to hourly buckets of time on Facebook.
-
-    cubes['timeonfacebook']\
-        .point_cut('current_nick', ['Thomas Levine'])\
-        .rollup({'time': ['hour', 'minute']}, dada.rollups.sum)
+                 dada.rollups.count('pk'))
 
 
 Ideas
