@@ -180,6 +180,13 @@ the other fields.
                  'args': ['arg0', 'arg1']},
                  dada.rollups.count('pk'))
 
+The parameters of rollup functions must be the names of fields
+in the fact table of the cube. (Or maybe not, but I'm starting
+with this in case it's complicated to do the other things.)
+To see exactly which fields are allowed, call ``.responses``
+(short for "response variables")
+
+    cubes['command'].responses()
 
 Ideas
 ==========
