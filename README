@@ -126,28 +126,36 @@ available. For example, the following is true.
     cubes['command'].dimensions['date'].levels() == \
     cubes['command'].dimensions['date'].levels(['year', 'month', 'day'])
 
-Hmm actually, I think ``.levels`` should be removed entirely; just use
-``.rollup``, and when there are no arguments, do what is shown above.
+``.rollup`` specifies that we should aggregate a cube by dicing it into
+many sub-cubes and applying some functions to each of the sub-cubes. It
+takes a dictionary of dimension-name keys and partial-hierarchy values
+(the same sort of argument as ``.levels`` takes).
 
-``.rollup`` takes the same sort of argument as ``.levels`` does as its
-first argument, except that it is required. You are only required to provide
-one argument, and in that case, a ``.rollup`` call is equivalent to a 
-``.levels`` call.
-
-    >>> cubes['command'].dimensions['date'].rollup(['year', 'month'])
+    >>> cubes['command'].rollup({'date': ['year', 'month']})
     [[2014, 'September'], [2014, 'August'], [2014, 'July'], ...]
 
-But you can also specify aggregation functions as further arguments
+This is the same output as the ``.levels`` call we saw above! One difference
+between ``.rollup`` and ``.levels`` is that ``.rollup`` can specify multiple
+dimensions.
+
+    >>> cubes['command'].rollup({'date': ['year', 'month'],
+                                 'language': ['language']})
+    [[2014, 'September', 'R'], [2014, 'August', 'R'], [2014, 'July', 'R'], ...,
+     [2014, 'September', 'shell'], [2014, 'August', 'shell'], [2014, 'July', 'shell'], ...]
+
+You can also specify aggregation functions as further arguments
 
     import dada.rollups as r
-    >>> cubes['command'].dimensions['date'].rollup(['year'], r.count, r.sum, r.median)
+    >>> cubes['command'].rollup({'date': ['year']}, r.count, r.sum, r.median)
     [[2014, 32, 41, 3], ...]
 
 The aggregations are applied to *everything* within the sub-cubes; to apply
 the aggregations to only one dimension, for example, slice or dice the column
 before applying the aggregation.
 
-    >>> cubes['command'].dimensions['date'].rollup(['year'], r.count, r.sum, r.median)
+    >>> cubes['command']\
+        .set_cut('language', ['R'], ['shell'])\
+        .rollup({'date': ['year']}, r.count, r.sum, r.median)
 
 Produce a cube/table with the fields "language" (R or shell),
 "year", "month", "hour", computer (laptop, nsa, &c.), arg0
@@ -168,3 +176,10 @@ Convert Facebook status changes to hourly buckets of time on Facebook.
     cubes['timeonfacebook']\
         .point_cut('current_nick', ['Thomas Levine'])\
         .rollup({'time': ['hour', 'minute']}, dada.rollups.sum)
+
+
+Ideas
+==========
+
+Only categorical data? That might mean that "count" is the only aggregation
+I need....
