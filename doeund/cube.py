@@ -50,7 +50,10 @@ class Dimension:
 
     def levels(self, *path):
         query = self._query
-        columns, _ = zip(*zip(self.hierarchy, path))
+        if len(path) == 0:
+            columns = self.hierarchy
+        else:
+            columns, _ = zip(*zip(self.hierarchy, path))
         for record in query.group_by(*columns):
             yield tuple(*(getattr(record, column.name) for column in columns))
 
@@ -107,7 +110,7 @@ class Cube:
                     }, doeund.rollups.count('pk'))
         '''
         subcube_hierarchies = OrderedDict()
-        for key, n in dimensions.items())
+        for key, n in dimensions.items():
             if n:
                 sub_hierarchy = self.dimensions[key].hierarchy[:n]
             else:
