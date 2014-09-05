@@ -23,7 +23,7 @@ def update(session, calendars = CALENDARS):
     for filename in calendars:
         with open(filename) as fp:
             calendar_file, events = parse(fp)
-        calendar_file = calendar_file.merge(session)
+        calendar_file = calendar_file.link(session)
         session.add_all(
             CalendarEvent(file = calendar_file, date = date,
                           description = description).link(session) \

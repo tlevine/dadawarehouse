@@ -13,14 +13,14 @@ class CalendarFile(d.Dimension):
     filename = m.Column(String, unique = True)
     description = m.Column(String)
 
-    def merge(self, session):
+    def link(self, session):
         return session.merge(self)
 
 class CalendarEventDescription(d.Dimension):
     pk = m.PkColumn()
     description = m.LabelColumn()
 
-    def merge(self, session):
+    def link(self, session):
         return d.merge_on_unique(self.__class__, session,
             CalendarEventDescription.description, self.description)
 
@@ -39,7 +39,7 @@ class CalendarEvent(d.Fact):
         '''
         event_date = m.create_date(session, self.date)
         event_description = CalendarEventDescription(
-            description = self.description).merge(session)
+            description = self.description).link(session)
         self.date = event_date
         self.description = event_description
-        return self
+        return self # Don't need to merge because duplicates are allowed
