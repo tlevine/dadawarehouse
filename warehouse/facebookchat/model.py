@@ -71,3 +71,4 @@ class FacebookDuration(Fact):
     def link(self, session):
         self.date = self.date.link(session)
         self.user = self.user.link(session)
+        return self

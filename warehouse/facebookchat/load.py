@@ -68,7 +68,7 @@ JOIN (
 ) 'beginnings'
 ON ends.uid = beginnings.uid;
 '''
-    for uid, current_nick, duration in engine.execute(sql).fetchall():
+    for uid, nick, duration in engine.execute(sql).fetchall():
         yield FacebookDuration(date = Date(pk = filedate),
             user = FacebookUser(pk = parse_uid(uid), current_nick = nick),
             duration = duration)
