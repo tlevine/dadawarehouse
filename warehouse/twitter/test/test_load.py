@@ -21,7 +21,7 @@ testcases = [
     ('Burton DeWilde (@bjdewilde) favorited one of your Tweets!',
         'Burton DeWilde', 'bjdewilde', actions.favorited),
     ('@seecmb retweeted one of your Retweets!',
-        None, 'seecmb', actions.retweeted_old),
+        None, 'seecmb', actions.retweeted),
     ('Thomas Levine, you have new followers on Twitter!',
         None, None, actions.multiple),
     ('Do you know jimmy fallon, Justin Timberlake  and KATY PERRY  on Twitter?',
