@@ -12,8 +12,6 @@ def test_parse_subject():
 testcases = [
     ('Rebecca Williams (@internetrebecca) is now following you on Twitter!',
         'Rebecca Williams', 'internetrebecca', actions.followed),
-    ('Arielle is now following you on Twitter!',
-        None, None, actions.followed_old),
     ('Volkan Unsal (@picardo) mentioned you on Twitter!',
         'Volkan Unsal', 'picardo', actions.mentioned),
     ('Burton DeWilde (@bjdewilde) replied to one of your Tweets!',

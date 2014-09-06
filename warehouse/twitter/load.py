@@ -24,7 +24,7 @@ def update(session):
 
 class actions:
     followed = re.compile(r'(?:(^[^(]+) \()?@([^)]+)\)? is now following you on Twitter!$')
-    mentioned = re.compile(r'(?:(^[^(]+) \()?@([^)]+)\)? ?mentioned you on Twitter!')
+    mentioned = re.compile(r'(?:(^[^(]+) ?\()?@([^)]+)\)? mentioned you on Twitter!')
     replied = re.compile(r'(?:(^[^(]+) \()?@([^)]+)\)? replied to one of your Tweets!')
     favorited = re.compile(r'(?:(^[^(]+) \()@([^)]+)\)? favorited one of your Tweets!')
     multiple = re.compile('^Thomas Levine, you have new followers on Twitter!')
@@ -38,13 +38,18 @@ def parse_subject(subject):
                    actions.replied, actions.favorited, actions.retweeted]:
         m = re.match(action, subject)
         if m:
-            return m.group(1), m.group(2), action
-
-    for action in [actions.multiple, actions.do_you_know,
-                   actions.direct_message_old]:
-        if re.match(action, subject):
-            return None, None, action
-    
-    import sys
-    sys.stderr.write('Could not parse subject "%s"\n' % subject)
-    return 8
+            a, b, c = m.group(1), m.group(2), action
+            break
+    else:
+        for action in [actions.multiple, actions.do_you_know,
+                       actions.direct_message_old]:
+            if re.match(action, subject):
+                a, b, c = None, None, action
+                break
+        else: 
+            import sys
+            sys.stderr.write('Could not parse subject "%s"\n' % subject)
+            return 8
+    if a != None:
+        a = a.strip()
+    return a, b, c
