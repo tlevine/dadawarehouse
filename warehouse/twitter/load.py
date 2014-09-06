@@ -20,7 +20,7 @@ def update(session):
     for email in emails():
         subject = email[0][0]['headers']['Subject']
         date = datetime.datetime.fromtimestamp(email[0][0]['timestamp'])
-        parse_subject(subject)
+        name, handle, action = parse_subject(subject)
 
 class actions:
     followed = re.compile(r'(?:(^[^(]+) \()?@([^)]+)\)? is now following you on Twitter!$')
@@ -55,9 +55,8 @@ def parse_subject(subject):
             if m:
                 a, b, c = m.group(1), None, actions.followed_nameonly
             else:
-                import sys
-                sys.stderr.write('Could not parse subject "%s"\n' % subject)
-                return 8
+                logger.debug('Could not parse subject "%s"\n' % subject)
+                a, b, c = None, None, None
     if a != None:
         a = a.strip()
     return a, b, c
