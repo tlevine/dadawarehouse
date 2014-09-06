@@ -52,34 +52,33 @@ def convert_log(engine, filedate):
             body = body)
 
 def online_durations(engine, filedate):
-    sql = '''
-SELECT uid, nick, min(ts), max(ts)
-FROM log_status
-GROUP BY uid;
-'''
-    for uid, nick, min_ts, max_ts in engine.execute(sql):
-        sql_avail = '''
-SELECT sum(ts)
-FROM log_status
-WHERE status = 'avail'
-  AND uid = ?
-  AND ts < ?
-'''
-        sql_notavail = '''
-SELECT sum(ts)
-FROM log_status
-WHERE status = 'notavail'
-  AND uid = ?
-  AND ts > ?
-'''
-        end = engine.execute(sql_notavail, uid, min_ts).fetchone()[0]
-        begin = engine.execute(sql_avail, uid, max_ts).fetchone()[0]
-        if end == None or begin == None or begin > end:
-            logger.info('Weird log for %s (%s) on %s' % (uid, nick, filedate.isoformat()))
-        else:
-            yield FacebookDuration(date = Date(pk = filedate),
-                user = FacebookUser(pk = parse_uid(uid), current_nick = nick),
-                duration = end - begin)
+    for uid, nick in engine.execute('SELECT DISTINCT uid, nick FROM log_status;'):
+        duration = 0
+        avail = False
+        prev_ts = None
+        for ts, status in engine.execute('SELECT ts, status FROM log_status WHERE uid = ? ORDER BY ts', uid):
+            if status == 'avail' and not avail:
+                avail = True
+                prev_ts = ts
+            elif status == 'avail' and avail:
+                pass
+            elif status == 'avail' and not avail:
+                avail = True
+                prev_ts = ts
+            elif status == 'notavail' and not avail:
+                pass
+            elif status == 'notavail' and avail:
+                duration += prev_ts - ts
+                avail = False
+                prev_ts = None
+            elif status == 'notavail' and not avail:
+                pass
+            else:
+                raise AssertionError('This else condition shouldn\'t happen.')
+
+        yield FacebookDuration(date = Date(pk = filedate),
+            user = FacebookUser(pk = parse_uid(uid), current_nick = nick),
+            duration = duration)
 
 def update(session):
   # download()
@@ -101,8 +100,8 @@ def update(session):
               # session.commit()
               # assert False
                 session.add_all(duration.link(session) for duration in online_durations(engine, filedate))
-                session.add_all(user_nick.link(session) for user_nick in get_user_nicks(engine))
-                session.add_all(log_event.link(session) for log_event in convert_log(engine, filedate))
+             #  session.add_all(user_nick.link(session) for user_nick in get_user_nicks(engine))
+             #  session.add_all(log_event.link(session) for log_event in convert_log(engine, filedate))
                 session.commit()
                 logger.info('Finished %s' % filename)
             else:
