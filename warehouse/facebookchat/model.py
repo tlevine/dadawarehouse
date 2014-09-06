@@ -58,3 +58,15 @@ class FacebookChatStatusChange(Fact):
         self.filedate = self.filedate.link(session)
         self.datetime = self.datetime.link(session)
         return self
+
+class FacebookOnlineTime(Fact):
+    '''
+    How long a person was on Facebook each day
+    '''
+    user_id = m.Column(s.String, s.ForeignKey(FacebookUser.pk), primary_key = True)
+    user = relationship(FacebookUser)
+    date_id = m.DateColumn(primary_key = True)
+    date = relationship(m.Date)
+    def link(self, session):
+        self.date = self.date.link(session)
+        self.user = self.user.link(session)
