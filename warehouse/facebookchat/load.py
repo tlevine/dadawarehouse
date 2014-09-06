@@ -51,7 +51,7 @@ def convert_log(engine, filedate):
             body = body)
 
 def update(session):
-   #download()
+    download()
     for filename in os.listdir(LOCAL_CHAT):
         try:
             filedate = datetime.datetime.strptime(filename, '%Y-%m-%d.db').date()

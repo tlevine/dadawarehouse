@@ -1,4 +1,5 @@
 import os, subprocess, json
+import io
 import re
 import datetime
 
@@ -6,15 +7,13 @@ NOTMUCH = ['notmuch', 'show', '--format=json', 'from:twitter.com']
 TMP = '/tmp/twitter'
 
 def emails():
-    if os.path.isfile(TMP):
-        fp = open(TMP)
-    else:
-        raise NotImplementedError
-        notmuch = subprocess.Popen(RSYNC)
+    if not os.path.isfile(TMP):
+        with open(TMP, 'wb') as fp:
+            notmuch = subprocess.Popen(NOTMUCH, stdout = fp,
+                                       stderr = subprocess.PIPE)
         notmuch.wait()
-
-    result = json.load(fp)
-    fp.close()
+    with open(TMP) as fp:
+        result = json.load(fp)
     return result[1:] # The first is empty?
 
 def update(session):
