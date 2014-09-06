@@ -81,7 +81,7 @@ def online_durations(engine, filedate):
             duration = duration)
 
 def update(session):
-  # download()
+    download()
     for filename in os.listdir(LOCAL_CHAT):
         try:
             filedate = datetime.datetime.strptime(filename, '%Y-%m-%d.db').date()
