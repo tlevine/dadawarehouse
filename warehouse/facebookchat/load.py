@@ -8,7 +8,8 @@ import sqlalchemy
 
 from ..logger import logger
 from .model import FacebookUser, FacebookUserNick, \
-                   FacebookChatStatusChange, FacebookMessage
+                   FacebookChatStatusChange, FacebookMessage, \
+                   FacebookDuration
 from ..model import Date, DateTime
 
 WAREHOUSE = os.path.expanduser('~/.dadawarehouse')
@@ -56,14 +57,14 @@ SELECT ends.uid, nick, ends.ends - beginnings.beginnings
 FROM (
   SELECT nick, uid, sum(ts) 'ends'
   FROM log_status
-  GROUP BY uid
   WHERE status = 'notavail'
+  GROUP BY uid
 ) 'ends'
 JOIN (
   SELECT uid, sum(ts) 'beginnings'
   FROM log_status
-  GROUP BY uid
   WHERE status = 'avail'
+  GROUP BY uid
 ) 'beginnings'
 ON ends.uid = beginnings.uid;
 '''
