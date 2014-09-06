@@ -24,11 +24,13 @@ def update(session):
 
 class actions:
     followed = re.compile(r'(?:(^[^(]+) \()?@([^)]+)\)? is now following you on Twitter!$')
+    followed_nameonly = re.compile(r'^([^)(@]+) is now following you on Twitter!')
     mentioned = re.compile(r'(?:(^[^(]+) ?\()?@([^)]+)\)? mentioned you on Twitter!')
-    replied = re.compile(r'(?:(^[^(]+) \()?@([^)]+)\)? replied to (?:one of your Tweets!|a Tweet you were mentioned in!)')
-    favorited = re.compile(r'(?:(^[^(]+) \()@([^)]+)\)? favorited (?:one of your Tweets!|a Tweet you were mentioned in!)')
+    replied = re.compile(r'(?:(^[^(]+) \()?@([^)]+)\)? replied to .+!')
+    favorited = re.compile(r'(?:(^[^(]+) \()?@([^)]+)\)? favorited .+\!')
     multiple = re.compile('^Thomas Levine, you have new followers on Twitter!')
-    retweeted = re.compile(r'(?:(^[^(]+) \()?@([^)]+)\)? retweeted one of your (?:Ret|T)weets!')
+    follower_in_body = re.compile(r'Thomas Levine, you have a new follower on Twitter!')
+    retweeted = re.compile(r'(?:(^[^(]+) \()?@([^)]+)\)? retweeted .+!')
     do_you_know = re.compile(r'^Do you know .+ on Twitter?')
     direct_message_old = re.compile(r'^Direct message from .+')
     direct_message = re.compile(r'(^[^(]+) \(@([^)]+)\) has sent you a direct message on Twitter!')
@@ -42,14 +44,18 @@ def parse_subject(subject):
             break
     else:
         for action in [actions.multiple, actions.do_you_know,
-                       actions.direct_message_old]:
+            actions.follower_in_body, actions.direct_message_old]:
             if re.match(action, subject):
                 a, b, c = None, None, action
                 break
         else: 
-            import sys
-            sys.stderr.write('Could not parse subject "%s"\n' % subject)
-            return 8
+            m = re.match(actions.followed_nameonly, subject)
+            if m:
+                a, b, c = m.group(1), None, actions.followed_nameonly
+            else:
+                import sys
+                sys.stderr.write('Could not parse subject "%s"\n' % subject)
+                return 8
     if a != None:
         a = a.strip()
     return a, b, c

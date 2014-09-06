@@ -34,6 +34,10 @@ testcases = [
         'ScraperWiki', 'ScraperWiki', actions.mentioned),
     ("@droquo retweeted a Tweet you were mentioned in!",
         None, 'droquo', actions.retweeted),
-    ("@droquo favorited a Tweet you were mentioned in!"
+    ("@droquo favorited a Tweet you were mentioned in!",
         None, 'droquo', actions.favorited),
+    ("OpenWatch is now following you on Twitter!",
+        'OpenWatch', None, actions.followed_nameonly),
+    ("@zentree favorited one of your Retweets!",
+        None, 'zentree', actions.favorited),
 ]
