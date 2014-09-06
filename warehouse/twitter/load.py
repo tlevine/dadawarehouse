@@ -24,18 +24,33 @@ def update(session):
 
 class actions:
     followed = re.compile(r'(^[^(]+) \(@([^)]+)\) is now following you on Twitter!$')
-    mentioned = re.compile(r'(^[^(]+) \(@([^)]+)\) mentioned you on Twitter!$')
+    followed_old = re.compile('[^@)(]+ is now following you on Twitter!')
+    mentioned = re.compile(r'(^[^(]+) \(@([^)]+)\) ?mentioned you on Twitter!')
     replied = re.compile(r'(^[^(]+) \(@([^)]+)\) replied to one of your Tweets!')
     favorited = re.compile(r'(^[^(]+) \(@([^)]+)\) favorited one of your Tweets!')
-    multiple = re.compile('Thomas Levine, you have new followers on Twitter!')
+    multiple = re.compile('^Thomas Levine, you have new followers on Twitter!')
+    retweeted = re.compile(r'(^[^(]+) \(@([^)]+)\) retweeted one of your (?:Ret|T)weets!')
+    retweeted_old = re.compile(r'^@([^ ]+) retweeted one of your (?:Ret|T)weets!')
+    do_you_know = re.compile(r'^Do you know .+ on Twitter?')
+    direct_message_old = re.compile(r'^Direct message from .+')
+    direct_message = re.compile(r'(^[^(]+) \(@([^)]+)\) has sent you a direct message on Twitter!')
 
 def parse_subject(subject):
-    for action in [actions.followed, actions.mentioned,
-                   actions.replied, actions.favorited]:
+    for action in [actions.followed, actions.mentioned, actions.direct_message,
+                   actions.replied, actions.favorited, actions.retweeted]:
         m = re.match(action, subject)
         if m:
             return m.group(1), m.group(2), action
-    if re.match(actions.multiple, subject):
-        return None, None, actions.multiple
-    else:
-        raise ValueError('Could not parse subject "%s"' % subject)
+
+    if re.match(actions.retweeted_old, subject):
+        match = re.match(actions.retweeted_old, subject)
+        return None, match.group(1), actions.retweeted
+
+    for action in [actions.multiple, actions.followed_old, actions.do_you_know,
+                   actions.direct_message_old]:
+        if re.match(action, subject):
+            return None, None, action
+    
+    import sys
+    sys.stderr.write('Could not parse subject "%s"\n' % subject)
+    return 8
