@@ -3,6 +3,9 @@ import io
 import re
 import datetime
 
+from .model import TwitterUser, TwitterAction
+from ..model import DateTime
+
 NOTMUCH = ['notmuch', 'show', '--format=json', 'from:twitter.com']
 TMP = '/tmp/twitter'
 
@@ -19,8 +22,13 @@ def emails():
 def update(session):
     for email in emails():
         subject = email[0][0]['headers']['Subject']
+        filename = email[0][0][0]['filename']
         date = datetime.datetime.fromtimestamp(email[0][0]['timestamp'])
         name, handle, action = parse_subject(subject)
+        yield TwitterAction(
+            user = TwitterUser(handle = handle, name = name).link(session),
+            action = ACTION_NAMES[action], email_file = filename,
+            datetime = DateTime(pk = date).link(session)).link(session)
 
 class actions:
     followed = re.compile(r'(?:(^[^(]+) \()?@([^)]+)\)? is now following you on Twitter!$')
@@ -35,6 +43,17 @@ class actions:
     do_you_know = re.compile(r'^Do you know .+ on Twitter?')
     direct_message_old = re.compile(r'^Direct message from .+')
     direct_message = re.compile(r'(^[^(]+) \(@([^)]+)\) has sent you a direct message on Twitter!')
+ACTION_NAMES = {
+    actions.followed: 'follow',
+    actions.followed_nameonly: 'follow',
+    actions.mentioned: 'mention',
+    actions.mentioned_photo: 'mention',
+    actions.replied: 'reply',
+    actions.favorited: 'favorite',
+    actions.retweeted: 'retweet',
+    actions.direct_message: 'direct-message',
+    actions.direct_message_old: 'direct-message',
+}
 
 def parse_subject(subject):
     for action in [actions.followed, actions.mentioned, actions.direct_message,
