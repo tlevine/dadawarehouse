@@ -52,38 +52,31 @@ def convert_log(engine, filedate):
             body = body)
 
 def online_durations(engine, filedate):
-    counts = defaultdict(lambda: {'avail': 0, 'notavail': 0})
-    for uid, status, count in 'select uid, status, count(*) from log_status group by uid, status;':
-        counts[uid][status] = count
-
-    equal_count = '''
-SELECT ends.uid, nick, ends.ends - beginnings.beginnings
+    for uid, nick in engine.execute('SELECT DISTINCT uid, nick FROM log_status;'):
+        sql = '''
+SELECT end - begin
 FROM (
-  SELECT nick, uid, sum(ts) 'ends'
-  FROM log_status
-  WHERE status = 'notavail'
-  GROUP BY uid
-) 'ends'
-JOIN (
-  SELECT uid, sum(ts) 'beginnings'
+  SELECT uid, sum(ts) 'begin'
   FROM log_status
   WHERE status = 'avail'
-  GROUP BY uid
-) 'beginnings'
-ON ends.uid = beginnings.uid;
+    AND uid = '%(uid)s'
+    AND ts < (SELECT max(ts) FROM log_status WHERE uid = '%(uid)s')
+) 'begin'
+JOIN (
+  SELECT uid, sum(ts) 'end'
+  FROM log_status
+  WHERE status = 'notavail'
+    AND uid = '%(uid)s'
+    AND ts > (SELECT max(ts) FROM log_status WHERE uid = '%(uid)s')
+) 'end'
+ON end.uid = begin.uid;
 '''
-    for uid, nick, duration in engine.execute(sql).fetchall():
-        if counts[uid]['avail'] == counts[uid]['notavail']:
-            yield FacebookDuration(date = Date(pk = filedate),
-                user = FacebookUser(pk = parse_uid(uid), current_nick = nick),
-                duration = duration)
-        else:
-            first_sql = 'SELECT status FROM log_status WHERE uid = ? ORDER BY ts ASC LIMIT 1'
-            last_sql = 'SELECT status FROM log_status WHERE uid = ? ORDER BY ts DESC LIMIT 1'
-            first_status = engine.execute(first_sql).fetchone()[0]
-            last_status = engine.execute(last_sql).fetchone()[0]
-            if first_status == 'notavail':
-                sql = 'SELECT sum(
+        print(sql % {'uid':uid})
+        duration = engine.execute(sql % {'uid':uid}).fetchone()[0]
+        print(duration)
+        yield FacebookDuration(date = Date(pk = filedate),
+            user = FacebookUser(pk = parse_uid(uid), current_nick = nick),
+            duration = duration)
 
 def update(session):
     download()
