@@ -59,7 +59,7 @@ class FacebookChatStatusChange(Fact):
         self.datetime = self.datetime.link(session)
         return self
 
-class FacebookOnlineTime(Fact):
+class FacebookDuration(Fact):
     '''
     How long a person was on Facebook each day
     '''
@@ -67,6 +67,7 @@ class FacebookOnlineTime(Fact):
     user = relationship(FacebookUser)
     date_id = m.DateColumn(primary_key = True)
     date = relationship(m.Date)
+    duration = m.Column(s.Integer) # in seconds
     def link(self, session):
         self.date = self.date.link(session)
         self.user = self.user.link(session)

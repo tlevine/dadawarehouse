@@ -50,6 +50,28 @@ def convert_log(engine, filedate):
             datetime = DateTime(pk = datetime.datetime.fromtimestamp(ts)),
             body = body)
 
+def online_durations(engine, filedate):
+    sql = '''
+SELECT ends.uid, nick, ends.ends - beginnings.beginnings
+FROM (
+  SELECT nick, uid, sum(ts) 'ends'
+  FROM log_status
+  GROUP BY uid
+  WHERE status = 'notavail'
+) 'ends'
+JOIN (
+  SELECT uid, sum(ts) 'beginnings'
+  FROM log_status
+  GROUP BY uid
+  WHERE status = 'avail'
+) 'beginnings'
+ON ends.uid = beginnings.uid;
+'''
+    for uid, current_nick, duration in engine.execute(sql).fetchall():
+        yield FacebookDuration(date = Date(pk = filedate),
+            user = FacebookUser(pk = parse_uid(uid), current_nick = nick),
+            duration = duration)
+
 def update(session):
     download()
     for filename in os.listdir(LOCAL_CHAT):
@@ -69,7 +91,7 @@ def update(session):
               # session.add(next(get_user_nicks(engine)).link(session))
               # session.commit()
               # assert False
-
+                session.add_all(duration.link(session) for duration in online_durations(engine, filedate))
                 session.add_all(user_nick.link(session) for user_nick in get_user_nicks(engine))
                 session.add_all(log_event.link(session) for log_event in convert_log(engine, filedate))
                 session.commit()
