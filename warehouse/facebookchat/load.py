@@ -52,34 +52,37 @@ def convert_log(engine, filedate):
             body = body)
 
 def online_durations(engine, filedate):
-    for uid, nick in engine.execute('SELECT DISTINCT uid, nick FROM log_status;'):
-        sql = '''
-SELECT end - begin
-FROM (
-  SELECT uid, sum(ts) 'begin'
-  FROM log_status
-  WHERE status = 'avail'
-    AND uid = '%(uid)s'
-    AND ts < (SELECT max(ts) FROM log_status WHERE uid = '%(uid)s')
-) 'begin'
-JOIN (
-  SELECT uid, sum(ts) 'end'
-  FROM log_status
-  WHERE status = 'notavail'
-    AND uid = '%(uid)s'
-    AND ts > (SELECT max(ts) FROM log_status WHERE uid = '%(uid)s')
-) 'end'
-ON end.uid = begin.uid;
+    sql = '''
+SELECT uid, nick, min(ts), max(ts)
+FROM log_status
+GROUP BY uid;
 '''
-        print(sql % {'uid':uid})
-        duration = engine.execute(sql % {'uid':uid}).fetchone()[0]
-        print(duration)
-        yield FacebookDuration(date = Date(pk = filedate),
-            user = FacebookUser(pk = parse_uid(uid), current_nick = nick),
-            duration = duration)
+    for uid, nick, min_ts, max_ts in engine.execute(sql):
+        sql_avail = '''
+SELECT sum(ts)
+FROM log_status
+WHERE status = 'avail'
+  AND uid = ?
+  AND ts < ?
+'''
+        sql_notavail = '''
+SELECT sum(ts)
+FROM log_status
+WHERE status = 'notavail'
+  AND uid = ?
+  AND ts > ?
+'''
+        end = engine.execute(sql_notavail, uid, min_ts).fetchone()[0]
+        begin = engine.execute(sql_avail, uid, max_ts).fetchone()[0]
+        if end == None or begin == None or begin > end:
+            logger.info('Weird log for %s (%s) on %s' % (uid, nick, filedate.isoformat()))
+        else:
+            yield FacebookDuration(date = Date(pk = filedate),
+                user = FacebookUser(pk = parse_uid(uid), current_nick = nick),
+                duration = end - begin)
 
 def update(session):
-    download()
+  # download()
     for filename in os.listdir(LOCAL_CHAT):
         try:
             filedate = datetime.datetime.strptime(filename, '%Y-%m-%d.db').date()
