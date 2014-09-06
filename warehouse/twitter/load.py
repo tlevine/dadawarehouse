@@ -26,6 +26,7 @@ class actions:
     followed = re.compile(r'(?:(^[^(]+) \()?@([^)]+)\)? is now following you on Twitter!$')
     followed_nameonly = re.compile(r'^([^)(@]+) is now following you on Twitter!')
     mentioned = re.compile(r'(?:(^[^(]+) ?\()?@([^)]+)\)? mentioned you on Twitter!')
+    mentioned_photo = re.compile(r'(?:(^[^(]+) ?\()?@([^)]+)\)? mentioned you in a photo!')
     replied = re.compile(r'(?:(^[^(]+) \()?@([^)]+)\)? replied to .+!')
     favorited = re.compile(r'(?:(^[^(]+) \()?@([^)]+)\)? favorited .+\!')
     multiple = re.compile('^Thomas Levine, you have new followers on Twitter!')
@@ -37,7 +38,8 @@ class actions:
 
 def parse_subject(subject):
     for action in [actions.followed, actions.mentioned, actions.direct_message,
-                   actions.replied, actions.favorited, actions.retweeted]:
+                   actions.replied, actions.favorited, actions.retweeted,
+                   actions.mentioned_photo]:
         m = re.match(action, subject)
         if m:
             a, b, c = m.group(1), m.group(2), action

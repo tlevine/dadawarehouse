@@ -40,4 +40,7 @@ testcases = [
         'OpenWatch', None, actions.followed_nameonly),
     ("@zentree favorited one of your Retweets!",
         None, 'zentree', actions.favorited),
+    ("Burton DeWilde (@bjdewilde) mentioned you in a photo!",
+        'Burton DeWilde', 'bjdewilde', actions.mentioned_photo),
+
 ]
