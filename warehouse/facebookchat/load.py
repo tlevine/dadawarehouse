@@ -52,7 +52,11 @@ def convert_log(engine, filedate):
             body = body)
 
 def online_durations(engine, filedate):
-    sql = '''
+    counts = defaultdict(lambda: {'avail': 0, 'notavail': 0})
+    for uid, status, count in 'select uid, status, count(*) from log_status group by uid, status;':
+        counts[uid][status] = count
+
+    equal_count = '''
 SELECT ends.uid, nick, ends.ends - beginnings.beginnings
 FROM (
   SELECT nick, uid, sum(ts) 'ends'
@@ -69,9 +73,17 @@ JOIN (
 ON ends.uid = beginnings.uid;
 '''
     for uid, nick, duration in engine.execute(sql).fetchall():
-        yield FacebookDuration(date = Date(pk = filedate),
-            user = FacebookUser(pk = parse_uid(uid), current_nick = nick),
-            duration = duration)
+        if counts[uid]['avail'] == counts[uid]['notavail']:
+            yield FacebookDuration(date = Date(pk = filedate),
+                user = FacebookUser(pk = parse_uid(uid), current_nick = nick),
+                duration = duration)
+        else:
+            first_sql = 'SELECT status FROM log_status WHERE uid = ? ORDER BY ts ASC LIMIT 1'
+            last_sql = 'SELECT status FROM log_status WHERE uid = ? ORDER BY ts DESC LIMIT 1'
+            first_status = engine.execute(first_sql).fetchone()[0]
+            last_status = engine.execute(last_sql).fetchone()[0]
+            if first_status == 'notavail':
+                sql = 'SELECT sum(
 
 def update(session):
     download()
