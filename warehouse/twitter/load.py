@@ -40,7 +40,7 @@ def parse_subject(subject):
         if m:
             return m.group(1), m.group(2), action
 
-    for action in [actions.multiple, actions.followed_old, actions.do_you_know,
+    for action in [actions.multiple, actions.do_you_know,
                    actions.direct_message_old]:
         if re.match(action, subject):
             return None, None, action
