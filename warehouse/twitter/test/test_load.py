@@ -32,4 +32,8 @@ testcases = [
         'David Jones', 'drjtwit', actions.retweeted),
     ("ScraperWiki(@ScraperWiki) mentioned you on Twitter!",
         'ScraperWiki', 'ScraperWiki', actions.mentioned),
+    ("@droquo retweeted a Tweet you were mentioned in!",
+        None, 'droquo', actions.retweeted),
+    ("@droquo favorited a Tweet you were mentioned in!"
+        None, 'droquo', actions.favorited),
 ]

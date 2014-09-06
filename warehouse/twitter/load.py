@@ -25,8 +25,8 @@ def update(session):
 class actions:
     followed = re.compile(r'(?:(^[^(]+) \()?@([^)]+)\)? is now following you on Twitter!$')
     mentioned = re.compile(r'(?:(^[^(]+) ?\()?@([^)]+)\)? mentioned you on Twitter!')
-    replied = re.compile(r'(?:(^[^(]+) \()?@([^)]+)\)? replied to one of your Tweets!')
-    favorited = re.compile(r'(?:(^[^(]+) \()@([^)]+)\)? favorited one of your Tweets!')
+    replied = re.compile(r'(?:(^[^(]+) \()?@([^)]+)\)? replied to (?:one of your Tweets!|a Tweet you were mentioned in!)')
+    favorited = re.compile(r'(?:(^[^(]+) \()@([^)]+)\)? favorited (?:one of your Tweets!|a Tweet you were mentioned in!)')
     multiple = re.compile('^Thomas Levine, you have new followers on Twitter!')
     retweeted = re.compile(r'(?:(^[^(]+) \()?@([^)]+)\)? retweeted one of your (?:Ret|T)weets!')
     do_you_know = re.compile(r'^Do you know .+ on Twitter?')
