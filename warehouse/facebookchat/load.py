@@ -68,7 +68,7 @@ def online_durations(engine, filedate):
             elif status == 'notavail' and not avail:
                 pass
             elif status == 'notavail' and avail:
-                duration += prev_ts - ts
+                duration += ts - prev_ts
                 avail = False
                 prev_ts = None
             elif status == 'notavail' and not avail:
