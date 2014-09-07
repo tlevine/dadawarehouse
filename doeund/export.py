@@ -77,10 +77,16 @@ def _mapping(column):
     '''
     http://cubes.databrewery.org/dev/doc/backends/sql.html?highlight=mappings#explicit-mapping
     '''
-    dimension = re.sub(r'^(?:dim|fact)_', '', column.table.name)
-    attribute = column.name
-    return '%s.%s' % (dimension, attribute), \
-           '%s.%s' % (column.table.name, column.name)
+    if column.table.name.startswith('dim_'):
+        dimension = re.sub(r'^dim_', '', column.table.name)
+        attribute = column.name
+        key = '%s.%s' % (dimension, attribute)
+    elif column.table.name.startswith('fact_'):
+        key = column.name
+    else:
+        raise ValueError('Column %s is neither a dimension nor a fact.' % column.name)
+
+    return key, '%s.%s' % (column.table.name, column.name)
 
 def mappings(table):
     for column in table.columns:
@@ -92,8 +98,11 @@ def mappings(table):
 def dimensions(fact_table):
     result = set()
     for key, value in mappings(fact_table):
-        dimension, attribute = key.split('.')
-        result.add(dimension)
+        if key.count('.') == 1:
+            # Fact attributes have zero dots,
+            # and dimension attributes have one dot.
+            dimension, attribute = key.split('.')
+            result.add(dimension)
     return result
 
 def export(tables):
@@ -115,7 +124,6 @@ def parse_fact_table(table):
         'joins': list(joins(table)),
         'mappings': dict(mappings(table)),
     })
-    d
 
 def parse_dim_table(table):
     levels = list(dim_levels(table))
