@@ -10,13 +10,15 @@ NUMERIC = (
     t.Boolean,
 )
 
-def olap_name(thingy):
+def named(thingy, contents = {}):
     cube_name = re.sub(r'(?:dim|fact)_', '', thingy.name)
     pretty_name = re.sub(r'[_ ]([a-z])', r' \1', cube_name)
-    return {
-        'name': cube_name
+    out = dict(contents)
+    out.update({
+        'name': cube_name,
         'label': thingy.info.get('label', pretty_name),
-    }
+    })
+    return out
 
 def aggregations(column):
     '''
@@ -34,11 +36,9 @@ def fact_measures(table):
     '''
     for column in table.columns:
         if not column.primary_key and len(column.foreign_keys) == 0:
-            yield {
-                'name': column.name,
-                'label': column.info.get('label', column.name),
+            yield named(column, {
                 'aggregations': aggregations(column)
-            }
+            })
 
 def dim_levels(table):
     '''
@@ -55,15 +55,12 @@ def dim_levels(table):
     # thing, like for date tables.
     for column in table.columns:
         if column.primary_key and column.name != 'pk':
-            yield {
-                'name': column.name,
-                'label': column.info.get('label', column.name),
-            }
+            yield named(column)
 
 def dimensions(fact_table):
     for column in fact_table.columns:
         for foreign_key in column.foreign_keys:
-            yield re.sub(r'^dim_', '', foreign_key.column.table.name)
+            yield named(foreign_key.column.table)['name']
             yield from dimensions(foreign_key.column.table)
 
 def joins(from_table):
