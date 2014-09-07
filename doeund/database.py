@@ -34,32 +34,26 @@ class DadaBase(Base):
         if len(table.relationships) == 0:
             self = self._merge(session)
         else:
-            for relationship in table.relationships:
-                self = self._link_one(relationship)
+            for foreign_key in table.columns:
+                for reference in foreign_key.foreign_keys:
+                    self = self._link_one(session, foreign_key, reference)
+
         return self
 
     def _merge(self, session):
         return session.merge(self)
 
-    def _link_one(self, relationship):
-        if len(relationship.local_columns) != 1:
-            msg = 'Linking works only on relationships with one local column.'
-            raise NotImplementError(msg)
+    def _link_one(self, session, foreign_key, reference):
+        if reference.column.table.primary_key != (reference,):
+            raise NotImplementedError('Only single-column primary keys are supported.')
         else:
-            local_column = next(iter(relationship.local_columns))
-            import pdb; pdb.set_trace()
-            names = {
-                'relationship': relationship.key,
-                'foreign_key': local_column.key,
-                'reference': next(iter(local_column.foreign_keys)).column.name,
-            }
-            values = {
-                'relationship': getattr(self, names['relationship']).link(session),
-                'foreign_key': getattr(values['relationship'], names['reference'])
-            }
+            Table = class_mapper(reference.table.__class__)
+            pk_name = reference.name
+            pk_value = getattr(self, foreign_key.name)
 
-            setattr(self, names['foreign_key'], values['foreign_key'])
-            setattr(self, names['relationship'], None)
+            other_table = Table(**{pk_name: pk_value}).link(session)
+            setattr(self, foreign_key.name, getattr(other_table, pk_name))
+
         return self
 
 class Fact(DadaBase):
