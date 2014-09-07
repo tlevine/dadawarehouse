@@ -1,6 +1,6 @@
-from collections import OrderedDict
+from collections import OrderedDict, namedtuple
 import re
-from functools import reduce
+from functools import reduce, partial
 
 import sqlalchemy.sql.sqltypes as t
 
@@ -12,6 +12,12 @@ NUMERIC = (
     t._DateAffinity,
     t.Boolean,
 )
+
+class DimensionPath(list):
+    info = {}
+    @property
+    def name(self):
+        return '_'.join(map(partial(re.sub(r'^dim_', ''), self)))
 
 def named(thingy, contents = {}):
     cube_name = re.sub(r'(?:dim|fact)_', '', thingy.name)
@@ -72,7 +78,7 @@ def _stringify_mapping(dimension_path, column):
     http://cubes.databrewery.org/dev/doc/backends/sql.html?highlight=mappings#explicit-mapping
     '''
     if column.table.name.startswith('dim_'):
-        key = '%s.%s' % ('_'.join(dimension_path), column.name)
+        key = '%s.%s' % (dimension_path.name, column.name)
     elif column.table.name.startswith('fact_'):
         key = column.name
     else:
@@ -85,8 +91,7 @@ def _mappings(prefix, table):
         yield prefix, column
     for _, from_column, to_table, to_column in foreign_keys(table):
         if to_table.name.startswith('dim_'):
-            dimension_path = [re.sub(r'^dim_', '', from_column.name)]
-            yield from _mappings(prefix + dimension_path, to_column.table)
+            yield from _mappings(prefix + [from_column.name], to_column.table)
 
 def mappings(table):
     '''
