@@ -36,8 +36,6 @@ def aggregations(column):
     return result
 
 def fact_measures(table):
-    '''
-    '''
     for column in nonkey_columns(table):
         yield named(column, {
             'aggregations': aggregations(column)
