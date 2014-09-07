@@ -25,12 +25,11 @@ class DimensionPath(list):
 
 def named(thingy, contents = {}):
     name = re.sub(r'(?:dim|fact)_', '', thingy.name)
-    label = re.sub(r'[_ ]([a-z])', r' \1',
-                   name[0].upper() + name[1:])
+    label = (word[0].upper() + word[1:] for word in re.split(r'[ _]', name))
     out = dict(contents)
     out.update({
         'name': name,
-        'label': thingy.info.get('label', label),
+        'label': thingy.info.get('label', ' '.join(label)),
     })
     return out
 
