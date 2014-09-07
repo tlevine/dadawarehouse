@@ -4,7 +4,8 @@ from functools import reduce, partial
 
 import sqlalchemy.sql.sqltypes as t
 
-from .columns import nonkey_columns, named_primary_keys, foreign_keys
+from .columns import nonkey_columns, named_primary_keys, foreign_keys, \
+                     is_crosswalk
 
 NUMERIC = (
     t.Integer,
@@ -92,7 +93,10 @@ def _mappings(prefix, table):
         yield prefix, column
     for _, from_column, to_table, to_column in foreign_keys(table):
         if to_table.name.startswith('dim_'):
-            suffix = [to_table.name]
+            if is_crosswalk(to_table):
+                suffix = []
+            else:
+                suffix = [to_table.name]
             path = DimensionPath(prefix + suffix)
             yield from _mappings(path, to_column.table)
 

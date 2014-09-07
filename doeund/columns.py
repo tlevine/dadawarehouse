@@ -26,3 +26,10 @@ def foreign_keys(table):
             to_table = foreign_key.column.table
             to_column = foreign_key.column
             yield from_table, from_column, to_table, to_column
+
+def is_crosswalk(table):
+    '''
+    Is this table just a bunch of keys that connect other tables?
+    '''
+    return all(column.primary_key or len(column.foreign_keys) > 0 \
+               for column in table.columns)
