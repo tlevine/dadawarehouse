@@ -37,9 +37,6 @@ class CalendarEvent(d.Fact):
         '''
         Link to dependencies.
         '''
-        event_date = m.Date(pk = self.date).link(session)
-        event_description = Description(
-            description = self.description).link(session)
-        self.date = event_date
-        self.description = event_description
+        self.date_id = self.date.link(session)
+        self.description_id = self.description.link(session)
         return self # Don't need to merge because duplicates are allowed

@@ -17,8 +17,8 @@ def load_data():
   # engine = create_engine('postgres:///tlevine')
     engine = create_engine('sqlite:////tmp/dada.sqlite')
     session = doeund.database(engine)
-    fb(session)
-    history(session)
+ #  fb(session)
+ #  history(session)
     pal(session)
 
 def export_model():

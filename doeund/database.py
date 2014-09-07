@@ -1,6 +1,7 @@
 from collections import namedtuple
 from enum import Enum
 
+from sqlalchemy.orm import class_mapper
 from sqlalchemy import Column as _Column
 from sqlalchemy.ext.declarative import \
     declarative_base as _declarative_base, declared_attr
@@ -34,6 +35,27 @@ class Fact(Base):
     @declared_attr
     def __tablename__(Class):
         return 'fact_' + Class.__name__.lower()
+
+    def link(session):
+        for relationship in class_mapper(self).relationships:
+            if len(relationship).local_columns != 1:
+                msg = 'Linking works only on relationships with one local column.'
+                raise NotImplementError(msg)
+            else:
+                local_column = next(iter(relationship.local_columns))
+                names = {
+                    'relationship': relationship.key,
+                    'foreign_key': local_column.key,
+                    'reference': next(iter(local_column.foreign_keys)).column.name,
+                }
+                values = {
+                    'relationship': getattr(self, names['relationship']).link(session),
+                    'foreign_key': getattr(values['relationship'], names['reference'])
+                }
+
+                getattr(self, names['foreign_key']) = values['foreign_key']
+                setattr(self, names['relationship'], None)
+        
 
 class Dimension(Base):
     '''
