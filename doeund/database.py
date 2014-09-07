@@ -35,7 +35,7 @@ class DadaBase(Base):
             out = self._merge(session)
         else:
             for relationship in table.relationships:
-                self = self._link_one(relationship)
+                self = self._link_one(session, relationship)
             out = self
         return out
 
@@ -69,7 +69,7 @@ class DadaBase(Base):
             Class._existing_references.add(value)
             return merge_on_unique(Class, session, getattr(Class, unique_column), value)
 
-    def _link_one(self, relationship):
+    def _link_one(self, session, relationship):
         if len(relationship.local_columns) != 1:
             msg = 'Automatic linking is not implemented for relationships with local column counts other than one.'
             raise NotImplementedError(msg)
