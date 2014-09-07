@@ -8,37 +8,37 @@ import doeund as d
 
 import warehouse.model as m
 
-class CalendarFile(d.Dimension):
-    pk = m.Column(String(2), primary_key = True)
-    filename = m.Column(String, unique = True)
+class File(d.Dimension):
+    pk = m.Column(String(2), primary_key = True, label = 'Two-letter code')
+    filename = m.Column(String, unique = True, label = 'File name')
     description = m.Column(String)
 
     def link(self, session):
         return session.merge(self)
 
-class CalendarEventDescription(d.Dimension):
+class Description(d.Dimension):
     pk = m.PkColumn()
     description = m.LabelColumn()
 
     def link(self, session):
         return d.merge_on_unique(self.__class__, session,
-            CalendarEventDescription.description, self.description)
+            Description.description, self.description)
 
 class CalendarEvent(d.Fact):
     pk = m.PkColumn()
-    file_id = m.Column(String(2), ForeignKey(CalendarFile.pk))
-    file = relationship(CalendarFile)
+    file_id = m.Column(String(2), ForeignKey(File.pk))
+    file = relationship(File)
     date_id = m.DateColumn()
     date = relationship(m.Date)
-    description_id = m.FkColumn(CalendarEventDescription.pk)
-    description = relationship(CalendarEventDescription)
+    description_id = m.FkColumn(Description.pk)
+    description = relationship(Description)
     
     def link(self, session):
         '''
         Link to dependencies.
         '''
         event_date = m.Date(pk = self.date).link(session)
-        event_description = CalendarEventDescription(
+        event_description = Description(
             description = self.description).link(session)
         self.date = event_date
         self.description = event_description

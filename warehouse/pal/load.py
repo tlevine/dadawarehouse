@@ -3,7 +3,7 @@ import datetime
 
 from ..logger import logger
 import warehouse.model as m
-from .model import CalendarFile, CalendarEvent, CalendarEventDescription
+from .model import File, CalendarEvent, Description
 
 CALENDARS = [os.path.join(os.path.expanduser('~/.pal'), rest) for rest in [\
     'secrets-nsa/secret-calendar.txt',
@@ -15,9 +15,9 @@ CALENDARS = [os.path.join(os.path.expanduser('~/.pal'), rest) for rest in [\
 ]]
     
 def update(session, calendars = CALENDARS):
-    session.query(CalendarEventDescription).delete()
+    session.query(Description).delete()
     session.query(CalendarEvent).delete()
-    session.query(CalendarFile).delete()
+    session.query(File).delete()
     session.commit()
 
     for filename in calendars:
@@ -49,7 +49,7 @@ def parse(fp, filename = None):
             pass
         elif calendar_file == None:
             calendar_code, _, calendar_description = line.partition(' ')
-            calendar_file = CalendarFile(pk = calendar_code,
+            calendar_file = File(pk = calendar_code,
                 filename = filename, description = calendar_description)
         else:
             events.extend(entry(line))

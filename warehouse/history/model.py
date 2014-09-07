@@ -7,16 +7,16 @@ import warehouse.model as m
 
 class CommandBody(d.Dimension):
     pk = m.PkColumn()
-    arg0 = m.Column(s.String, nullable = True)
-    arg1 = m.Column(s.String, nullable = True)
-    arg2 = m.Column(s.String, nullable = True)
-    full_command = m.Column(s.String, unique = True)
+    arg0 = m.Column(s.String, nullable = True, label = '$0')
+    arg1 = m.Column(s.String, nullable = True, label = '$1')
+    arg2 = m.Column(s.String, nullable = True, label = '$2')
+    full_command = m.Column(s.String, unique = True, label = '!!')
 
 class ShellSession(d.Dimension):
     pk = m.PkColumn()
     datetime_id = m.DateTimeColumn()
     datetime = relationship(m.DateTime)
-    filename = m.LabelColumn()
+    filename = m.LabelColumn(label = 'File Name')
     commands = relationship('Command')
 
 class Command(d.Fact):
