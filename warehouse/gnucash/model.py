@@ -1,3 +1,5 @@
+import sqlalchemy as s
+
 from doeund import Fact, Dimension
 
 import warehouse.model as m
@@ -24,9 +26,9 @@ class GnuCashAccount(Dimension):
     description = m.Column(s.String)
     commodity_guid = m.Column(Guid)
 
-    account_type = m.FkColumn(GnuCashAccountType.pk))
-    section = m.FkColumn(GnuCashSection.pk))
-    subsection = m.FkColumn(GnuCashSubSection.pk), nullable = True)
+    account_type = m.FkColumn(GnuCashAccountType.pk)
+    section = m.FkColumn(GnuCashSection.pk)
+    subsection = m.FkColumn(GnuCashSubSection.pk, nullable = True)
 
 class GnuCashTransaction(Dimension):
     guid = m.Column(Guid, primary_key = True)

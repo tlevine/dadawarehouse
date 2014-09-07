@@ -9,6 +9,7 @@ from warehouse.history.load import update as history
 from warehouse.pal.load import update as pal
 from warehouse.facebookchat.load import update as fb
 from warehouse.twitter.load import update as twitter
+from warehouse.gnucash.load import update as gnucash
 
 CACHE_DIRECTORY = os.path.expanduser('~/.dadawarehouse')
 

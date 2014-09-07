@@ -8,7 +8,10 @@ Facebook messages
     Facebook messages that people have sent me (not messages I have sent)
 Facebook chat status changes
     When people go online and offline
-
+Twitter notifications
+    When people direct message, follow, &c. me.
+GnuCash splits
+    Along with their transactions, accounts, &c.
 
 Here are some other possible cubes or data sources.
 
@@ -20,7 +23,6 @@ Here are some other possible cubes or data sources.
   * Mailing lists
   * Travel bookings
   * ...
-* Finances (Gnucash)
 * Old calendar (Google Calendar)
 * Other Google services, mainly for stuff from years ago
 * Text messages
