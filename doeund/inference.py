@@ -21,21 +21,25 @@ NUMERIC = (
 )
 
 def aggregations(column):
+    '''
+    Choose aggregations based on column type.
+    http://cubes.databrewery.org/dev/doc/backends/sql.html?highlight=avg
+    '''
+    result = ['count', 'count_nonempty', 'count_distinct']
     if isinstance(column, NUMERIC):
-        return ['sum', 'avg', 'max']
+        result.extend(['min', 'max', 'avg', 'stddev', 'variance'])
+    return result
 
 def fact_measures(table):
     '''
     List the columns that are not foreign keys.
     '''
-    return OrderedDict((column.name, [column]) for column in table.columns \
-                       if len(column.foreign_keys) == 0)
     for column in table.columns:
         if len(column.foreign_keys) == 0 and column.name != 'pk':
             yield {
                 'name': column.name
                 'label': column.info.get('label', column.name),
-                'aggregations': 
+                'aggregations': aggregations(column)
             }
 
 def joins(from_table):

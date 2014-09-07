@@ -17,21 +17,13 @@ def add_table(model, table):
     return model
 
 def parse_fact_table(table):
-
-        dimensions = fact_measures(fact_table)
-        self.responses = list(dimensions.keys())
-        dimensions = fact_measures(fact_table)
-                dimensions[dim_name] = dim_levels(to_table)
     return {
         'name': table.name,
         'label': table.info.get('label', table.name),
         'dimensions': ["date_sale", "customer", "product", "country" ],
-        'measures': [
-            {'name': 'quantity', 'aggregations': ['sum', 'avg', 'max'] },
-            {'name': 'price_total', 'aggregations': ['sum', 'avg', 'max', 'min'] }
-        ],
+        'measures': list(fact_measures(table))
         'joins': list(joins(table)),
-        'mappings': {},
+    #   'mappings': {},
     }
 
 def parse_dim_table(table):
