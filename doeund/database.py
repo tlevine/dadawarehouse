@@ -39,10 +39,8 @@ class DadaBase(Base):
         return self
 
     def _merge(self, session):
-        Class = class_mapper(self.__class__)
-
-        primary_key_columns = [c.name for c in Class.__table__.columns if c.primary_key]
-        unique_columns = [c.name for c in Class.__table__.columns if c.unique]
+        primary_key_columns = [c.name for c in self.__table__.columns if c.primary_key]
+        unique_columns = [c.name for c in self.__table__.columns if c.unique]
 
         if len(unique_columns) == 1:
             unique_column = unique_columns[0]
@@ -53,7 +51,9 @@ class DadaBase(Base):
         elif len(primary_key_columns) > 1:
             raise NotImplementedError
 
-        return merge_on_unique(Class, session,
+        Class = self.__class__
+        return merge_on_unique(Class,
+                               session,
                                getattr(Class, unique_column),
                                getattr(self, unique_column))
 
