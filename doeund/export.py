@@ -1,6 +1,6 @@
 from functools import reduce
 
-from .inference import dim_levels as _dim_levels, fact_measures as _fact_measures, joins as _joins
+from .inference import dim_levels, fact_measures, joins, mappings
 
 def export(tables):
     initial = {'dimensions':[], 'cubes': []}

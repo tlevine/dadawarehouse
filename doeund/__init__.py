@@ -1,5 +1,4 @@
 from sqlalchemy.orm import sessionmaker as _sessionmaker
-from sqlalchemy.exc import ProgrammingError
 
 from .database import Fact, Dimension, Column, Base as _Base, merge_on_unique
 from .export import export as _export

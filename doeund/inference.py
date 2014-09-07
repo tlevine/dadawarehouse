@@ -25,7 +25,7 @@ def fact_measures(table):
     for column in table.columns:
         if not column.primary_key and len(column.foreign_keys) == 0:
             yield {
-                'name': column.name
+                'name': column.name,
                 'label': column.info.get('label', column.name),
                 'aggregations': aggregations(column)
             }
@@ -59,8 +59,8 @@ def joins(from_table):
             to_column = foreign_key.column
             to_table = to_column.table
             yield {
-                'master': '%s.%s' (from_table.name, from_column.name),
-                'detail': '%s.%s' (to_table.name, to_column.name),
+                'master': '%s.%s' % (from_table.name, from_column.name),
+                'detail': '%s.%s' % (to_table.name, to_column.name),
             }
             yield from joins(to_table)
 
@@ -75,6 +75,6 @@ def _mapping(column):
 
 def mappings(from_table):
     for from_column in from_table.columns:
-        yield _mapping(from_column):
+        yield _mapping(from_column)
         for foreign_key in from_column.foreign_keys:
             yield from mappings(to_column.table)
