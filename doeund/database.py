@@ -45,7 +45,8 @@ class DadaBase(Base):
 
     def _link_one(self, session, foreign_key, reference):
         if reference.column.table.primary_key != (reference,):
-            raise NotImplementedError('Only single-column primary keys are supported.')
+            # raise NotImplementedError('Only single-column primary keys are supported.')
+            pass
         else:
             Table = class_mapper(reference.table.__class__)
             pk_name = reference.name
