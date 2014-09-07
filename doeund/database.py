@@ -34,40 +34,33 @@ class DadaBase(Base):
         if len(table.relationships) == 0:
             self = self._merge(session)
         else:
-            for foreign_key in table.columns:
-                for _reference in foreign_key.foreign_keys:
-                    self = self._link_one(session, foreign_key, _reference.column)
-
+            for relationship in table.relationships:
+                self = self._link_one(relationship)
         return self
 
     def _merge(self, session):
-        Table = self.__class__
+        return session.merge(self)
 
-        unique_columns = list(filter(lambda c: c.unique, Table.columns))
-        primary_key_columns = list(filter(lambda c: c.primary_key, Table.columns))
-
-        if len(unique_columns) == 1:
-            unique_column = unique_columns[0]
-        elif len(primary_key_columns) == 1:
-            unique_column = primary_key_columns[0]
+    def _link_one(self, relationship):
+        if len(relationship.local_columns) != 1:
+            msg = 'Automatic linking is not implemented for relationships with local column counts other than one.'
+            raise NotImplementedError(msg)
         else:
-            raise NotImplementedError
+            local_column = next(iter(relationship.local_columns))
+            names = {
+                'relationship': relationship.key,
+                'foreign_key': local_column.key,
+                'reference': next(iter(local_column.foreign_keys)).column.name,
+            }
 
-        value = getattr(self, unique_column.name)
-        return merge_on_unique(Class, session, unique_column, value)
-
-    def _link_one(self, session, foreign_key, reference):
-        if tuple(reference.table.primary_key.columns) != (reference,):
-            raise NotImplementedError('Only single-column primary keys are supported.')
-            pass
-        else:
-            Table = reference.table.__class__
-            pk_name = reference.name
-            pk_value = getattr(self, foreign_key.name)
-
-            other_table = Table(**{pk_name: pk_value}).link(session)
-            setattr(self, foreign_key.name, getattr(other_table, pk_name))
-
+            related_instance = getattr(self, names['relationship'])
+            if related_instance == None:
+                msg = 'You must set the relationship attribute, not the foreign key attribute, for automatic linking to work.'
+                raise NotImplementedError(msg)
+            target = getattr(related_instance.link(session), names['reference'])
+            
+            setattr(self, names['foreign_key'], target)
+            setattr(self, names['relationship'], None)
         return self
 
 class Fact(DadaBase):
