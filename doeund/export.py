@@ -90,10 +90,10 @@ def _mapping(column):
 
 def mappings(table):
     for column in table.columns:
-        yield _mapping(column)
+        if not column.primary_key and len(column.foreign_keys) == 0:
+            yield _mapping(column)
         for foreign_key in column.foreign_keys:
-            if not column.primary_key and len(column.foreign_keys) == 0:
-                yield from mappings(foreign_key.column.table)
+            yield from mappings(foreign_key.column.table)
 
 def dimension_names(fact_table):
     result = set()
