@@ -81,7 +81,7 @@ def _stringify_mapping(dimension_path, column):
     '''
     http://cubes.databrewery.org/dev/doc/backends/sql.html?highlight=mappings#explicit-mapping
     '''
-    if len(dimension_path) == 0:
+    if len(dimension_path) == 1:
         key = column.name
     else:
         key = '%s.%s' % (dimension_path.name, column.name)
