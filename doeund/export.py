@@ -67,14 +67,12 @@ def joins(table):
         }
         yield from joins(to_table)
 
-def _mapping(prefix, column):
+def _stringify_mapping(dimension_path, column):
     '''
     http://cubes.databrewery.org/dev/doc/backends/sql.html?highlight=mappings#explicit-mapping
     '''
     if column.table.name.startswith('dim_'):
-        dimension = re.sub(r'^dim_', '', column.table.name)
-        attribute = column.name
-        key = '%s.%s' % (dimension, attribute)
+        key = '%s.%s' % ('_'.join(dimension_path), column.name)
     elif column.table.name.startswith('fact_'):
         key = column.name
     else:
@@ -84,7 +82,15 @@ def _mapping(prefix, column):
 
     return prefixed_key, '%s.%s' % (column.table.name, column.name)
 
-def mappings(table, prefix = ''):
+def _mappings(prefix, table):
+    for column in nonkey_columns(table):
+        yield prefix, column
+    for _, from_column, to_table, to_column in foreign_keys(table):
+        if to_table.name.startswith('dim_'):
+            dimension_path = [re.sub(r'^dim_', '', column.table.name)]
+            yield from _mappings(prefix + dimension_path, to_column.table)
+
+def mappings(table):
     '''
     Produce the mappings dictionary.
 
@@ -93,23 +99,17 @@ def mappings(table, prefix = ''):
     key references two different columns, treat them as different dimensions
     and name them reasonably.
     '''
-    for column in nonkey_columns(table):
-        yield _mapping(prefix, column)
-    for _, from_column, _, to_column in foreign_keys(table):
-        if prefix == '':
-            new_prefix = '%s_' % from_column.name
-        else:
-            new_prefix = '%s_%s_' % (prefix, from_column.name)
-        yield from mappings(to_column.table, prefix = new_prefix)
+    for dimension, table in _mappings([], table):
+        yield _stringify_mapping(dimension, table)
 
 def dimension_names(fact_table):
     result = set()
-    for key, value in mappings(fact_table):
-        if key.count('.') == 1:
-            # Fact attributes have zero dots,
-            # and dimension attributes have one dot.
-            dimension, attribute = key.split('.')
-            result.add(dimension)
+    for dimension_path, _ in _mappings(fact_table):
+        if len(prefix) == 0:
+            # This is a measure from the fact table.
+            pass
+        else:
+            result.add('_'.join(dimension))
     return result
 
 def export(tables):
