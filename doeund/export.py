@@ -95,7 +95,7 @@ def mappings(table):
             if not column.primary_key and len(column.foreign_keys) == 0:
                 yield from mappings(foreign_key.column.table)
 
-def dimensions(fact_table):
+def dimension_names(fact_table):
     result = set()
     for key, value in mappings(fact_table):
         if key.count('.') == 1:
@@ -106,31 +106,28 @@ def dimensions(fact_table):
     return result
 
 def export(tables):
-    model = {'dimensions':[], 'cubes': []}
+    model = {'dimensions': [], 'cubes': []}
+    previous_dimensions = set()
     for table in tables.values():
         if table.name.startswith('fact_'):
-            model['cubes'].append(parse_fact_table(table))
-            model['dimensions'].extend(parse_dimension_tables(table))
-        elif table.name.startswith('dim_'):
-            pass
-        else:
-            warnings.warn('I\'m ignoring table "%s" because it is neither a fact nor a dimension.' % table.name)
+            model['cubes'].append(parse_fact(table))
+            for dimension in parse_dimensions(table):
+                if dimension['name'] not in previous_dimensions:
+                    model['dimensions'].append(dimension)
+                    previous_dimensions.add(dimension['name'])
     return model
 
-def parse_fact_table(table):
+def parse_fact(table):
     return named(table, {
-        'dimensions': list(dimensions(table)),
+        'dimensions': list(dimension_names(table)),
         'measures': list(fact_measures(table)),
         'joins': list(joins(table)),
         'mappings': dict(mappings(table)),
     })
 
-def parse_dimension_tables(fact_table):
-    previous_dimensions = set()
-    for column in fact_table.columns:
+def parse_dimensions(table):
+    for column in table.columns:
         for foreign_key in column.foreign_keys:
             levels = list(dim_levels(foreign_key.column.table))
-            if column.name not in previous_dimensions:
-                yield named(column, {'levels': levels})
-                previous_dimensions.add(column.name)
-            yield from parse_dimension_tables(foreign_key.column.table)
+            yield named(column, {'levels': levels})
+            yield from parse_dimensions(foreign_key.column.table)
