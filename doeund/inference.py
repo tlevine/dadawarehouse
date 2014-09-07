@@ -60,9 +60,11 @@ def dim_levels(table):
 
 def dimensions(fact_table):
     for column in fact_table.columns:
-        for foreign_key in column.foreign_keys:
-            yield named(foreign_key.column.table)['name']
-            yield from dimensions(foreign_key.column.table)
+        if len(column.foreign_keys) == 1 and column.name.endswith('_id'):
+           #yield re.sub(r'_id$', '', named(column)['name'])
+            yield named(column)['name']
+            for foreign_key in column.foreign_keys:
+                yield from dimensions(foreign_key.column.table)
 
 def joins(from_table):
     '''
