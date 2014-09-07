@@ -7,13 +7,6 @@ import sqlalchemy.sql.sqltypes as t
 from .columns import nonkey_columns, named_primary_keys, foreign_keys, \
                      is_crosswalk
 
-NUMERIC = (
-    t.Integer,
-    t.Numeric,
-    t._DateAffinity,
-    t.Boolean,
-)
-
 class DimensionPath(list):
     '''
     A list of table names that specifies a joined dimension
@@ -34,6 +27,13 @@ def named(thingy, contents = {}):
     })
     return out
 
+NUMERIC = (
+    t.Integer,
+    t.Numeric,
+    t._DateAffinity,
+    t.Boolean,
+)
+
 def aggregations(column):
     '''
     Choose aggregations based on column type.
@@ -41,7 +41,7 @@ def aggregations(column):
     '''
     result = ['count', 'count_nonempty', 'count_distinct']
     if isinstance(column, NUMERIC):
-        result.extend(['min', 'max', 'avg', 'stddev', 'variance'])
+        result.extend(['min', 'max', 'avg', 'stddev', 'variance', 'sum'])
     return result
 
 def fact_measures(table):
