@@ -107,14 +107,11 @@ def dimension_names(fact_table):
 
 def export(tables):
     model = {'dimensions': [], 'cubes': []}
-    previous_dimensions = set()
     for table in tables.values():
         if table.name.startswith('fact_'):
             model['cubes'].append(parse_fact(table))
-            for dimension in parse_dimensions(table):
-                if dimension['name'] not in previous_dimensions:
-                    model['dimensions'].append(dimension)
-                    previous_dimensions.add(dimension['name'])
+        elif table.name.startswith('dim_'):
+            model['dimensions'].append(parse_dimension(table))
     return model
 
 def parse_fact(table):
@@ -125,9 +122,5 @@ def parse_fact(table):
         'mappings': dict(mappings(table)),
     })
 
-def parse_dimensions(table):
-    for column in table.columns:
-        for foreign_key in column.foreign_keys:
-            levels = list(dim_levels(foreign_key.column.table))
-            yield named(column, {'levels': levels})
-            yield from parse_dimensions(foreign_key.column.table)
+def parse_dimension(table):
+    return named(table, {'levels': list(dim_levels(table))})
