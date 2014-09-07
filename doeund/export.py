@@ -109,8 +109,8 @@ def export(tables):
     model = {'dimensions':[], 'cubes': []}
     for table in tables.values():
         if table.name.startswith('fact_'):
-            for olap_type, model_element in parse_fact_table(table):
-                model[olap_type + 's'].append(model_element)
+            model['cubes'].append(parse_fact_table(table))
+            model['dimensions'].extend(parse_dimension_tables(table))
         elif table.name.startswith('dim_'):
             pass
         else:
@@ -118,15 +118,19 @@ def export(tables):
     return model
 
 def parse_fact_table(table):
-    yield 'cube', named(table, {
+    return named(table, {
         'dimensions': list(dimensions(table)),
         'measures': list(fact_measures(table)),
         'joins': list(joins(table)),
         'mappings': dict(mappings(table)),
     })
 
-def parse_dim_table(table):
-    levels = list(dim_levels(table))
-    return named(table, {
-        'levels': levels,
-    })
+def parse_dimension_tables(fact_table):
+    previous_dimensions = set()
+    for column in fact_table.columns:
+        for foreign_key in column.foreign_keys:
+            levels = list(dim_levels(foreign_key.column.table))
+            if column.name not in previous_dimensions:
+                yield named(column, {'levels': levels})
+                previous_dimensions.add(column.name)
+            yield from parse_dimension_tables(foreign_key.column.table)
