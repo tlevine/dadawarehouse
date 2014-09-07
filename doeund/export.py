@@ -123,3 +123,9 @@ def parse_fact(table):
 
 def parse_dimension(table):
     return named(table, {'levels': list(dim_levels(table))})
+
+
+# Here's a problem: If the same dimension table is used for two different
+# dimensions in a cube (like multiple different dates), it only gets shown
+# once. Also, the name is unclear because it uses the dimension table name
+# rather than the fact table name.
