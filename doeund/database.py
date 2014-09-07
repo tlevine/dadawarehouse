@@ -5,8 +5,6 @@ from sqlalchemy import Column as _Column
 from sqlalchemy.ext.declarative import \
     declarative_base as _declarative_base, declared_attr
 
-from .inference import dim_levels, fact_measures, joins
-
 Base = _declarative_base()
 
 class Column(_Column):
@@ -37,12 +35,6 @@ class Fact(Base):
     def __tablename__(Class):
         return 'fact_' + Class.__name__.lower()
 
-#   def __repr__(self):
-#       msg = '<Fact "%s" with measures %s and referencing dimensions %s>'
-#       measures = list(fact_measures(self.__table__).keys())
-#       dimensions = list(to_column.table.name for (_, to_column) in joins(self.__table))
-#       return msg % (self.__tablename__, measures, dimensions)
-
 class Dimension(Base):
     '''
     A dimension table
@@ -56,13 +48,6 @@ class Dimension(Base):
     @declared_attr
     def __tablename__(Class):
         return 'dim_' + Class.__name__.lower()
-
-#   def __repr__(self):
-#       msg = '<Dimension "%s" with levels %s and referencing dimensions %s>'
-#       measures = dim_levels(self.__table__)
-#       dimensions = list(to_column.table.name for (_, to_column) in \
-#                         joins(self.__table))
-#       return msg % (self.__tablename__, measures, dimensions)
 
 def merge_on_unique(Class, session, unique_column, value):
     '''

@@ -59,14 +59,6 @@ def dim_levels(table):
         if column.primary_key and column.name != 'pk':
             yield named(column)
 
-def dimensions(fact_table):
-    for column in fact_table.columns:
-        if len(column.foreign_keys) == 1:
-            yield named(column)['name']
-           #yield re.sub(r'_id$', '', named(column)['name'])
-            for foreign_key in column.foreign_keys:
-                yield from dimensions(foreign_key.column.table)
-
 def joins(from_table):
     '''
     List the joins from this fact table to dimension tables.
@@ -97,29 +89,33 @@ def mappings(table):
             if not column.primary_key and len(column.foreign_keys) == 0:
                 yield from mappings(foreign_key.column.table)
 
-
+def dimensions(fact_table):
+    result = set()
+    for key, value in mappings(fact_table).items():
+        dimension, attribute = key.split('.')
+        result.add(dimension)
+    return result
 
 def export(tables):
-    initial = {'dimensions':[], 'cubes': []}
-    return reduce(add_table, tables.values(), initial)
-
-def add_table(model, table):
-    model = dict(model)
-    if table.name.startswith('fact_'):
-        model['cubes'].append(parse_fact_table(table))
-    elif table.name.startswith('dim_'):
-        model['dimensions'].append(parse_dim_table(table))
-    else:
-        warnings.warn('I\'m ignoring table "%s" because it is neither a fact nor a dimension.' % table.name)
+    model = {'dimensions':[], 'cubes': []}
+    for table in tables.values():
+        if table.name.startswith('fact_'):
+            for olap_type, model_element in parse_fact_table(table):
+                model[olap_type + 's'].append(model_element)
+        elif table.name.startswith('dim_'):
+            pass
+        else:
+            warnings.warn('I\'m ignoring table "%s" because it is neither a fact nor a dimension.' % table.name)
     return model
 
 def parse_fact_table(table):
-    return named(table, {
+    yield 'cube', named(table, {
         'dimensions': list(dimensions(table)),
         'measures': list(fact_measures(table)),
         'joins': list(joins(table)),
         'mappings': dict(mappings(table)),
     })
+    d
 
 def parse_dim_table(table):
     levels = list(dim_levels(table))
