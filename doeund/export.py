@@ -21,17 +21,16 @@ def parse_fact_table(table):
         'name': table.name,
         'label': table.info.get('label', table.name),
         'dimensions': ["date_sale", "customer", "product", "country" ],
-        'measures': list(fact_measures(table))
+        'measures': list(fact_measures(table)),
         'joins': list(joins(table)),
     #   'mappings': {},
     }
 
 def parse_dim_table(table):
-    levels = 
-    hierarchies = 
+    levels = dim_levels(table)
     return {
         'name': table.name,
         'label': table.info.get('label', table.name),
-        'levels': [{'name': , 'label': }],
-        'hierarchies': [{'name': , 'label': , 'levels': []}],
+        'levels': levels,
+        'hierarchies': [level['name'] for level in levels],
     }
