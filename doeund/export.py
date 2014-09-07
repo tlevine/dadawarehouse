@@ -14,11 +14,14 @@ NUMERIC = (
 )
 
 class DimensionPath(list):
+    '''
+    A list of table names that specifies a joined dimension
+    '''
     info = {}
     @property
     def name(self):
         if len(self) > 0:
-            return '_'.join(map(partial(re.sub, r'^dim_', ''), self))
+            return '_'.join(map(partial(re.sub, r'^(?:dim|fact)_', ''), self))
 
 def named(thingy, contents = {}):
     name = re.sub(r'(?:dim|fact)_', '', thingy.name)
@@ -78,12 +81,10 @@ def _stringify_mapping(dimension_path, column):
     '''
     http://cubes.databrewery.org/dev/doc/backends/sql.html?highlight=mappings#explicit-mapping
     '''
-    if column.table.name.startswith('dim_'):
-        key = '%s.%s' % (dimension_path.name, column.name)
-    elif column.table.name.startswith('fact_'):
+    if len(dimension_path) == 0:
         key = column.name
     else:
-        raise ValueError('Column %s is neither a dimension nor a fact.' % column.name)
+        key = '%s.%s' % (dimension_path.name, column.name)
 
     return key, '%s.%s' % (column.table.name, column.name)
 
@@ -92,7 +93,8 @@ def _mappings(prefix, table):
         yield prefix, column
     for _, from_column, to_table, to_column in foreign_keys(table):
         if to_table.name.startswith('dim_'):
-            path = DimensionPath(prefix + [from_column.name])
+            suffix = [to_table.name]
+            path = DimensionPath(prefix + suffix)
             yield from _mappings(path, to_column.table)
 
 def mappings(table):
@@ -104,16 +106,16 @@ def mappings(table):
     key references two different columns, treat them as different dimensions
     and name them reasonably.
     '''
-    for dimension, table in _mappings(DimensionPath(), table):
+    for dimension, table in _mappings(DimensionPath([table.name]), table):
         yield _stringify_mapping(dimension, table)
 
 def dimensions(fact_table):
     result = set()
-    for dimension, column in _mappings(DimensionPath(), fact_table):
+    for dimension, column in _mappings(DimensionPath([fact_table.name]), fact_table):
         if len(dimension) == 0:
             # This is a measure from the fact table.
             pass
-        else:
+        elif dimension.name not in result:
             result.add(dimension.name)
             yield dimension
 
