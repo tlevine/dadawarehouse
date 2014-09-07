@@ -91,7 +91,7 @@ def mappings(table):
 
 def dimensions(fact_table):
     result = set()
-    for key, value in mappings(fact_table).items():
+    for key, value in mappings(fact_table):
         dimension, attribute = key.split('.')
         result.add(dimension)
     return result
