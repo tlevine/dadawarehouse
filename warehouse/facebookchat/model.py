@@ -11,7 +11,7 @@ class User(Dimension):
     user_id = m.Column(s.BigInteger, primary_key = True)
     current_nick = m.Column(s.String)
     def link(self, session):
-        return merge_on_unique(User, session, User.pk, self.pk)
+        return merge_on_unique(User, session, User.user_id, self.user_id)
 
 class FacebookUserFullName(Fact):
     pk = m.PkColumn()

@@ -29,7 +29,7 @@ def parse_uid(uid):
 
 def get_user_nicks(engine):
     for uid, nick in engine.execute('SELECT DISTINCT * FROM (SELECT uid, nick FROM log_status UNION SELECT uid, nick FROM log_msg);'):
-        user = User(pk = parse_uid(uid), current_nick = nick)
+        user = User(user_id = parse_uid(uid), current_nick = nick)
         yield FacebookUserFullName(user = user, nick = nick)
 
 def convert_log(engine, filedate):
@@ -38,7 +38,7 @@ def convert_log(engine, filedate):
         yield FacebookChatStatusChange(
             filedate = Date(pk = filedate),
             rowid = rowid,
-            user = User(pk = parse_uid(uid), current_nick = nick),
+            user = User(user_id = parse_uid(uid), current_nick = nick),
             datetime = DateTime(pk = datetime.datetime.fromtimestamp(ts)),
             status = status)
 
@@ -47,7 +47,7 @@ def convert_log(engine, filedate):
         yield FacebookMessage(
             filedate = Date(pk = filedate),
             rowid = rowid,
-            user = User(pk = parse_uid(uid), current_nick = nick),
+            user = User(user_id = parse_uid(uid), current_nick = nick),
             datetime = DateTime(pk = datetime.datetime.fromtimestamp(ts)),
             body = body)
 
@@ -77,7 +77,7 @@ def online_durations(engine, filedate):
                 raise AssertionError('This else condition shouldn\'t happen.')
 
         yield FacebookDuration(date = Date(pk = filedate),
-            user = User(pk = parse_uid(uid), current_nick = nick),
+            user = User(user_id = parse_uid(uid), current_nick = nick),
             duration = duration)
 
 def update(session):
