@@ -20,7 +20,7 @@ def foreign_keys(table):
     foreign keys
     '''
     for column in table.columns:
-        for foreign_key in column.foreign_keys
+        for foreign_key in column.foreign_keys:
             from_table = table
             from_column = column
             to_table = foreign_key.column.table

@@ -4,8 +4,7 @@ from functools import reduce
 
 import sqlalchemy.sql.sqltypes as t
 
-from .columns import nonkey_columns, named_primary_keys,
-                     foreign_keys
+from .columns import nonkey_columns, named_primary_keys, foreign_keys
 
 NUMERIC = (
     t.Integer,
