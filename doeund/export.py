@@ -16,14 +16,6 @@ def add_table(model, table):
         warnings.warn('I\'m ignoring table "%s" because it is neither a fact nor a dimension.' % table.name)
     return model
 
-def joins(from_table):
-    for from_column, to_column in joins(from_table):
-        to_table = to_column.table
-        yield {
-            'master': '%s.%s' (from_table.name, from_column.name),
-            'detail': '%s.%s' (to_table.name, to_column.name),
-        }
-
 def parse_fact_table(table):
 
         dimensions = fact_measures(fact_table)
