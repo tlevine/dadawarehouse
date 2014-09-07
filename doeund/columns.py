@@ -14,11 +14,15 @@ def named_primary_keys(table):
         if column.primary_key and column.name != 'pk':
             yield column
 
-def foreign_key_references(table):
+def foreign_keys(table):
     '''
     Columns (usually from other tables) that are referenced by this table's
     foreign keys
     '''
     for column in table.columns:
         for foreign_key in column.foreign_keys
-            yield foreign_key.column
+            from_table = table
+            from_column = column
+            to_table = foreign_key.column.table
+            to_column = foreign_key.column
+            yield from_table, from_column, to_table, to_column

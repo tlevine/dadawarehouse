@@ -5,7 +5,7 @@ from functools import reduce
 import sqlalchemy.sql.sqltypes as t
 
 from .columns import nonkey_columns, named_primary_keys,
-                     foreign_key_references,
+                     foreign_keys
 
 NUMERIC = (
     t.Integer,
@@ -59,19 +59,16 @@ def dim_levels(table):
     for column in named_primary_keys(table):
         yield named(column)
 
-def joins(from_table):
+def joins(table):
     '''
     List the joins from this fact table to dimension tables.
     '''
-    for from_column in from_table.columns:
-        for foreign_key in from_column.foreign_keys:
-            to_column = foreign_key.column
-            to_table = to_column.table
-            yield {
-                'master': '%s.%s' % (from_table.name, from_column.name),
-                'detail': '%s.%s' % (to_table.name, to_column.name),
-            }
-            yield from joins(to_table)
+    for from_table, from_column, to_table, to_column in foreign_keys(table):
+        yield {
+            'master': '%s.%s' % (from_table.name, from_column.name),
+            'detail': '%s.%s' % (to_table.name, to_column.name),
+        }
+        yield from joins(to_table)
 
 def _mapping(column):
     '''
@@ -97,7 +94,7 @@ def mappings(table):
     '''
     for column in nonkey_columns(table):
         yield _mapping(column)
-    for column in foreign_key_references(table):
+    for _, _, _, column in foreign_keys(table):
         yield from mappings(column.table)
 
 def dimension_names(fact_table):
