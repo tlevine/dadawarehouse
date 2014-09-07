@@ -8,7 +8,7 @@ from doeund import Fact, Dimension, merge_on_unique
 import warehouse.model as m
 
 class FacebookUser(Dimension):
-    pk = m.Column(s.String, primary_key = True)
+    user_id = m.Column(s.BigInteger, primary_key = True)
     current_nick = m.Column(s.String)
     def link(self, session):
         return merge_on_unique(FacebookUser, session,
@@ -16,7 +16,7 @@ class FacebookUser(Dimension):
 
 class FacebookUserNick(Fact):
     pk = m.PkColumn()
-    user_id = m.Column(s.String, s.ForeignKey(FacebookUser.pk))
+    user_id = m.Column(s.BigInteger, s.ForeignKey(FacebookUser.user_id))
     user = relationship(FacebookUser)
     nick = m.Column(s.String)
     def link(self, session):
@@ -29,7 +29,7 @@ class FacebookMessage(Fact):
     filedate = relationship(m.Date)
     rowid = m.Column(s.Integer, primary_key = True)
 
-    user_id = m.Column(s.String, s.ForeignKey(FacebookUser.pk))
+    user_id = m.Column(s.BigInteger, s.ForeignKey(FacebookUser.user_id))
     user = relationship(FacebookUser)
     datetime_id = m.DateTimeColumn()
     datetime = relationship(m.DateTime)
@@ -47,7 +47,7 @@ class FacebookChatStatusChange(Fact):
     filedate = relationship(m.Date)
     rowid = m.Column(s.Integer, primary_key = True)
 
-    user_id = m.Column(s.String, s.ForeignKey(FacebookUser.pk))
+    user_id = m.Column(s.BigInteger, s.ForeignKey(FacebookUser.user_id))
     user = relationship(FacebookUser)
     datetime_id = m.DateTimeColumn()
     datetime = relationship(m.DateTime)
@@ -63,7 +63,7 @@ class FacebookDuration(Fact):
     '''
     How long a person was on Facebook each day
     '''
-    user_id = m.Column(s.String, s.ForeignKey(FacebookUser.pk), primary_key = True)
+    user_id = m.Column(s.BigInteger, s.ForeignKey(FacebookUser.user_id), primary_key = True)
     user = relationship(FacebookUser)
     date_id = m.DateColumn(primary_key = True)
     date = relationship(m.Date)
