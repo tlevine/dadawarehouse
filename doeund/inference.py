@@ -1,4 +1,6 @@
 from collections import OrderedDict
+import re
+
 import sqlalchemy.sql.sqltypes as t
 
 NUMERIC = (
@@ -73,8 +75,8 @@ def _mapping(column):
     return '%s.%s' % (dimension, attribute), \
            '%s.%s' % (column.table.name, column.name)
 
-def mappings(from_table):
-    for from_column in from_table.columns:
-        yield _mapping(from_column)
-        for foreign_key in from_column.foreign_keys:
-            yield from mappings(to_column.table)
+def mappings(table):
+    for column in table.columns:
+        yield _mapping(column)
+        for foreign_key in column.foreign_keys:
+            yield from mappings(foreign_key.column.table)
