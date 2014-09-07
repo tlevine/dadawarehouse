@@ -23,7 +23,7 @@ def parse_fact_table(table):
         'dimensions': ["date_sale", "customer", "product", "country" ],
         'measures': list(fact_measures(table)),
         'joins': list(joins(table)),
-    #   'mappings': {},
+        'mappings': dict(mappings(table)),
     }
 
 def parse_dim_table(table):

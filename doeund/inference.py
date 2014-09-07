@@ -50,7 +50,6 @@ def dim_levels(table):
                 'label': column.info.get('label', column.name),
             }
 
-
 def joins(from_table):
     '''
     List the joins from this fact table to dimension tables.
@@ -74,5 +73,8 @@ def _mapping(column):
     return '%s.%s' % (dimension, attribute), \
            '%s.%s' % (column.table.name, column.name)
 
-def mappings(columns):
-    return dict(map(_mapping, columns))
+def mappings(from_table):
+    for from_column in from_table.columns:
+        yield _mapping(from_column):
+        for foreign_key in from_column.foreign_keys:
+            yield from mappings(to_column.table)
