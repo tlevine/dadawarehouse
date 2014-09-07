@@ -45,6 +45,11 @@ class Date(Dimension):
     day_monthly = relationship(Monthly)
     day_weekly = relationship(Weekly)
     weekday = WeekDay()
+ 
+    def link(self, session):
+        self.day_monthly = Monthly(pk = self.pk)._merge(session)
+        self.day_weekly = Weekly(pk = self.pk)._merge(session)
+        return self
 
 def DateColumn(*args, **kwargs):
     return Column(s.Date, s.ForeignKey(Date.pk), *args, **kwargs)
