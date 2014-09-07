@@ -25,8 +25,10 @@ def update(session, calendars = CALENDARS):
             calendar_file, events = parse(fp)
         calendar_file = calendar_file.link(session)
         session.add_all(
-            CalendarEvent(file = calendar_file, date = date,
-                          description = description).link(session) \
+            CalendarEvent(file = calendar_file,
+                          date = m.Date(pk = date),
+                          description = Description(description = description)
+                          ).link(session) \
             for date, description in events)
         session.commit()
         logger.info('Inserted events from calendar %s' % filename)
