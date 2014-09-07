@@ -37,25 +37,36 @@ class Fact(Base):
         return 'fact_' + Class.__name__.lower()
 
     def link(session):
-        for relationship in class_mapper(self).relationships:
-            if len(relationship).local_columns != 1:
-                msg = 'Linking works only on relationships with one local column.'
-                raise NotImplementError(msg)
-            else:
-                local_column = next(iter(relationship.local_columns))
-                names = {
-                    'relationship': relationship.key,
-                    'foreign_key': local_column.key,
-                    'reference': next(iter(local_column.foreign_keys)).column.name,
-                }
-                values = {
-                    'relationship': getattr(self, names['relationship']).link(session),
-                    'foreign_key': getattr(values['relationship'], names['reference'])
-                }
+        table = class_mapper(self)
+        if len(table.relationships) == 0:
+            self = self._merge(session)
+        else:
+            for relationship in table.relationships:
+                self = self._link_one(relationship)
+        return self
 
-                setattr(self, names['foreign_key'], values['foreign_key'])
-                setattr(self, names['relationship'], None)
-        
+    def _merge(self, session):
+        return session.merge(self)
+
+    def _link_one(self, relationship):
+        if len(relationship).local_columns != 1:
+            msg = 'Linking works only on relationships with one local column.'
+            raise NotImplementError(msg)
+        else:
+            local_column = next(iter(relationship.local_columns))
+            names = {
+                'relationship': relationship.key,
+                'foreign_key': local_column.key,
+                'reference': next(iter(local_column.foreign_keys)).column.name,
+            }
+            values = {
+                'relationship': getattr(self, names['relationship']).link(session),
+                'foreign_key': getattr(values['relationship'], names['reference'])
+            }
+
+            setattr(self, names['foreign_key'], values['foreign_key'])
+            setattr(self, names['relationship'], None)
+        return self
 
 class Dimension(Base):
     '''
