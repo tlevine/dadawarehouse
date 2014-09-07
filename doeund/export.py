@@ -28,5 +28,4 @@ def parse_dim_table(table):
     levels = list(dim_levels(table))
     return named(table, {
         'levels': levels,
-        'hierarchies': [level['name'] for level in levels],
     })
