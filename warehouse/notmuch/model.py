@@ -34,8 +34,14 @@ class NotmuchMessage(d.Fact):
     pk = d.Column(s.String, primary_key = True)
     message = relationship(Message)
 
-class NotmuchMessagePart(d.Fact):
+class ContentType(d.Dimension):
+    pk = PkColumn()
+    content_type = m.LabelColumn()
+
+class NotmuchAttachment(d.Fact):
     message_id = d.Column(s.String, s.ForeignKey(Message.pk), primary_key = True)
     message = relationship(Message)
+    content_type_id = m.FkColumn(ContentType.pk)
+    content_type = relationship(ContentType)
     part_number = d.Column(s.Integer, primary_key = True)
     name = d.Column(s.String)

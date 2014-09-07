@@ -2,8 +2,8 @@ from notmuch import Database, Query
 
 import warehouse.model as m
 
-from .model import NotmuchMessage, NotmuchMessagePart, NotmuchCorrespondance,\
-                   Address, Thread, Message
+from .model import NotmuchMessage, NotmuchAttachment, NotmuchCorrespondance,\
+                   Address, Thread, Message, ContentType
 
 def update(session):
     db = Database()
@@ -25,14 +25,27 @@ def update(session):
         ).link(session)
         yield NotmuchMessage(message = message).link(session)
         for part_number, message_part in enumerate(m.get_message_parts()):
-            yield NotmuchMessagePart(
+            content_type, name = parse_attachment_name(message_part)
+            yield NotmuchAttachment(
                 message = message,
                 part_number = part_number,
-                name = parse_attachment_name(message_part)
+                content_type = ContentType(content_type = content_type)\
+                                   .link(session),
+                name = name,
             )
 
 def parse_email_address(email_address):
     m = re.match(r'([^<]+)?(?: <)?([^>]+)>?', email_address)
     return Address(pk = m.group(2), name = m.group(1))
 
-def parse_attachment_name
+def parse_attachment_name(headers):
+    if headers.get('Content-Disposition') == 'inline':
+        return None, None
+    elif 'Content-Type' in headers:
+        m = re.match(r'([^;]+); name="([^"]+)"', headers['Content-Type'])
+        return m.group(1), m.group(2)
+    elif 'Content-Disposition' in headers:
+        m = re.match(r'attachment; filename="([^"]+)"', headers['Content-Disposition'])
+        return None, m.group(1)
+    else:
+        return None, None
