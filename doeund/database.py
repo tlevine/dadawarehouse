@@ -32,30 +32,42 @@ class DadaBase(Base):
     def link(self, session):
         table = class_mapper(self.__class__)
         if len(table.relationships) == 0:
-            self = self._merge(session)
+            out = self._merge(session)
         else:
             for relationship in table.relationships:
                 self = self._link_one(relationship)
-        return self
+            out = self
+        return out
+
+
+    _existing_references = set()
 
     def _merge(self, session):
         primary_key_columns = [c.name for c in self.__table__.columns if c.primary_key]
         unique_columns = [c.name for c in self.__table__.columns if c.unique]
 
-        if len(unique_columns) == 1:
-            unique_column = unique_columns[0]
-        elif len(unique_columns) > 1:
+        if len(primary_key_columns) > 1 or len(unique_columns) > 1:
             raise NotImplementedError
+        elif len(unique_columns) == 1:
+            primary_key = False
+            unique_column = unique_columns[0]
         elif len(primary_key_columns) == 1:
+            primary_key = True
             unique_column = primary_key_columns[0]
-        elif len(primary_key_columns) > 1:
+        else:
             raise NotImplementedError
 
         Class = self.__class__
-        return merge_on_unique(Class,
-                               session,
-                               getattr(Class, unique_column),
-                               getattr(self, unique_column))
+        value = getattr(self, unique_column)
+
+        if False: # value in Class._existing_references:
+            return self
+        elif primary_key:
+            Class._existing_references.add(value)
+            return session.merge(self)
+        else:
+            Class._existing_references.add(value)
+            return merge_on_unique(Class, session, getattr(Class, unique_column), value)
 
     def _link_one(self, relationship):
         if len(relationship.local_columns) != 1:
