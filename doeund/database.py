@@ -53,7 +53,7 @@ class Fact(Base):
                     'foreign_key': getattr(values['relationship'], names['reference'])
                 }
 
-                getattr(self, names['foreign_key']) = values['foreign_key']
+                setattr(self, names['foreign_key'], values['foreign_key'])
                 setattr(self, names['relationship'], None)
         
 
