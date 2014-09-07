@@ -17,16 +17,17 @@ class DimensionPath(list):
     info = {}
     @property
     def name(self):
-        return '_'.join(map(partial(re.sub(r'^dim_', ''), self)))
+        if len(self) > 0:
+            return '_'.join(map(partial(re.sub, r'^dim_', ''), self))
 
 def named(thingy, contents = {}):
-    cube_name = re.sub(r'(?:dim|fact)_', '', thingy.name)
-    pretty_name = re.sub(r'[_ ]([a-z])', r' \1',
-                      cube_name[0].upper() + cube_name[1:])
+    name = re.sub(r'(?:dim|fact)_', '', thingy.name)
+    label = re.sub(r'[_ ]([a-z])', r' \1',
+                   name[0].upper() + name[1:])
     out = dict(contents)
     out.update({
-        'name': cube_name,
-        'label': thingy.info.get('label', pretty_name),
+        'name': name,
+        'label': thingy.info.get('label', label),
     })
     return out
 
@@ -91,7 +92,8 @@ def _mappings(prefix, table):
         yield prefix, column
     for _, from_column, to_table, to_column in foreign_keys(table):
         if to_table.name.startswith('dim_'):
-            yield from _mappings(prefix + [from_column.name], to_column.table)
+            path = DimensionPath(prefix + [from_column.name])
+            yield from _mappings(path, to_column.table)
 
 def mappings(table):
     '''
@@ -102,17 +104,17 @@ def mappings(table):
     key references two different columns, treat them as different dimensions
     and name them reasonably.
     '''
-    for dimension, table in _mappings([], table):
+    for dimension, table in _mappings(DimensionPath(), table):
         yield _stringify_mapping(dimension, table)
 
 def dimension_names(fact_table):
     result = set()
-    for dimension_path, _ in _mappings([], fact_table):
+    for dimension_path, _ in _mappings(DimensionPath(), fact_table):
         if len(dimension_path) == 0:
             # This is a measure from the fact table.
             pass
         else:
-            result.add('_'.join(dimension_path))
+            result.add(dimension_path.name)
     return result
 
 def export(tables):
@@ -120,8 +122,10 @@ def export(tables):
     for table in tables.values():
         if table.name.startswith('fact_'):
             model['cubes'].append(parse_fact(table))
-        elif table.name.startswith('dim_'):
-            model['dimensions'].append(parse_dimension(table))
+            for dimension, column in _mappings(DimensionPath(), table):
+                if column.name.startswith('dim_'):
+                    d = named(dimension, {'levels': list(dim_levels(table))})
+                    model['dimensions'].append(d)
     return model
 
 def parse_fact(table):
@@ -131,9 +135,6 @@ def parse_fact(table):
         'joins': list(joins(table)),
         'mappings': dict(mappings(table)),
     })
-
-def parse_dimension(table):
-    return named(table, {'levels': list(dim_levels(table))})
 
 
 # Here's a problem: If the same dimension table is used for two different
