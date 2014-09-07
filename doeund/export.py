@@ -67,7 +67,7 @@ def joins(table):
         }
         yield from joins(to_table)
 
-def _mapping(column):
+def _mapping(prefix, column):
     '''
     http://cubes.databrewery.org/dev/doc/backends/sql.html?highlight=mappings#explicit-mapping
     '''
@@ -80,19 +80,27 @@ def _mapping(column):
     else:
         raise ValueError('Column %s is neither a dimension nor a fact.' % column.name)
 
-    return key, '%s.%s' % (column.table.name, column.name)
+    prefixed_key = prefix + key
 
-def mappings(table):
+    return prefixed_key, '%s.%s' % (column.table.name, column.name)
+
+def mappings(table, prefix = ''):
     '''
     Produce the mappings dictionary.
 
     When an attribute corresponds to both a foreign key and its reference,
-    report the foreign key column rather than the reference.
+    report the foreign key column rather than the reference. When a foreign
+    key references two different columns, treat them as different dimensions
+    and name them reasonably.
     '''
     for column in nonkey_columns(table):
-        yield _mapping(column)
-    for _, _, _, column in foreign_keys(table):
-        yield from mappings(column.table)
+        yield _mapping(prefix, column)
+    for _, from_column, _, to_column in foreign_keys(table):
+        if prefix == '':
+            new_prefix = '%s_' % from_column.name
+        else:
+            new_prefix = '%s_%s_' % (prefix, from_column.name)
+        yield from mappings(to_column.table, prefix = new_prefix)
 
 def dimension_names(fact_table):
     result = set()
