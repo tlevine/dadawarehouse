@@ -1,5 +1,6 @@
 from collections import OrderedDict
 import re
+from functools import reduce
 
 import sqlalchemy.sql.sqltypes as t
 
@@ -60,9 +61,9 @@ def dim_levels(table):
 
 def dimensions(fact_table):
     for column in fact_table.columns:
-        if len(column.foreign_keys) == 1 and column.name.endswith('_id'):
-           #yield re.sub(r'_id$', '', named(column)['name'])
+        if len(column.foreign_keys) == 1:
             yield named(column)['name']
+           #yield re.sub(r'_id$', '', named(column)['name'])
             for foreign_key in column.foreign_keys:
                 yield from dimensions(foreign_key.column.table)
 
@@ -93,4 +94,35 @@ def mappings(table):
     for column in table.columns:
         yield _mapping(column)
         for foreign_key in column.foreign_keys:
-            yield from mappings(foreign_key.column.table)
+            if not column.primary_key and len(column.foreign_keys) == 0:
+                yield from mappings(foreign_key.column.table)
+
+
+
+def export(tables):
+    initial = {'dimensions':[], 'cubes': []}
+    return reduce(add_table, tables.values(), initial)
+
+def add_table(model, table):
+    model = dict(model)
+    if table.name.startswith('fact_'):
+        model['cubes'].append(parse_fact_table(table))
+    elif table.name.startswith('dim_'):
+        model['dimensions'].append(parse_dim_table(table))
+    else:
+        warnings.warn('I\'m ignoring table "%s" because it is neither a fact nor a dimension.' % table.name)
+    return model
+
+def parse_fact_table(table):
+    return named(table, {
+        'dimensions': list(dimensions(table)),
+        'measures': list(fact_measures(table)),
+        'joins': list(joins(table)),
+        'mappings': dict(mappings(table)),
+    })
+
+def parse_dim_table(table):
+    levels = list(dim_levels(table))
+    return named(table, {
+        'levels': levels,
+    })
