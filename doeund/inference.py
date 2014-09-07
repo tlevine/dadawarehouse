@@ -52,6 +52,12 @@ def dim_levels(table):
                 'label': column.info.get('label', column.name),
             }
 
+def dimensions(fact_table):
+    for column in fact_table.columns:
+        for foreign_key in column.foreign_keys:
+            yield re.sub(r'^dim_', '', foreign_key.column.table.name)
+            yield from dimensions(foreign_key.column.table)
+
 def joins(from_table):
     '''
     List the joins from this fact table to dimension tables.

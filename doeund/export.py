@@ -20,7 +20,7 @@ def parse_fact_table(table):
     return {
         'name': table.name,
         'label': table.info.get('label', table.name),
-        'dimensions': ["date_sale", "customer", "product", "country" ],
+        'dimensions': list(dimensions(table)),
         'measures': list(fact_measures(table)),
         'joins': list(joins(table)),
         'mappings': dict(mappings(table)),
