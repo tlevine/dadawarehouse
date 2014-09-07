@@ -41,11 +41,24 @@ class DadaBase(Base):
         return self
 
     def _merge(self, session):
-        return session.merge(self)
+        Table = self.__class__
+
+        unique_columns = list(filter(lambda c: c.unique, Table.columns))
+        primary_key_columns = list(filter(lambda c: c.primary_key, Table.columns))
+
+        if len(unique_columns) == 1:
+            unique_column = unique_columns[0]
+        elif len(primary_key_columns) == 1:
+            unique_column = primary_key_columns[0]
+        else:
+            raise NotImplementedError
+
+        value = getattr(self, unique_column.name)
+        return merge_on_unique(Class, session, unique_column, value)
 
     def _link_one(self, session, foreign_key, reference):
         if reference.column.table.primary_key != (reference,):
-            # raise NotImplementedError('Only single-column primary keys are supported.')
+            raise NotImplementedError('Only single-column primary keys are supported.')
             pass
         else:
             Table = class_mapper(reference.table.__class__)
