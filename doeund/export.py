@@ -32,15 +32,31 @@ def aggregations(column):
         result.extend(['min', 'max', 'avg', 'stddev', 'variance'])
     return result
 
-def fact_measures(table):
+def nonkey_columns(table):
     '''
-    List the columns that are not foreign keys.
+    List the columns in the present table that are not foreign keys.
     '''
     for column in table.columns:
         if not column.primary_key and len(column.foreign_keys) == 0:
-            yield named(column, {
-                'aggregations': aggregations(column)
-            })
+            yield column
+
+def named_primary_keys(table):
+    for column in table.columns:
+        if column.primary_key and column.name != 'pk':
+            yield column
+
+def foreign_key_references(table):
+    for column in table.columns:
+        for foreign_key in column.foreign_keys
+            yield foreign_key.column
+
+def fact_measures(table):
+    '''
+    '''
+    for column in nonkey_columns(table):
+        yield named(column, {
+            'aggregations': aggregations(column)
+        })
 
 def dim_levels(table):
     '''
@@ -55,9 +71,8 @@ def dim_levels(table):
 
     # Put primary key last if it appears to be the most precise
     # thing, like for date tables.
-    for column in table.columns:
-        if column.primary_key and column.name != 'pk':
-            yield named(column)
+    for column in named_primary_keys(table):
+        yield named(column)
 
 def joins(from_table):
     '''
@@ -89,11 +104,16 @@ def _mapping(column):
     return key, '%s.%s' % (column.table.name, column.name)
 
 def mappings(table):
-    for column in table.columns:
-        if not column.primary_key and len(column.foreign_keys) == 0:
-            yield _mapping(column)
-        for foreign_key in column.foreign_keys:
-            yield from mappings(foreign_key.column.table)
+    '''
+    Produce the mappings dictionary.
+
+    When an attribute corresponds to both a foreign key and its reference,
+    report the foreign key column rather than the reference.
+    '''
+    for column in nonkey_columns(table):
+        yield _mapping(column)
+    for column in foreign_key_references(table):
+        yield from mappings(column.table)
 
 def dimension_names(fact_table):
     result = set()
