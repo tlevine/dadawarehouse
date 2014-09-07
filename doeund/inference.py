@@ -64,3 +64,15 @@ def joins(from_table):
                 'detail': '%s.%s' (to_table.name, to_column.name),
             }
             yield from joins(to_table)
+
+def _mapping(column):
+    '''
+    http://cubes.databrewery.org/dev/doc/backends/sql.html?highlight=mappings#explicit-mapping
+    '''
+    dimension = re.sub(r'^(?:dim|fact)_', '', column.table.name)
+    attribute = column.name
+    return '%s.%s' % (dimension, attribute), \
+           '%s.%s' % (column.table.name, column.name)
+
+def mappings(columns):
+    return dict(map(_mapping, columns))
