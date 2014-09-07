@@ -78,16 +78,14 @@ def _stringify_mapping(dimension_path, column):
     else:
         raise ValueError('Column %s is neither a dimension nor a fact.' % column.name)
 
-    prefixed_key = prefix + key
-
-    return prefixed_key, '%s.%s' % (column.table.name, column.name)
+    return key, '%s.%s' % (column.table.name, column.name)
 
 def _mappings(prefix, table):
     for column in nonkey_columns(table):
         yield prefix, column
     for _, from_column, to_table, to_column in foreign_keys(table):
         if to_table.name.startswith('dim_'):
-            dimension_path = [re.sub(r'^dim_', '', column.table.name)]
+            dimension_path = [re.sub(r'^dim_', '', from_column.name)]
             yield from _mappings(prefix + dimension_path, to_column.table)
 
 def mappings(table):
@@ -104,12 +102,12 @@ def mappings(table):
 
 def dimension_names(fact_table):
     result = set()
-    for dimension_path, _ in _mappings(fact_table):
-        if len(prefix) == 0:
+    for dimension_path, _ in _mappings([], fact_table):
+        if len(dimension_path) == 0:
             # This is a measure from the fact table.
             pass
         else:
-            result.add('_'.join(dimension))
+            result.add('_'.join(dimension_path))
     return result
 
 def export(tables):
