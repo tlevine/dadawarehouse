@@ -8,6 +8,7 @@ import doeund
 from warehouse.history.load import update as history
 from warehouse.pal.load import update as pal
 from warehouse.facebookchat.load import update as fb
+from warehouse.twitter.load import update as twitter
 
 CACHE_DIRECTORY = os.path.expanduser('~/.dadawarehouse')
 
