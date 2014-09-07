@@ -115,15 +115,19 @@ def dimension_names(fact_table):
             pass
         else:
             result.add(dimension_path.name)
-    return result
+            yield dimension_path.name
 
 def export(tables):
+    result = set()
     model = {'dimensions': [], 'cubes': []}
     for table in tables.values():
         if table.name.startswith('fact_'):
             model['cubes'].append(parse_fact(table))
             for dimension, column in _mappings(DimensionPath(), table):
-                if column.name.startswith('dim_'):
+                if len(dimension_path) == 0:
+                    # This is a measure from the fact table.
+                    pass
+                else:
                     d = named(dimension, {'levels': list(dim_levels(table))})
                     model['dimensions'].append(d)
     return model
