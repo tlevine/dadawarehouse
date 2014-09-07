@@ -26,18 +26,11 @@ class Column(_Column):
             info['aggregations'] = _kwargs.pop('aggregations')
         _Column.__init__(self, *args, info = info, **_kwargs)
 
-class Fact(Base):
-    '''
-    A fact table
-    '''
+class DadaBase(Base):
     __abstract__ = True
 
-    @declared_attr
-    def __tablename__(Class):
-        return 'fact_' + Class.__name__.lower()
-
-    def link(session):
-        table = class_mapper(self)
+    def link(self, session):
+        table = class_mapper(self.__class__)
         if len(table.relationships) == 0:
             self = self._merge(session)
         else:
@@ -49,11 +42,12 @@ class Fact(Base):
         return session.merge(self)
 
     def _link_one(self, relationship):
-        if len(relationship).local_columns != 1:
+        if len(relationship.local_columns) != 1:
             msg = 'Linking works only on relationships with one local column.'
             raise NotImplementError(msg)
         else:
             local_column = next(iter(relationship.local_columns))
+            import pdb; pdb.set_trace()
             names = {
                 'relationship': relationship.key,
                 'foreign_key': local_column.key,
@@ -68,7 +62,17 @@ class Fact(Base):
             setattr(self, names['relationship'], None)
         return self
 
-class Dimension(Base):
+class Fact(DadaBase):
+    '''
+    A fact table
+    '''
+    __abstract__ = True
+
+    @declared_attr
+    def __tablename__(Class):
+        return 'fact_' + Class.__name__.lower()
+
+class Dimension(DadaBase):
     '''
     A dimension table
 
