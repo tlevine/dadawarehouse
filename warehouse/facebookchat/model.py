@@ -17,16 +17,16 @@ class FacebookUserFullName(Fact):
     pk = m.PkColumn()
     user_id = m.Column(s.BigInteger, s.ForeignKey(User.user_id))
     user = relationship(User)
-    nick = m.Column(s.String)
+    nick = m.Column(s.String, label = 'Full Name')
     def link(self, session):
         self.user = self.user.link(session)
         return self
 
 class FacebookMessage(Fact):
     # Two-column primary key
-    filedate_id = m.DateColumn(primary_key = True)
+    filedate_id = m.DateColumn(primary_key = True, label = 'File Date')
     filedate = relationship(m.Date)
-    rowid = m.Column(s.Integer, primary_key = True)
+    rowid = m.Column(s.Integer, primary_key = True, label = 'Row Id')
 
     user_id = m.Column(s.BigInteger, s.ForeignKey(User.user_id))
     user = relationship(User)
@@ -42,7 +42,7 @@ class FacebookMessage(Fact):
 
 class FacebookChatStatusChange(Fact):
     # Two-column primary key
-    filedate_id = m.DateColumn(primary_key = True)
+    filedate_id = m.DateColumn(primary_key = True, label = 'Log File Date')
     filedate = relationship(m.Date)
     rowid = m.Column(s.Integer, primary_key = True)
 
@@ -50,7 +50,8 @@ class FacebookChatStatusChange(Fact):
     user = relationship(User)
     datetime_id = m.DateTimeColumn()
     datetime = relationship(m.DateTime)
-    status = m.Column(s.Enum('avail','notavail', name = 'faceboook_chat_status'))
+    status = m.Column(s.Enum('avail','notavail', name = 'faceboook_chat_status'),
+                      label = 'New Status')
 
     def link(self, session):
         self.user = self.user.link(session)
