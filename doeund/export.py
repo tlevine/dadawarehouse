@@ -107,15 +107,15 @@ def mappings(table):
     for dimension, table in _mappings(DimensionPath(), table):
         yield _stringify_mapping(dimension, table)
 
-def dimension_names(fact_table):
+def dimensions(fact_table):
     result = set()
-    for dimension_path, _ in _mappings(DimensionPath(), fact_table):
-        if len(dimension_path) == 0:
+    for dimension, column in _mappings(DimensionPath(), fact_table):
+        if len(dimension) == 0:
             # This is a measure from the fact table.
             pass
         else:
-            result.add(dimension_path.name)
-            yield dimension_path.name
+            result.add(dimension.name)
+            yield dimension
 
 def export(tables):
     result = set()
@@ -123,18 +123,14 @@ def export(tables):
     for table in tables.values():
         if table.name.startswith('fact_'):
             model['cubes'].append(parse_fact(table))
-            for dimension, column in _mappings(DimensionPath(), table):
-                if len(dimension_path) == 0:
-                    # This is a measure from the fact table.
-                    pass
-                else:
-                    d = named(dimension, {'levels': list(dim_levels(table))})
-                    model['dimensions'].append(d)
+            for dimension in dimensions(table):
+                d = named(dimension, {'levels': list(dim_levels(table))})
+                model['dimensions'].append(d)
     return model
 
 def parse_fact(table):
     return named(table, {
-        'dimensions': list(dimension_names(table)),
+        'dimensions': [d.name for d in dimensions(table)],
         'measures': list(fact_measures(table)),
         'joins': list(joins(table)),
         'mappings': dict(mappings(table)),
