@@ -4,7 +4,7 @@ PYTHONPATH=.
 export PYTHONPATH
 
 check:
-	python3 example/export_to_cubes.py
+	./bin/dada-model
 	slicer model validate /tmp/model.json
 
 test:
