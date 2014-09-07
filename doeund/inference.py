@@ -12,7 +12,8 @@ NUMERIC = (
 
 def named(thingy, contents = {}):
     cube_name = re.sub(r'(?:dim|fact)_', '', thingy.name)
-    pretty_name = re.sub(r'[_ ]([a-z])', r' \1', cube_name)
+    pretty_name = re.sub(r'[_ ]([a-z])', r' \1',
+                      cube_name[0].upper() + cube_name[1:])
     out = dict(contents)
     out.update({
         'name': cube_name,
