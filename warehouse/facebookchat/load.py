@@ -7,7 +7,7 @@ import subprocess
 import sqlalchemy
 
 from ..logger import logger
-from .model import FacebookUser, FacebookUserNick, \
+from .model import User, FacebookUserFullName, \
                    FacebookChatStatusChange, FacebookMessage, \
                    FacebookDuration
 from ..model import Date, DateTime
@@ -29,8 +29,8 @@ def parse_uid(uid):
 
 def get_user_nicks(engine):
     for uid, nick in engine.execute('SELECT DISTINCT * FROM (SELECT uid, nick FROM log_status UNION SELECT uid, nick FROM log_msg);'):
-        user = FacebookUser(pk = parse_uid(uid), current_nick = nick)
-        yield FacebookUserNick(user = user, nick = nick)
+        user = User(pk = parse_uid(uid), current_nick = nick)
+        yield FacebookUserFullName(user = user, nick = nick)
 
 def convert_log(engine, filedate):
     for row in engine.execute('SELECT rowid, uid, nick, ts, status FROM log_status').fetchall():
@@ -38,7 +38,7 @@ def convert_log(engine, filedate):
         yield FacebookChatStatusChange(
             filedate = Date(pk = filedate),
             rowid = rowid,
-            user = FacebookUser(pk = parse_uid(uid), current_nick = nick),
+            user = User(pk = parse_uid(uid), current_nick = nick),
             datetime = DateTime(pk = datetime.datetime.fromtimestamp(ts)),
             status = status)
 
@@ -47,7 +47,7 @@ def convert_log(engine, filedate):
         yield FacebookMessage(
             filedate = Date(pk = filedate),
             rowid = rowid,
-            user = FacebookUser(pk = parse_uid(uid), current_nick = nick),
+            user = User(pk = parse_uid(uid), current_nick = nick),
             datetime = DateTime(pk = datetime.datetime.fromtimestamp(ts)),
             body = body)
 
@@ -77,7 +77,7 @@ def online_durations(engine, filedate):
                 raise AssertionError('This else condition shouldn\'t happen.')
 
         yield FacebookDuration(date = Date(pk = filedate),
-            user = FacebookUser(pk = parse_uid(uid), current_nick = nick),
+            user = User(pk = parse_uid(uid), current_nick = nick),
             duration = duration)
 
 def update(session):
