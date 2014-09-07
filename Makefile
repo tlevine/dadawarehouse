@@ -1,7 +1,11 @@
-.PHONY: test
+.PHONY: test check
 
 PYTHONPATH=.
 export PYTHONPATH
-test:
+
+check:
 	python3 example/export_to_cubes.py
 	slicer model validate /tmp/model.json
+
+test:
+	nosetests3
