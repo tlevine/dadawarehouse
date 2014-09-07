@@ -4,6 +4,9 @@ from functools import reduce
 
 import sqlalchemy.sql.sqltypes as t
 
+from .columns import nonkey_columns, named_primary_keys,
+                     foreign_key_references,
+
 NUMERIC = (
     t.Integer,
     t.Numeric,
@@ -31,24 +34,6 @@ def aggregations(column):
     if isinstance(column, NUMERIC):
         result.extend(['min', 'max', 'avg', 'stddev', 'variance'])
     return result
-
-def nonkey_columns(table):
-    '''
-    List the columns in the present table that are not foreign keys.
-    '''
-    for column in table.columns:
-        if not column.primary_key and len(column.foreign_keys) == 0:
-            yield column
-
-def named_primary_keys(table):
-    for column in table.columns:
-        if column.primary_key and column.name != 'pk':
-            yield column
-
-def foreign_key_references(table):
-    for column in table.columns:
-        for foreign_key in column.foreign_keys
-            yield foreign_key.column
 
 def fact_measures(table):
     '''
