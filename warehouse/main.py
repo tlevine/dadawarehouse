@@ -23,4 +23,4 @@ def export_model():
     engine = create_engine("sqlite:///")
     model = doeund.model()
     with open('/tmp/model.json', 'w') as fp:
-        json.dump(model, fp)
+        json.dump(model, fp, indent = 2, separators = (',', ': '))
