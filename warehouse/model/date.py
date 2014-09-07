@@ -8,15 +8,6 @@ from doeund import Dimension
 from .base import Column, LabelColumn, PkColumn, FkColumn
 from .util import d
 
-class Day(Dimension):
-    '''
-    Dates with hierarchies
-    '''
-    pk = Column(s.Date, primary_key = True)
-    year = Column(s.Integer, default = d(lambda pk: pk.year))
-    month = Column(s.Integer, default = d(lambda pk: pk.month))
-    day = Column(s.Integer, default = d(lambda pk: pk.day))
-
 WEEKDAYS = [
     'Monday',
     'Tuesday',
@@ -26,23 +17,38 @@ WEEKDAYS = [
     'Saturday',
     'Sunday',
 ]
-class DayOfWeek(Dimension):
-    pk = PkColumn()
-    dayofweek = Column(s.String, default = d(lambda pk: WEEKDAYS[pk]))
+WeekDay = lambda: Column(s.Enum(*WEEKDAYS, name = 'weekday'),
+                 label = 'Day of the week',
+                 default = d(lambda pk: WEEKDAYS[pk.weekday()]))
+
+class Monthly(Dimension):
+    '''
+    Dates with hierarchies
+    '''
+    pk = Column(s.Date, primary_key = True, label = 'Day')
+    year = Column(s.Integer, default = d(lambda pk: pk.year))
+    month = Column(s.Integer, default = d(lambda pk: pk.month))
+    day = Column(s.Integer, default = d(lambda pk: pk.day))
+
+class Weekly(Dimension):
+    '''
+    Dates with hierarchies
+    '''
+    pk = Column(s.Date, primary_key = True, label = 'Day')
+    year = Column(s.Integer, default = d(lambda pk: pk.year))
+    week = Column(s.Integer, default = d(lambda pk: pk.isocalendar()[1]))
+    weekday = WeekDay()
 
 class Date(Dimension):
-    pk = Column(s.Date, s.ForeignKey(Day.pk), primary_key = True)
-    day = relationship(Day)
-    dayofweek_id = FkColumn(DayOfWeek.pk, default = d(lambda pk: pk.weekday()))
-    dayofweek = relationship(DayOfWeek)
+    pk = Column(s.Date, s.ForeignKey(Monthly.pk), s.ForeignKey(Weekly.pk),
+                primary_key = True)
+    day_monthly = relationship(Monthly)
+    day_weekly = relationship(Weekly)
+    weekday = WeekDay()
 
     def link(self, session):
-        dayofweek = session.merge(DayOfWeek(pk = self.pk.weekday()))
-        self.dayofweek = dayofweek
-
-        day = session.merge(Day(pk = self.pk))
-        self.day = day
-
+        self.day_monthly = session.merge(Monthly(pk = self.pk))
+        self.day_weekly = session.merge(Weekly(pk = self.pk))
         return session.merge(self)
 
 def DateColumn(*args, **kwargs):
