@@ -5,16 +5,34 @@ def export(tables):
     return reduce(add_table, tables.values(), initial)
 
 def add_table(model, table):
+    model = dict(model)
     if table.name.startswith('fact_'):
-        f = add_fact_table
+        model['cubes'].append(parse_fact_table(table))
     elif table.name.startswith('dim_'):
-        f = add_dim_table
+        model['dimensions'].append(parse_dim_table(table))
     else:
         warnings.warn('I\'m ignoring table "%s" because it is neither a fact nor a dimension.' % table.name)
-        f = lambda m: m
-    return f(model, table)
+    return model
 
-def add_fact_table(model, table):
-    pass
+def parse_fact_table(table):
+    return {
+        'name': table.name,
+        'label': table.info.get('label', table.name),
+        'dimensions': ["date_sale", "customer", "product", "country" ],
+        'measures': [
+            {'name': 'quantity', 'aggregations': ['sum', 'avg', 'max'] },
+            {'name': 'price_total', 'aggregations': ['sum', 'avg', 'max', 'min'] }
+        ],
+        'joins': [{'master': , 'detail': }]
+        'mappings': {},
+    }
 
-def add_dim_table(model, table):
+def parse_dim_table(table):
+    levels = 
+    hierarchies = 
+    return {
+        'name': table.name,
+        'label': table.info.get('label', table.name),
+        'levels': [{'name': , 'label': }],
+        'hierarchies': [{'name': , 'label': , 'levels': []}],
+    }
