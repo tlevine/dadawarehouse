@@ -2,15 +2,7 @@ from sqlalchemy.orm import sessionmaker as _sessionmaker
 from sqlalchemy.exc import ProgrammingError
 
 from .database import Fact, Dimension, Column, Base as _Base, merge_on_unique
-from .query import Cube
-from .export import export as _export
-
-def refresh(engine):
-    for table in _Base.metadata.sorted_tables:
-        try:
-            engine.execute(table.delete())
-        except ProgrammingError:
-            pass
+# from .export import export as _export
 
 def create(engine):
     _Base.metadata.create_all(engine) 
