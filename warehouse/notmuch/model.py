@@ -5,21 +5,22 @@ import doeund as d
 
 import warehouse.model as m
 
-class Person(d.Dimension):
-    pk = PkColumn()
-    name = d.Column(s.String)
-
 class Address(d.Dimension):
     pk = d.Column(s.String, primary_key = True)
-    person_id = d.FkColumn(Person.pk)
+    name = d.Column(s.String)
+
+class Thread(d.Dimension):
+    pk = d.Column(s.String, primary_key = True)
 
 class Message(d.Dimension):
     pk = d.Column(s.String, primary_key = True)
     datetime_id = m.DateTimeColumn()
-    thread_id = d.Column(s.String, s.ForeignKey(Thread))
+    datetime = relationship(m.DateTime)
+    thread_id = d.Column(s.String, s.ForeignKey(Thread.pk))
+    thread = relationship(Thread)
     filename = d.Column(s.String)
     subject = d.Column(s.String)
-    from_address = d.FkColumn(Address.pk)
+    from_address = d.Column(s.String, s.ForeignKey(Address.pk))
 
 class NotmuchCorrespondance(d.Fact):
     '''
@@ -31,8 +32,10 @@ class NotmuchCorrespondance(d.Fact):
 
 class NotmuchMessage(d.Fact):
     pk = d.Column(s.String, primary_key = True)
+    message = relationship(Message)
 
 class NotmuchMessagePart(d.Fact):
     message_id = d.Column(s.String, s.ForeignKey(Message.pk), primary_key = True)
-    part = d.Column(s.Integer, primary_key = True)
+    message = relationship(Message)
+    part_number = d.Column(s.Integer, primary_key = True)
     name = d.Column(s.String)
