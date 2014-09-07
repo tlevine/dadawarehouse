@@ -10,6 +10,14 @@ NUMERIC = (
     t.Boolean,
 )
 
+def olap_name(thingy):
+    cube_name = re.sub(r'(?:dim|fact)_', '', thingy.name)
+    pretty_name = re.sub(r'[_ ]([a-z])', r' \1', cube_name)
+    return {
+        'name': cube_name
+        'label': thingy.info.get('label', pretty_name),
+    }
+
 def aggregations(column):
     '''
     Choose aggregations based on column type.

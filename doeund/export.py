@@ -1,6 +1,6 @@
 from functools import reduce
 
-from .inference import dim_levels, fact_measures, joins, mappings
+from .inference import dim_levels, fact_measures, joins, mappings, dimensions
 
 def export(tables):
     initial = {'dimensions':[], 'cubes': []}
@@ -27,7 +27,7 @@ def parse_fact_table(table):
     }
 
 def parse_dim_table(table):
-    levels = dim_levels(table)
+    levels = list(dim_levels(table))
     return {
         'name': table.name,
         'label': table.info.get('label', table.name),
