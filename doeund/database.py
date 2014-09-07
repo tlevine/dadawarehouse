@@ -35,8 +35,8 @@ class DadaBase(Base):
             self = self._merge(session)
         else:
             for foreign_key in table.columns:
-                for reference in foreign_key.foreign_keys:
-                    self = self._link_one(session, foreign_key, reference)
+                for _reference in foreign_key.foreign_keys:
+                    self = self._link_one(session, foreign_key, _reference.column)
 
         return self
 
@@ -57,11 +57,11 @@ class DadaBase(Base):
         return merge_on_unique(Class, session, unique_column, value)
 
     def _link_one(self, session, foreign_key, reference):
-        if reference.column.table.primary_key != (reference,):
+        if tuple(reference.table.primary_key.columns) != (reference,):
             raise NotImplementedError('Only single-column primary keys are supported.')
             pass
         else:
-            Table = class_mapper(reference.table.__class__)
+            Table = reference.table.__class__
             pk_name = reference.name
             pk_value = getattr(self, foreign_key.name)
 
