@@ -12,8 +12,5 @@ class Time(Dimension):
     hour = Column(s.Integer, default = d(lambda pk: pk.hour))
     minute = Column(s.Integer, default = d(lambda pk: pk.minute))
 
-    def link(self, session):
-        return session.merge(self)
-
 def TimeColumn(*args, **kwargs):
     return Column(s.Time, s.ForeignKey(Time.pk), *args, **kwargs)

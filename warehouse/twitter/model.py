@@ -10,8 +10,6 @@ import warehouse.model as m
 class TwitterUser(d.Dimension):
     handle = s.Column(s.String, primary_key = True)
     name = s.Column(s.String)
-    def link(self, session):
-        return session.merge(self)
 
 class TwitterAction(d.Fact):
     pk = m.PkColumn()
