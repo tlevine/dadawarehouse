@@ -60,7 +60,7 @@ class Dimension(Base):
         else:
             return merge_on_unique(Class, session, unique_column, value)
 
-def merge_on_unique(Class, session, unique_column, value):
+def merge_on_unique(Class, session, unique_column, value, **kwargs):
     '''
     Merge on a single unique column, assuming that that is the only
     column in the table that needs to be specified.
@@ -69,6 +69,8 @@ def merge_on_unique(Class, session, unique_column, value):
         raise ValueError('Value may not be None.')
     x = session.query(Class).filter(unique_column == value).first()
     if x == None:
-        x = Class(**{unique_column.name: value})
+        _kwargs = dict(kwargs)
+        kwargs[unique_column.name] = value
+        x = Class(**_kwargs)
         session.add(x)
     return x
