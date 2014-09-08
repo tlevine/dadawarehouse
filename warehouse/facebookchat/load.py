@@ -8,7 +8,7 @@ import subprocess
 import sqlalchemy
 
 from ..logger import logger
-from .model import User, FacebookUserFullName, \
+from .model import LogSqliteDb,
                    FacebookChatStatusChange, FacebookMessage, \
                    FacebookDuration
 from ..model import Date, DateTime
@@ -28,31 +28,28 @@ UID = re.compile(r'xmpp:-([0-9]+)@chat.facebook.com')
 def parse_uid(uid):
     return str(int(re.match(UID, uid).group(1)))
 
-def get_user_nicks(engine):
-    for uid, nick in engine.execute('SELECT DISTINCT * FROM (SELECT uid, nick FROM log_status UNION SELECT uid, nick FROM log_msg);'):
-        user = User(user_id = parse_uid(uid), current_nick = nick)
-        yield FacebookUserFullName(user = user, nick = nick)
-
-def convert_log(engine, filedate):
-    for row in engine.execute('SELECT rowid, uid, nick, ts, status FROM log_status').fetchall():
-        rowid, uid, nick, ts, status = row
+def convert_log(engine, filedate, session):
+    sql = 'SELECT rowid, uid, nick, ts, status FROM log_status'
+    for rowid, uid, nick, ts, status in engine.execute(sql).fetchall():
         yield FacebookChatStatusChange(
-            filedate = Date(pk = filedate),
+            filedate = filedate,
             rowid = rowid,
-            user = User(user_id = parse_uid(uid), current_nick = nick),
-            datetime = DateTime(pk = datetime.datetime.fromtimestamp(ts)),
+            user_id = parse_uid(uid),
+            datetime = session.merge(DateTime(pk = datetime.datetime.fromtimestamp(ts))),
+            current_name = nick,
             status = status)
 
-    for row in engine.execute('SELECT rowid, uid, nick, ts, body FROM log_msg').fetchall():
-        rowid, uid, nick, ts, body = row
+    sql = 'SELECT rowid, uid, nick, ts, body FROM log_msg'
+    for rowid, uid, nick, ts, body in engine.execute(sql).fetchall():
         yield FacebookMessage(
-            filedate = Date(pk = filedate),
+            filedate = filedate,
             rowid = rowid,
-            user = User(user_id = parse_uid(uid), current_nick = nick),
-            datetime = DateTime(pk = datetime.datetime.fromtimestamp(ts)),
+            user_id = parse_uid(uid),
+            datetime = session.merge(DateTime(pk = datetime.datetime.fromtimestamp(ts))),
+            current_name = nick,
             body = body)
 
-def online_durations(engine, filedate):
+def online_durations(engine, filedate, session):
     for uid, nick in engine.execute('SELECT DISTINCT uid, nick FROM log_status;'):
         duration = 0
         avail = False
@@ -77,32 +74,38 @@ def online_durations(engine, filedate):
             else:
                 raise AssertionError('This else condition shouldn\'t happen.')
 
-        yield FacebookDuration(date = Date(pk = filedate),
-            user = User(user_id = parse_uid(uid), current_nick = nick),
-            duration = duration)
+        yield FacebookDuration(
+            date = filedate,
+            user = parse_uid(uid),
+            duration = duration
+        )
 
-def update(session):
+def update(session, today = datetime.date.today()):
     download()
-    for filename in os.listdir(LOCAL_CHAT):
+    already_imported = session.query(LogSqliteDb.filedate).distinct()
+    for filename_id in set(os.listdir(LOCAL_CHAT)).difference(already_imported):
         try:
-            filedate = datetime.datetime.strptime(filename, '%Y-%m-%d.db').date()
-            is_new = session.query(FacebookChatStatusChange).\
-                filter(FacebookChatStatusChange.filedate_id == filedate).\
-                count() == 0
-            if is_new:
-                logger.info('Importing %s' % filename)
+            filedate_id = datetime.datetime.strptime(filename, '%Y-%m-%d.db').date()
+            if filedate_id >= today:
+                # Skip if it's from today because the file might not be complete.
+                continue
+            logger.info('Importing %s' % filename)
 
-                # Copy to RAM so it's faster.
-                shutil.copy(os.path.join(LOCAL_CHAT, filename), '/tmp/fb.db')
-                engine = sqlalchemy.create_engine('sqlite:////tmp/fb.db')
+            # Copy to RAM so it's faster.
+            shutil.copy(os.path.join(LOCAL_CHAT, filename), '/tmp/fb.db')
+            engine = sqlalchemy.create_engine('sqlite:////tmp/fb.db')
 
-                session.add_all(log_event.link(session) for log_event in convert_log(engine, filedate))
-                session.add_all(duration.link(session) for duration in online_durations(engine, filedate))
-                session.add_all(user_nick.link(session) for user_nick in get_user_nicks(engine))
-                session.commit()
-                logger.info('Finished %s' % filename)
-            else:
-                logger.info('Skipping %s' % filename)
+
+            # Add stuff
+            filedate = session.merge(m.Date(pk = filedate_id))
+            session.add_all(convert_log(engine, filedate, session))
+            session.add_all(online_durations(engine, filedate, session))
+            session.add(LogSqliteDb(filedate = filedate))
+
+            # Commit at the end so that we can't have a partial import
+            # for a given day.
+            session.commit()
+            logger.info('Finished %s' % filename)
         except KeyboardInterrupt:
             break
 
