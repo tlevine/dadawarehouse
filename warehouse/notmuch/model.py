@@ -8,13 +8,9 @@ import warehouse.model as m
 class Address(d.Dimension):
     pk = m.Column(s.String, primary_key = True)
     name = m.Column(s.String)
-    def link(self, session):
-        return session.merge(self)
 
 class Thread(d.Dimension):
     pk = m.Column(s.String, primary_key = True)
-    def link(self, session):
-        return session.merge(self)
 
 class Message(d.Dimension):
     pk = m.Column(s.String, primary_key = True)
@@ -27,8 +23,10 @@ class Message(d.Dimension):
     from_address_id = m.Column(s.String, s.ForeignKey(Address.pk))
     from_address = relationship(Address)
     def link(self, session):
-        self.from_address = self.from_address.link(session)
-        return session.merge(self)
+        self.datetime = self.datetime.link(session)
+        self.from_address = session.merge(self.from_address)
+        self.thread = session.merge(self.thread)
+        return self
 
 class NotmuchCorrespondance(d.Fact):
     '''
@@ -48,16 +46,12 @@ class NotmuchMessage(d.Fact):
     pk = m.Column(s.String, s.ForeignKey(Message.pk), primary_key = True)
     message = relationship(Message)
     def link(self, session):
-       #self.message = self.message.link(session)
-        return session.merge(self)
+        self.message = self.message.link(session)
+        return self
 
 class ContentType(d.Dimension):
     pk = m.PkColumn()
     content_type = m.LabelColumn()
-    def link(self, session):
-        return d.merge_on_unique(ContentType, session,
-                                 ContentType.content_type,
-                                 self.content_type)
 
 class NotmuchAttachment(d.Fact):
     message_id = m.Column(s.String, s.ForeignKey(Message.pk), primary_key = True)
@@ -69,5 +63,6 @@ class NotmuchAttachment(d.Fact):
     def link(self, session):
        #self.message = self.message.link(session)
         if self.content_type != None:
-            self.content_type = self.content_type.link(session)
-        return session.merge(self)
+            self.content_type = d.merge_on_unique(ContentType, session,
+                ContentType.content_type, self.content_type)
+        return self

@@ -13,9 +13,9 @@ def update(session):
     db = Database()
     for message in Query(db,'').search_messages():
         _dt = datetime.datetime.fromtimestamp(message.get_date())
-        dt = m.DateTime(pk = _dt).link(session)
-        from_address = parse_email_address(message.get_header('from')).link(session)
-        thread = Thread(pk = message.get_thread_id()).link(session)
+        dt = m.DateTime(pk = _dt)
+        from_address = parse_email_address(message.get_header('from'))
+        thread = Thread(pk = message.get_thread_id())
         filename = message.get_filename()
         subject = message.get_header('subject')
 
@@ -26,23 +26,25 @@ def update(session):
             filename = filename,
             subject = subject,
             from_address = from_address,
-        ).link(session)
+        )
         session.add(NotmuchMessage(message = dim_message).link(session))
+        session.commit()
         try:
             for part_number, message_part in enumerate(message.get_message_parts()):
                 _content_type, name = parse_attachment_name(message_part)
                 if _content_type == None:
                     content_type = None
                 else:
-                    content_type = ContentType(content_type = _content_type).link(session)
+                    content_type = ContentType(content_type = _content_type)
                 session.add(NotmuchAttachment(
                     message = dim_message,
                     part_number = part_number,
                     content_type = content_type,
                     name = name
-                ))
+                ).link(session))
         except UnicodeDecodeError:
             logger.warning('Encoding error at message %s' % message.get_message_id())
+            session.rollback()
         finally:
             session.commit()
 
