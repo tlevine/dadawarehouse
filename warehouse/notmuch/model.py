@@ -36,9 +36,9 @@ class NotmuchCorrespondance(d.Fact):
     '''
     pk = m.PkColumn()
     from_address_id = m.Column(s.String, s.ForeignKey(Address.pk))
-    from_address = relationship(Address)
+    from_address = relationship(Address, foreign_keys = [from_address_id])
     to_address_id = m.Column(s.String, s.ForeignKey(Address.pk))
-    from_address = relationship(Address)
+    to_address = relationship(Address, foreign_keys = [to_address_id])
     def link(self, session):
         self.from_address = self.from_address.link(session)
         self.to_address = self.to_address.link(session)
@@ -62,11 +62,12 @@ class ContentType(d.Dimension):
 class NotmuchAttachment(d.Fact):
     message_id = m.Column(s.String, s.ForeignKey(Message.pk), primary_key = True)
     message = relationship(Message)
-    content_type_id = m.FkColumn(ContentType.pk)
-    content_type = relationship(ContentType)
     part_number = m.Column(s.Integer, primary_key = True)
+    content_type_id = m.FkColumn(ContentType.pk, nullable = True)
+    content_type = relationship(ContentType)
     name = m.Column(s.String)
     def link(self, session):
         self.message = self.message.link(session)
-        self.content_type = self.content_type.link(session)
+        if self.content_type != None:
+            self.content_type = self.content_type.link(session)
         return session.merge(self)
