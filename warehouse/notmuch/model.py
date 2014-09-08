@@ -46,7 +46,7 @@ class NotmuchMessage(d.Fact):
     pk = m.Column(s.String, s.ForeignKey(Message.pk), primary_key = True)
     message = relationship(Message)
     def link(self, session):
-        self.message = self.message.link(session)
+        self.message = session.merge(self.message.link(session))
         return self
 
 class ContentType(d.Dimension):

@@ -26,8 +26,8 @@ def update(session):
             filename = filename,
             subject = subject,
             from_address = from_address,
-        )
-        session.add(NotmuchMessage(message = dim_message).link(session))
+        ).link(session)
+        session.merge(NotmuchMessage(message = session.merge(dim_message)))
         session.commit()
         try:
             for part_number, message_part in enumerate(message.get_message_parts()):
@@ -36,7 +36,7 @@ def update(session):
                     content_type = None
                 else:
                     content_type = ContentType(content_type = _content_type)
-                session.add(NotmuchAttachment(
+                session.merge(NotmuchAttachment(
                     message = dim_message,
                     part_number = part_number,
                     content_type = content_type,
