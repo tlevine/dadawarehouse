@@ -16,7 +16,7 @@ class DateTime(Dimension):
     time_id = Column(s.Time, s.ForeignKey(Time.pk), default = d(lambda pk: pk.time()))
     time = relationship(Time)
 
-    def link(self, session):
+    def merge(self, session):
         self.date = Date(pk = self.pk.date()).link(session)
         self.time = Time(pk = self.pk.time()).link(session)
         return session.merge(self)

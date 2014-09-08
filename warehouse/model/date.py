@@ -17,9 +17,14 @@ WEEKDAYS = [
     'Saturday',
     'Sunday',
 ]
-WeekDay = lambda: Column(s.Enum(*WEEKDAYS, name = 'weekday'),
-                 label = 'Day of the week',
-                 default = d(lambda pk: WEEKDAYS[pk.weekday()]))
+
+class WeekDay(Dimension):
+    pk = PkColumn()
+    weekday = LabelColumn(label = 'Day of the week',
+        default = d(lambda pk: WEEKDAYS[pk.weekday()]))
+
+    def merge(self, session):
+        return self.merge_on('weekday', session)
 
 class Monthly(Dimension):
     '''
@@ -30,6 +35,9 @@ class Monthly(Dimension):
     month = Column(s.Integer, default = d(lambda pk: pk.month))
     day = Column(s.Integer, default = d(lambda pk: pk.day))
 
+    def merge(self, session):
+        return session.merge(self)
+
 class Weekly(Dimension):
     '''
     Dates with hierarchies
@@ -37,16 +45,22 @@ class Weekly(Dimension):
     pk = Column(s.Date, primary_key = True, label = 'Day')
     year = Column(s.Integer, default = d(lambda pk: pk.year))
     week = Column(s.Integer, default = d(lambda pk: pk.isocalendar()[1]))
-    weekday = WeekDay()
+    weekday_id = FkColumn(WeekDay.pk)
+    weekday = relationship(WeekDay)
+
+    def merge(self, session):
+        self.weekday = self.weekday.merge(session)
+        return session.merge(self)
 
 class Date(Dimension):
     pk = Column(s.Date, s.ForeignKey(Monthly.pk), s.ForeignKey(Weekly.pk),
                 primary_key = True)
     day_monthly = relationship(Monthly)
     day_weekly = relationship(Weekly)
-    weekday = WeekDay()
+    weekday_id = FkColumn(WeekDay.pk)
+    weekday = relationship(WeekDay)
 
-    def link(self, session):
+    def merge(self, session):
         self.day_monthly = session.merge(Monthly(pk = self.pk))
         self.day_weekly = session.merge(Weekly(pk = self.pk))
         return session.merge(self)
