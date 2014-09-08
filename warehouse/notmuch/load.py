@@ -34,7 +34,7 @@ def update(session):
                 if _content_type == None:
                     content_type = None
                 else:
-                    content_type = ContentType(content_type = content_type).link(session)
+                    content_type = ContentType(content_type = _content_type).link(session)
                 session.add(NotmuchAttachment(
                     message = dim_message,
                     part_number = part_number,
@@ -47,7 +47,7 @@ def update(session):
             session.commit()
 
 def parse_email_address(email_address):
-    match = re.match(r'([^<]+)?(?: <)?([^>]+)>?', email_address)
+    match = re.match(r'(?:(.+) <)?([^>]+)>?', email_address)
     return Address(pk = match.group(2), name = match.group(1))
 
 def parse_attachment_name(headers):
