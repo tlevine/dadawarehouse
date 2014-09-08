@@ -1,4 +1,5 @@
 from collections import defaultdict
+import shutil
 import os
 import re
 import datetime
@@ -90,8 +91,10 @@ def update(session):
                 count() == 0
             if is_new:
                 logger.info('Importing %s' % filename)
-                engine = sqlalchemy.create_engine('sqlite:///' +
-                    os.path.join(LOCAL_CHAT, filename))
+
+                # Copy to RAM so it's faster.
+                shutil.copy(os.path.join(LOCAL_CHAT, filename), '/tmp/fb.db')
+                engine = sqlalchemy.create_engine('sqlite:////tmp/fb.db')
 
                 session.add_all(log_event.link(session) for log_event in convert_log(engine, filedate))
                 session.add_all(duration.link(session) for duration in online_durations(engine, filedate))
