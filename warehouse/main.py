@@ -10,6 +10,7 @@ from warehouse.pal.load import update as pal
 from warehouse.facebookchat.load import update as fb
 from warehouse.twitter.load import update as twitter
 from warehouse.gnucash.load import update as gnucash
+from warehouse.notmuch.load import update as notmuch
 
 CACHE_DIRECTORY = os.path.expanduser('~/.dadawarehouse')
 
@@ -17,6 +18,7 @@ def load_data():
   # engine = create_engine('postgres:///tlevine')
     engine = create_engine('sqlite:////tmp/dada.sqlite')
     session = doeund.database(engine)
+    notmuch(session)
     fb(session)
     history(session)
     pal(session)
