@@ -49,6 +49,17 @@ class Dimension(Base):
     def __tablename__(Class):
         return 'dim_' + Class.__name__.lower()
 
+    def merge_on(self, column_name, session):
+        Class = self.__class__
+        unique_column = getattr(Class, column_name)
+        value = getattr(self, column_name)
+        if unique_column == None:
+            raise ValueError('The table doesn\'t have a %s column.' % column_name)
+        elif value == None:
+            raise ValueError('The instance doesn\'t have a %s column.' % column_name)
+        else:
+            return merge_on_unique(Class, session, unique_column, value)
+
 def merge_on_unique(Class, session, unique_column, value):
     '''
     Merge on a single unique column, assuming that that is the only
