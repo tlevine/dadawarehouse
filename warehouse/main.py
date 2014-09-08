@@ -18,7 +18,7 @@ def load_data():
   # engine = create_engine('postgres:///tlevine')
     engine = create_engine('sqlite:////tmp/dada.sqlite')
     session = doeund.database(engine)
-    notmuch(session)
+   #notmuch(session)
     fb(session)
     history(session)
     pal(session)
