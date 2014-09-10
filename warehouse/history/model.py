@@ -27,9 +27,6 @@ class ShellSession(Dimension):
     datetime = relationship(m.DateTime)
     filename = m.LabelColumn(label = 'File Name')
 
-    def merge(self, session):
-        return self.merge_on('filename', session)
-
 class Command(Fact):
     pk = m.PkColumn()
     shellsession_id = m.FkColumn(ShellSession.pk)
