@@ -45,7 +45,10 @@ class DadaBase(Base):
     @classmethod
     def _relationships(Class):
         for r in Class.__mapper__.relationships:
-            yield r.key + '_id', r.key, r.argument
+            if len(r.local_columns) != 1:
+                msg = 'The relationship must have exactly one local column.'
+                raise ValueError(msg)
+            yield r.local_columns[0].name, r.key, r.argument
 
     @classmethod
     def _uniques(Class):
@@ -54,15 +57,13 @@ class DadaBase(Base):
                 yield c.name 
 
     def _merge_pk(self):
-        for name, key, Class in self.__class__._references():
-            r = getattr(self, key, Class.new(pk = getattr(self, name)))
+        for colname, relname, Class in self.__class__._relationships():
+            r = getattr(self, relname, Class(pk = getattr(self, name)))
             if reference_instance == None:
                 raise ValueError('The reference %s.%s and its column, %s.%s,'
                     'are both None (not defined). This isn\'t allowed.' % \
-                    (Class, key, Class, name))
-            setattr(self, key, r.merge(session))
-        self.weekday = self.weekday.merge(session)
-        self._merge_references(session, 'year', 'week', 'weekday')
+                    (Class, relname, Class, colname))
+            setattr(self, relname, r.merge(session))
         return session.merge(self)
 
     def _merge_label(self, session):
