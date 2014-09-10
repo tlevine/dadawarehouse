@@ -25,7 +25,22 @@ class Column(_Column):
             info['aggregations'] = _kwargs.pop('aggregations')
         _Column.__init__(self, *args, info = info, **_kwargs)
 
-class Fact(Base):
+class DadaBase(Base):
+    __abstract__ = True
+
+    @classmethod
+    def _relationships(Class):
+        for r in Class.__mapper__.relationships:
+            yield r.key + '_id', r.key, r.argument
+
+    @classmethod
+    def _uniques(Class):
+        for c in Class.__mapper__.columns:
+            if c.unique:
+                yield c.name 
+
+
+class Fact(DadaBase):
     '''
     A fact table
     '''
@@ -68,7 +83,7 @@ class Dimension(Base):
     def _merge_pk(self, session):
         return session.merge(self)
 
-    def _merge_label(self, session, *column_names):
+    def _merge_label(self, session):
         Class = self.__class__
         filters = [(getattr(Class, column_name), getattr(self, column_name)) \
                    for column_name in column_names]
@@ -103,11 +118,3 @@ class Dimension(Base):
                 raise ValueError('The reference is None (not defined). This isn\'t allowed.')
         setattr(self, reference, reference_instance.merge(session))
         return session.merge(self)
-
-
-'''
-for r in self.__mapper__.relationships:
-    r.key
-    r.key + '_id'
-    r.argument
-'''
