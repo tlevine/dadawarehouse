@@ -45,12 +45,13 @@ def parse(fp, filename = None):
             pass
         elif calendar_file == None:
             calendar_code, _, calendar_description = line.partition(' ')
-            yield File(pk = calendar_code,
+            calendar_file = File(pk = calendar_code,
                 filename = filename, description = calendar_description)
+        #   yield calendar_file
         else:
-            date, description = entry(line)
-            yield CalendarEvent(file = calendar_file, date_id = date,
-                                description = description).merge(session)
+            for date, description in entry(line):
+                yield CalendarEvent(file = calendar_file, date_id = date,
+                                    description = description)
 
 def entry(line):
     'Read a pal calendar entry'

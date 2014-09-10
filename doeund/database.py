@@ -41,7 +41,7 @@ class DadaBase(Base):
             if len(r.local_columns) != 1:
                 msg = 'The relationship must have exactly one local column.'
                 raise ValueError(msg)
-            yield r.local_columns[0].name, r.key, r.argument
+            yield next(iter(r.local_columns)).name, r.key, r.argument
 
     @classmethod
     def _uniques(Class):
@@ -49,38 +49,36 @@ class DadaBase(Base):
             if c.unique:
                 yield c.name 
 
-    def _merge_pk(self):
+    def _merge_pk(self, session):
         for colname, relname, Class in self.__class__._relationships():
-            r = getattr(self, relname, Class(pk = getattr(self, name)))
-            if reference_instance == None:
+            r = getattr(self, relname)
+
+            if r == None:
+                r = Class(pk = getattr(self, colname))
+
+            if r == None:
                 raise ValueError('The reference %s.%s and its column, %s.%s,'
                     'are both None (not defined). This isn\'t allowed.' % \
-                    (Class, relname, Class, colname))
+                    (self, relname, self, colname))
+
             setattr(self, relname, r.merge(session))
+
         return session.merge(self)
 
     def _merge_label(self, session):
         Class = self.__class__
-        filters = [(getattr(Class, column_name), getattr(self, column_name)) \
-                   for column_name in self._uniques()]
+        filters = ((getattr(Class, column_name), getattr(self, column_name)) \
+                   for column_name in self._uniques())
 
         query = session.query(Class)
-
         for unique_column, value in filters:
-            if unique_column == None:
-                raise ValueError('The table doesn\'t have a %s column.' % column_name)
-            elif value == None:
-                raise ValueError('The instance doesn\'t have a %s attribute.' % column_name)
-            else:
-                query = query.filter(unique_column == value)
+            query = query.filter(unique_column == value)
 
         record = query.first()
         if record == None:
-            _kwargs = dict(kwargs)
-            for unique_column, value in filters:
-                _kwargs[unique_column.name] = value
-            record = Class(**_kwargs)
-            session.add(record)
+            kwargs = {column.name: value for column, value in filters}
+            record = Class(**kwargs)
+            record = session.add(record)
             # session.commit() ?
         return record
 
