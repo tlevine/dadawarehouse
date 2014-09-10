@@ -17,7 +17,7 @@ class FacebookMessage(Fact):
     filedate = relationship(m.Date)
     rowid = m.Column(s.Integer, primary_key = True, label = 'Row Id')
 
-    user_id = m.Column(s.BigInteger, s.ForeignKey(User.user_id))
+    user_id = m.Column(s.BigInteger)
     datetime_id = m.DateTimeColumn()
     datetime = relationship(m.DateTime)
     current_name = m.Column(s.String, label = 'Full Name')
@@ -29,7 +29,7 @@ class FacebookChatStatusChange(Fact):
     filedate = relationship(m.Date)
     rowid = m.Column(s.Integer, primary_key = True)
 
-    user_id = m.Column(s.BigInteger, s.ForeignKey(User.user_id))
+    user_id = m.Column(s.BigInteger)
     datetime_id = m.DateTimeColumn()
     datetime = relationship(m.DateTime)
     current_name = m.Column(s.String, label = 'Full Name')
@@ -40,7 +40,7 @@ class FacebookDuration(Fact):
     '''
     How long a person was on Facebook each day
     '''
-    user_id = m.Column(s.BigInteger, s.ForeignKey(User.user_id), primary_key = True)
+    user_id = m.Column(s.BigInteger, primary_key = True)
     date_id = m.DateColumn(primary_key = True)
     date = relationship(m.Date)
     duration = m.Column(s.Integer) # in seconds

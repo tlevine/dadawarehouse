@@ -8,7 +8,7 @@ import subprocess
 import sqlalchemy
 
 from ..logger import logger
-from .model import LogSqliteDb,
+from .model import LogSqliteDb, \
                    FacebookChatStatusChange, FacebookMessage, \
                    FacebookDuration
 from ..model import Date, DateTime
@@ -35,9 +35,9 @@ def convert_log(engine, filedate, session):
             filedate = filedate,
             rowid = rowid,
             user_id = parse_uid(uid),
-            datetime = session.merge(DateTime(pk = datetime.datetime.fromtimestamp(ts))),
+            datetime_id = datetime.datetime.fromtimestamp(ts),
             current_name = nick,
-            status = status)
+            status = status).merge(session)
 
     sql = 'SELECT rowid, uid, nick, ts, body FROM log_msg'
     for rowid, uid, nick, ts, body in engine.execute(sql).fetchall():
@@ -45,7 +45,7 @@ def convert_log(engine, filedate, session):
             filedate = filedate,
             rowid = rowid,
             user_id = parse_uid(uid),
-            datetime = session.merge(DateTime(pk = datetime.datetime.fromtimestamp(ts))),
+            datetime_id = datetime.datetime.fromtimestamp(ts),
             current_name = nick,
             body = body)
 
@@ -98,8 +98,9 @@ def update(session, today = datetime.date.today()):
 
             # Add stuff
             filedate = session.merge(m.Date(pk = filedate_id))
-            session.add_all(convert_log(engine, filedate, session))
-            session.add_all(online_durations(engine, filedate, session))
+            for instance in chain(convert_log(engine, filedate, session),
+                                  online_durations(engine, filedate, session)):
+                instance.merge(session)
             session.add(LogSqliteDb(filedate = filedate))
 
             # Commit at the end so that we can't have a partial import
