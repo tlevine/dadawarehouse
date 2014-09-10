@@ -83,3 +83,14 @@ class Dimension(Base):
             session.add(record)
             # session.commit() ?
         return record
+
+    def _merge_references(self, session, references):
+        '''
+        references is a list of string names of relationship properties
+        '''
+        for reference in references:
+            reference_instance = getattr(self, reference, None)
+            if reference_instance == None:
+                raise ValueError('The reference is None (not defined). This isn\'t allowed.')
+        setattr(self, reference, reference_instance.merge(session))
+        return session.merge(self)
