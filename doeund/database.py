@@ -29,6 +29,20 @@ class DadaBase(Base):
     __abstract__ = True
 
     @classmethod
+    def new(Class, pk):
+        '''
+        Create a new instance of this dimension. Create defaults and merge
+        relationships, but don't merge the new instance itself.
+        '''
+        msg = 'Please implement the %(c)s.new method.'
+        raise NotImplementedError(msg % {'c': Class})
+
+    def merge(self, session):
+        'Merge the present instance and all of its references into the session.'
+        s = self._merge_label(session)
+        return s._merge_pk()
+
+    @classmethod
     def _relationships(Class):
         for r in Class.__mapper__.relationships:
             yield r.key + '_id', r.key, r.argument
@@ -39,54 +53,22 @@ class DadaBase(Base):
             if c.unique:
                 yield c.name 
 
-
-class Fact(DadaBase):
-    '''
-    A fact table
-    '''
-    __abstract__ = True
-
-    @declared_attr
-    def __tablename__(Class):
-        return 'fact_' + Class.__name__.lower()
-
-class Dimension(Base):
-    '''
-    A dimension table
-
-    Each dimension table should have only one dimension;
-    the different columns within that table are treated
-    as a hierarchy of levels within that dimension.
-    '''
-    __abstract__ = True
-
-    @declared_attr
-    def __tablename__(Class):
-        return 'dim_' + Class.__name__.lower()
-
-    @classmethod
-    def new(Class, pk):
-        '''
-        Create a new instance of this dimension. Create defaults and merge
-        relationships, but don't merge the new instance itself.
-        '''
-        msg = 'Please implement the %(c)s.new method.'
-        raise NotImplementedError(msg % {'c': Class})
-
-    def merge(self, session):
-        raise NotImplementedError(
-            'Please implement a %(c)s.merge method that calls one of'
-            '%(c)s._merge_label and %(c)s._merge_pk and that calls'
-            '%(c)s._merge_references if it is appropriate.' % \
-            {'c': self.__class__})
-
-    def _merge_pk(self, session):
+    def _merge_pk(self):
+        for name, key, Class in self.__class__._references():
+            r = getattr(self, key, Class.new(pk = getattr(self, name)))
+            if reference_instance == None:
+                raise ValueError('The reference %s.%s and its column, %s.%s,'
+                    'are both None (not defined). This isn\'t allowed.' % \
+                    (Class, key, Class, name))
+            setattr(self, key, r.merge(session))
+        self.weekday = self.weekday.merge(session)
+        self._merge_references(session, 'year', 'week', 'weekday')
         return session.merge(self)
 
     def _merge_label(self, session):
         Class = self.__class__
         filters = [(getattr(Class, column_name), getattr(self, column_name)) \
-                   for column_name in column_names]
+                   for column_name in self._uniques()]
 
         query = session.query(Class)
 
@@ -108,13 +90,27 @@ class Dimension(Base):
             # session.commit() ?
         return record
 
-    def _merge_references(self, session, *references):
-        '''
-        references is a list of string names of relationship properties
-        '''
-        for reference in references:
-            reference_instance = getattr(self, reference, None)
-            if reference_instance == None:
-                raise ValueError('The reference is None (not defined). This isn\'t allowed.')
-        setattr(self, reference, reference_instance.merge(session))
-        return session.merge(self)
+
+class Fact(DadaBase):
+    '''
+    A fact table
+    '''
+    __abstract__ = True
+
+    @declared_attr
+    def __tablename__(Class):
+        return 'fact_' + Class.__name__.lower()
+
+class Dimension(DadaBase):
+    '''
+    A dimension table
+
+    Each dimension table should have only one dimension;
+    the different columns within that table are treated
+    as a hierarchy of levels within that dimension.
+    '''
+    __abstract__ = True
+
+    @declared_attr
+    def __tablename__(Class):
+        return 'dim_' + Class.__name__.lower()
