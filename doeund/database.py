@@ -28,19 +28,12 @@ class Column(_Column):
 class DadaBase(Base):
     __abstract__ = True
 
-    @classmethod
-    def new(Class, pk):
-        '''
-        Create a new instance of this dimension. Create defaults and merge
-        relationships, but don't merge the new instance itself.
-        '''
-        msg = 'Please implement the %(c)s.new method.'
-        raise NotImplementedError(msg % {'c': Class})
-
     def merge(self, session):
         'Merge the present instance and all of its references into the session.'
-        s = self._merge_label(session)
-        return s._merge_pk()
+        if len(list(self._uniques())) > 0:
+            return self._merge_label(session)
+        else:
+            return self._merge_pk(session)
 
     @classmethod
     def _relationships(Class):
