@@ -45,6 +45,8 @@ def parse(fp, filename = None):
             pass
         elif calendar_file == None:
             calendar_code, _, calendar_description = line.partition(' ')
+            print(calendar_code, filename, calendar_description)
+            assert False
             calendar_file = File(pk = calendar_code,
                 filename = filename, description = calendar_description)
         #   yield calendar_file
