@@ -1,6 +1,6 @@
 from sqlalchemy.orm import sessionmaker as _sessionmaker
 
-from .database import Fact, Dimension, Column, Base as _Base, merge_on_unique
+from .database import Fact, Dimension, Column, Base as _Base
 from .export import export as _export
 
 def database(engine):

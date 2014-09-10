@@ -70,7 +70,7 @@ class Dimension(Base):
 
     def _merge_label(self, session, *column_names):
         Class = self.__class__
-        filters = [(getattr(Class, column_name), getattr(self, column_name) \
+        filters = [(getattr(Class, column_name), getattr(self, column_name)) \
                    for column_name in column_names]
 
         query = session.query(Class)
