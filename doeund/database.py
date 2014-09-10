@@ -61,28 +61,25 @@ class Dimension(Base):
 
     def _merge_label(self, session, column_names):
         Class = self.__class__
-        unique_columns = [getattr(Class, column_name) \
-                          for column_name in column_names]
-        values = [getattr(self, column_name) for column_name in column_names]
-        for unique_column, value in zip(unique_columns, values):
+        filters = [(getattr(Class, column_name), getattr(self, column_name) \
+                   for column_name in column_names]
+
+        query = session.query(Class)
+
+        for unique_column, value in filters:
             if unique_column == None:
                 raise ValueError('The table doesn\'t have a %s column.' % column_name)
             elif value == None:
                 raise ValueError('The instance doesn\'t have a %s attribute.' % column_name)
-        else:
-            return merge_on_unique(Class, session, unique_column, value)
+            else:
+                query = query.filter(unique_column == value)
 
-def merge_on_unique(Class, session, unique_column, value, **kwargs):
-    '''
-    Merge on a single unique column, assuming that that is the only
-    column in the table that needs to be specified.
-    '''
-    if value == None:
-        raise ValueError('Value may not be None.')
-    x = session.query(Class).filter(unique_column == value).first()
-    if x == None:
-        _kwargs = dict(kwargs)
-        kwargs[unique_column.name] = value
-        x = Class(**_kwargs)
-        session.add(x)
-    return x
+        record = query.first()
+        if record == None:
+            _kwargs = dict(kwargs)
+            for unique_column, value in filters:
+                _kwargs[unique_column.name] = value
+            record = Class(**_kwargs)
+            session.add(record)
+            # session.commit() ?
+        return record
