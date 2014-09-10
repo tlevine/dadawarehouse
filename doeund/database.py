@@ -49,6 +49,15 @@ class Dimension(Base):
     def __tablename__(Class):
         return 'dim_' + Class.__name__.lower()
 
+    @classmethod
+    def new(Class, pk):
+        '''
+        Create a new instance of this dimension. Create defaults and merge
+        relationships, but don't merge the new instance itself.
+        '''
+        msg = 'Please implement the %(c)s.new method.'
+        raise NotImplementedError(msg % {'c': Class})
+
     def merge(self, session):
         raise NotImplementedError(
             'Please implement a %(c)s.merge method that calls one of'
@@ -59,7 +68,7 @@ class Dimension(Base):
     def _merge_pk(self, session):
         return session.merge(self)
 
-    def _merge_label(self, session, column_names):
+    def _merge_label(self, session, *column_names):
         Class = self.__class__
         filters = [(getattr(Class, column_name), getattr(self, column_name) \
                    for column_name in column_names]
@@ -84,7 +93,7 @@ class Dimension(Base):
             # session.commit() ?
         return record
 
-    def _merge_references(self, session, references):
+    def _merge_references(self, session, *references):
         '''
         references is a list of string names of relationship properties
         '''

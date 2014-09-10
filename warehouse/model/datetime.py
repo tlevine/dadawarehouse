@@ -16,6 +16,13 @@ class DateTime(Dimension):
     time_id = Column(s.Time, s.ForeignKey(Time.pk), default = d(lambda pk: pk.time()))
     time = relationship(Time)
 
+    @classmethod
+    def new(Class, pk):
+        dt = Class(pk = pk)
+        dt.date = Date(pk = dt.date_id).merge(session)
+        dt.time = Time(pk = dt.time_id).merge(session)
+        return date
+
     def merge(self, session):
         self.date = Date(pk = self.pk.date()).link(session)
         self.time = Time(pk = self.pk.time()).link(session)

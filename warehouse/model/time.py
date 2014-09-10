@@ -12,8 +12,12 @@ class Time(Dimension):
     hour = Column(s.Integer, default = d(lambda pk: pk.hour))
     minute = Column(s.Integer, default = d(lambda pk: pk.minute))
 
+    @classmethod
+    def new(Class, pk):
+        return Class(pk = pk)
+
     def merge(self, session):
-        return session.merge(self)
+        return self._merge_pk(session)
 
 def TimeColumn(*args, **kwargs):
     return Column(s.Time, s.ForeignKey(Time.pk), *args, **kwargs)
