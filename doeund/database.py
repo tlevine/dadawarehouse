@@ -103,3 +103,11 @@ class Dimension(Base):
                 raise ValueError('The reference is None (not defined). This isn\'t allowed.')
         setattr(self, reference, reference_instance.merge(session))
         return session.merge(self)
+
+
+'''
+for r in self.__mapper__.relationships:
+    r.key
+    r.key + '_id'
+    r.argument
+'''
