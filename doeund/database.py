@@ -49,14 +49,26 @@ class Dimension(Base):
     def __tablename__(Class):
         return 'dim_' + Class.__name__.lower()
 
-    def merge_on(self, column_name, session):
+    def merge(self, session):
+        raise NotImplementedError(
+            'Please implement a %(c)s.merge method that calls one of'
+            '%(c)s._merge_label and %(c)s._merge_pk and that calls'
+            '%(c)s._merge_references if it is appropriate.' % \
+            {'c': self.__class__})
+
+    def _merge_pk(self, session):
+        return session.merge(self)
+
+    def _merge_label(self, session, column_names):
         Class = self.__class__
-        unique_column = getattr(Class, column_name)
-        value = getattr(self, column_name)
-        if unique_column == None:
-            raise ValueError('The table doesn\'t have a %s column.' % column_name)
-        elif value == None:
-            raise ValueError('The instance doesn\'t have a %s column.' % column_name)
+        unique_columns = [getattr(Class, column_name) \
+                          for column_name in column_names]
+        values = [getattr(self, column_name) for column_name in column_names]
+        for unique_column, value in zip(unique_columns, values):
+            if unique_column == None:
+                raise ValueError('The table doesn\'t have a %s column.' % column_name)
+            elif value == None:
+                raise ValueError('The instance doesn\'t have a %s attribute.' % column_name)
         else:
             return merge_on_unique(Class, session, unique_column, value)
 
