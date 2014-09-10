@@ -24,7 +24,7 @@ class WeekDay(Dimension):
         default = d(lambda pk: WEEKDAYS[pk.weekday()]))
 
     def merge(self, session):
-        return self.merge_on('weekday', session)
+        return self.merge_on(self, session, ['weekday'])
 
 class Monthly(Dimension):
     '''
@@ -49,6 +49,7 @@ class Weekly(Dimension):
     weekday = relationship(WeekDay)
 
     def merge(self, session):
+        self._merge_references(session, references)
         self.weekday = self.weekday.merge(session)
         return session.merge(self)
 
