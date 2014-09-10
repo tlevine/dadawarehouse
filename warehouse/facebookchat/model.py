@@ -3,7 +3,7 @@ import os
 from sqlalchemy.orm import relationship
 import sqlalchemy as s
 
-from doeund import Fact, Dimension, merge_on_unique
+from doeund import Fact, Dimension
 
 import warehouse.model as m
 
