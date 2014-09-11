@@ -38,7 +38,7 @@ def convert_log(engine, filedate, session):
             user_id = parse_uid(uid),
             datetime = DateTime.new(datetime.datetime.fromtimestamp(ts)).merge(session),
             current_name = nick,
-            status = status).merge(session)
+            status = status)
 
     sql = 'SELECT rowid, uid, nick, ts, body FROM log_msg'
     for rowid, uid, nick, ts, body in engine.execute(sql).fetchall():
@@ -99,9 +99,8 @@ def update(session, today = datetime.date.today()):
 
             # Add stuff
             filedate = Date.new(filedate_id).merge(session)
-            for instance in chain(convert_log(engine, filedate, session),
-                                  online_durations(engine, filedate, session)):
-                instance.merge(session)
+            session.add_all(chain(convert_log(engine, filedate, session),
+                                  online_durations(engine, filedate, session)))
             session.add(LogSqliteDb(filedate = filedate))
 
             # Commit at the end so that we can't have a partial import
