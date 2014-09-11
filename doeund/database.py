@@ -72,19 +72,21 @@ class DadaBase(Base):
         return Class._label_mapping[value]
 
     @classmethod
-    def create_related(Class, session):
+    def create_related(ParentClass, session):
         # With each relationship,
-        for colname, relname, Class in self.__class__._relationships():
+        for colname, relname, Class in ParentClass._relationships():
             # look through all of the values of the foreign key column,
             # that aren't in the referenced table
             import pdb; pdb.set_trace()
-           #reference = session.query(getattr
-          # q = session.query(getattr(Class, colname)).distinct()
+            reference = session.query(getattr(Class, 'pk'))
 
             # Where can I get pkname?
             # Perhaps relationships may only involve primary key columns...
             # Can I do this with foreign keys and without relationships?
-            session.add_all(Class(**{pkname: fk}) for fk in q)
+            parent = session.query(getattr(ParentClass, colname)).distinct()
+            pks = (for pk in set(reference) - set(parent))
+
+            session.add_all(Class(pk = pk) for pk in pks)
             session.commit()
             Class.create_related(session)
 
