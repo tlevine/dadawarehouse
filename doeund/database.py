@@ -38,9 +38,39 @@ class DadaBase(Base):
 
     @classmethod
     def _uniques(Class):
-        for c in Class.__mapper__.columns:
-            if c.unique:
-                yield c.name 
+        return [c.name for c in Class.__mapper__.columns if c.unique]
+
+    @classmethod
+    def _primary_keys(Class):
+        return [c.name for c in Class.__mapper__.columns if c.primary_key]
+
+    _label_mapping = {}
+    @classmethod
+    def from_label(Class, session, value):
+        'Returns the primary key, creating the record if needed'
+        uniques = Class._uniques()
+        if len(uniques) != 1:
+            raise TypeError('To use %(c)s.from_label, %(c)s must have exactly one unique column, not %(n)s' % {'c': Class.__name__, 'n': len(uniques)})
+        unique = uniques[0]
+
+        primary_keys = Class._primary_keys()
+        if len(primary_keys) != 1:
+            raise TypeError('To use %(c)s.from_label, %(c)s must have exactly one primary key column, not %(n)s' % {'c': Class.__name__, 'n': len(primary_keys)})
+        primary_key = primary_keys[0]
+
+        if len(Class._label_mapping) == 0:
+            for instance in session.query(Class):
+                Class._label_mapping[getattr(instance, unique.name)] = getattr(instance, primary_key.name)
+
+        if value not in Class._label_mapping:
+            primary_key_value = max(Class._label_mapping.values())
+            kwargs = {primary_key.name: primary_key_value, unique.name: value}
+            instance = Class(**kwargs)
+            session.add(instance)
+            Class._label_mapping[value] = primary_key_value
+
+        return Class._label_mapping[value]
+
 
     @classmethod
     def create_relations(Class, session):
