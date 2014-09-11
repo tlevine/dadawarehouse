@@ -20,8 +20,7 @@ WEEKDAYS = [
 
 class WeekDay(Dimension):
     pk = PkColumn()
-    weekday = LabelColumn(label = 'Day of the week',
-        default = d(lambda pk: WEEKDAYS[pk.weekday()]))
+    weekday = LabelColumn(label = 'Day of the week')#, default = d(lambda pk: WEEKDAYS[pk]))
 
 class Monthly(Dimension):
     '''
@@ -47,8 +46,13 @@ class Date(Dimension):
                 primary_key = True)
     day_monthly = relationship(Monthly)
     day_weekly = relationship(Weekly)
-    weekday_id = FkColumn(WeekDay.pk)
+    weekday_id = FkColumn(WeekDay.pk, default = d(lambda pk: pk.weekday()))
     weekday = relationship(WeekDay)
+    def merge(self, session):
+        self.day_monthly = Monthly(pk = self.pk).merge(session)
+        self.day_weekly = Weekly(pk = self.pk).merge(session)
+        self.weekday = WeekDay(pk = self.pk.weekday()).merge(session)
+        return session.merge(self)
 
 def DateColumn(*args, **kwargs):
     return Column(s.Date, s.ForeignKey(Date.pk), *args, **kwargs)
