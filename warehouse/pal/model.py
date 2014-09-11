@@ -17,6 +17,10 @@ class Description(d.Dimension):
     pk = m.PkColumn()
     description = m.LabelColumn()
 
+    @classmethod
+    def new(Class, description):
+        return Class(description = description)
+
 class CalendarEvent(d.Fact):
     pk = m.PkColumn()
     file_id = m.Column(String(2), ForeignKey(File.pk))

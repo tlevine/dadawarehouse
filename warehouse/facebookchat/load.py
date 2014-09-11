@@ -1,4 +1,5 @@
 from collections import defaultdict
+from itertools import chain
 import shutil
 import os
 import re
@@ -35,7 +36,7 @@ def convert_log(engine, filedate, session):
             filedate = filedate,
             rowid = rowid,
             user_id = parse_uid(uid),
-            datetime_id = datetime.datetime.fromtimestamp(ts),
+            datetime = DateTime.new(datetime.datetime.fromtimestamp(ts)).merge(session),
             current_name = nick,
             status = status).merge(session)
 
@@ -45,7 +46,7 @@ def convert_log(engine, filedate, session):
             filedate = filedate,
             rowid = rowid,
             user_id = parse_uid(uid),
-            datetime_id = datetime.datetime.fromtimestamp(ts),
+            datetime = DateTime.new(datetime.datetime.fromtimestamp(ts)).merge(session),
             current_name = nick,
             body = body)
 
@@ -81,9 +82,9 @@ def online_durations(engine, filedate, session):
         )
 
 def update(session, today = datetime.date.today()):
-    download()
+ #  download()
     already_imported = session.query(LogSqliteDb.filedate).distinct()
-    for filename_id in set(os.listdir(LOCAL_CHAT)).difference(already_imported):
+    for filename in set(os.listdir(LOCAL_CHAT)).difference(already_imported):
         try:
             filedate_id = datetime.datetime.strptime(filename, '%Y-%m-%d.db').date()
             if filedate_id >= today:
@@ -97,7 +98,7 @@ def update(session, today = datetime.date.today()):
 
 
             # Add stuff
-            filedate = session.merge(m.Date(pk = filedate_id))
+            filedate = Date.new(filedate_id).merge(session)
             for instance in chain(convert_log(engine, filedate, session),
                                   online_durations(engine, filedate, session)):
                 instance.merge(session)

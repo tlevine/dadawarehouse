@@ -21,7 +21,7 @@ def load_data():
 
    #pal(session)
    #history(session)
-    notmuch(session)
+   #notmuch(session)
     fb(session)
 
 def export_model():

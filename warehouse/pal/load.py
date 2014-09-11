@@ -38,13 +38,14 @@ def update(session, calendars = CALENDARS):
                     calendar_code, _, calendar_description = line.partition(' ')
                     calendar_file = File(pk = calendar_code,
                         filename = filename,
-                        description = calendar_description).merge(session)
+                        description = calendar_description)
+                    session.add(calendar_file)
                 else:
                     for date, description in entry(line):
-                        description = Description(description = calendar_description).merge(session)
-                        CalendarEvent(file = calendar_file,
-                                      date = m.Date.new(date).merge(session),
-                                      description = description).merge(session)
+                        description = Description.new(calendar_description).merge(session)
+                        session.add(CalendarEvent(file = calendar_file,
+                            date = m.Date.new(date).merge(session),
+                            description = description))
 
         session.commit()
         logger.info('Inserted events from calendar %s' % filename)
