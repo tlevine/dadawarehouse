@@ -72,17 +72,24 @@ class DadaBase(Base):
         return Class._label_mapping[value]
 
     @classmethod
-    def create_related(Class, session, relationship_name):
-        from_relationship = Class.__mapper__.relationships[relationship_name]
-        if len(from_relationship.local_columns) != 1:
-            raise TypeError('There must be exactly one local column.')
-        from_column = list(from_relationship.local_columns)[0]
-        to_columns = (fk.column for fk in to_column.foreign_keys)
-        for to_column in to_columns:
-            from_values = set(session.query(from_column).distinct())
-            to_values = set(session.query(to_column).distinct())
-            values = to_values - from_values:
-            session.add_all(to_column.table(**{to_column.name: value})
+    def create_related(Class, session):
+        '''
+        Create entries in related tables.
+        '''
+        for from_relationship in Class.__mapper__.relationships:
+
+            if len(from_relationship.local_columns) != 1:
+                msg = 'The relationship must have exactly one local column.'
+                raise ValueError(msg)
+
+            from_column = list(from_relationship.local_columns)[0]
+            to_columns = (fk.column for fk in to_column.foreign_keys)
+
+            for to_column in to_columns:
+                from_values = set(session.query(from_column).distinct())
+                to_values = set(session.query(to_column).distinct())
+                values = to_values - from_values:
+                session.add_all(to_column.table(**{to_column.name: value})
 
        #list(list(warehouse.pal.model.CalendarEvent.__table__.columns)[1].foreign_keys)[0].column
        #list(list(warehouse.pal.model.CalendarEvent.__table__.columns)[1].foreign_keys)[0].column
