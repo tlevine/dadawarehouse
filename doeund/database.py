@@ -72,12 +72,21 @@ class DadaBase(Base):
         return Class._label_mapping[value]
 
 
-    @classmethod
-    def create_relations(Class, session):
-        session.query(*(getattr(Class, colname) for (colname, _, _) \
-                        in Class._relationships())).distinct()
 
+
+
+
+
+    @classmethod
+    def create_related(Class, session):
+        # With each relationship,
         for colname, relname, Class in self.__class__._relationships():
+            # look through all of the values of the foreign key column,
+            # that aren't in the referenced table
+            q = session.query(getattr(Class, colname)).distinct().where...
+            for fk in q:
+                # Where can I get pkname?
+                yield Class(**{pkname: fk})
 
 
     @classmethod
