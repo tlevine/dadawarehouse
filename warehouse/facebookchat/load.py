@@ -29,29 +29,29 @@ UID = re.compile(r'xmpp:-([0-9]+)@chat.facebook.com')
 def parse_uid(uid):
     return str(int(re.match(UID, uid).group(1)))
 
-def status_changes(engine, filedate, session):
+def status_changes(engine, filedate_id, session):
     sql = 'SELECT rowid, uid, nick, ts, status FROM log_status'
     for rowid, uid, nick, ts, status in engine.execute(sql).fetchall():
         yield FacebookChatStatusChange(
-            filedate = filedate,
+            filedate_id = filedate_id,
             rowid = rowid,
             user_id = parse_uid(uid),
             datetime_id = datetime.datetime.fromtimestamp(ts),
             current_name = nick,
             status = status)
 
-def messages(engine, filedate, session):
+def messages(engine, filedate_id, session):
     sql = 'SELECT rowid, uid, nick, ts, body FROM log_msg'
     for rowid, uid, nick, ts, body in engine.execute(sql).fetchall():
         yield FacebookMessage(
-            filedate = filedate,
+            filedate_id = filedate_id,
             rowid = rowid,
             user_id = parse_uid(uid),
             datetime = datetime.datetime.fromtimestamp(ts),
             current_name = nick,
             body = body)
 
-def online_durations(engine, filedate, session):
+def online_durations(engine, filedate_id, session):
     for uid, nick in engine.execute('SELECT DISTINCT uid, nick FROM log_status;'):
         duration = 0
         avail = False
@@ -77,14 +77,14 @@ def online_durations(engine, filedate, session):
                 raise AssertionError('This else condition shouldn\'t happen.')
 
         yield FacebookDuration(
-            date = filedate,
+            date = filedate_id,
             user = parse_uid(uid),
             duration = duration
         )
 
 def update(session, today = datetime.date.today()):
  #  download()
-    already_imported = session.query(LogSqliteDb.filedate).distinct()
+    already_imported = session.query(LogSqliteDb.filedate_id).distinct()
     for filename in set(os.listdir(LOCAL_CHAT)).difference(already_imported):
         try:
             filedate_id = datetime.datetime.strptime(filename, '%Y-%m-%d.db').date()
@@ -99,13 +99,13 @@ def update(session, today = datetime.date.today()):
 
 
             # Add stuff
-            session.add_all(status_changes(engine, filedate, session))
+            session.add_all(status_changes(engine, filedate_id, session))
             FacebookChatStatusChange.create_related(session)
-            session.add_all(messages(engine, filedate, session))
+            session.add_all(messages(engine, filedate_id, session))
             FacebookMessage.create_related(session)
-            session.add_all(online_durations(engine, filedate, session))
+            session.add_all(online_durations(engine, filedate_id, session))
             FacebookDuration.create_related(session)
-            session.add(LogSqliteDb(filedate = filedate))
+            session.add(LogSqliteDb(filedate_id = filedate_id))
 
             # Commit at the end so that we can't have a partial import
             # for a given day.

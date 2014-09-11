@@ -77,7 +77,9 @@ class DadaBase(Base):
         for colname, relname, Class in self.__class__._relationships():
             # look through all of the values of the foreign key column,
             # that aren't in the referenced table
-            q = session.query(getattr(Class, colname)).distinct().where...
+            import pdb; pdb.set_trace()
+           #reference = session.query(getattr
+          # q = session.query(getattr(Class, colname)).distinct()
 
             # Where can I get pkname?
             # Perhaps relationships may only involve primary key columns...
