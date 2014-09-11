@@ -21,37 +21,31 @@ def update(session, calendars = CALENDARS):
     session.commit()
 
     for filename in calendars:
+
+        if filename == None:
+            try:
+                filename = fp.name
+            except NameError:
+                raise ValueError('You must specify a filename.')
+
+        calendar_file = None
         with open(filename) as fp:
-            for thing in parse(fp):
-                thing.merge(session)
+            for line in fp:
+                line = line.rstrip()
+                if line.startswith('#'):
+                    pass
+                elif calendar_file == None:
+                    calendar_code, _, calendar_description = line.partition(' ')
+                    calendar_file = File(pk = calendar_code,
+                        filename = filename,
+                        description = calendar_description).merge(session)
+                else:
+                    for date, description in entry(line):
+                        CalendarEvent(file = calendar_file, date_id = date,
+                                      description = description).merge(session)
+
         session.commit()
         logger.info('Inserted events from calendar %s' % filename)
-
-def parse(fp, filename = None):
-    'Read a pal calendar file.'
-
-    # Parse the filename.
-    if filename == None:
-        try:
-            filename = fp.name
-        except NameError:
-            raise ValueError('You must specify a filename.')
-
-    calendar_file = None
-    events = []
-    for line in fp:
-        line = line.rstrip()
-        if line.startswith('#'):
-            pass
-        elif calendar_file == None:
-            calendar_code, _, calendar_description = line.partition(' ')
-            calendar_file = File(pk = calendar_code,
-                filename = filename, description = calendar_description)
-            yield calendar_file
-        else:
-            for date, description in entry(line):
-                yield CalendarEvent(file = calendar_file, date_id = date,
-                                    description = description)
 
 def entry(line):
     'Read a pal calendar entry'

@@ -67,8 +67,8 @@ class DadaBase(Base):
 
     def _merge_label(self, session):
         Class = self.__class__
-        filters = ((getattr(Class, column_name), getattr(self, column_name)) \
-                   for column_name in self._uniques())
+        filters = [(getattr(Class, column_name), getattr(self, column_name)) \
+                   for column_name in self._uniques()]
 
         query = session.query(Class)
         for unique_column, value in filters:
@@ -77,9 +77,11 @@ class DadaBase(Base):
         record = query.first()
         if record == None:
             kwargs = {column.name: value for column, value in filters}
+            print(kwargs)
             record = Class(**kwargs)
             record = session.add(record)
-            # session.commit() ?
+            session.commit()
+
         return record
 
 
