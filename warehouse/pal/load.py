@@ -41,6 +41,7 @@ def update(session, calendars = CALENDARS):
                         description = calendar_description).merge(session)
                 else:
                     for date, description in entry(line):
+                        description = Description(description = calendar_description).merge(session)
                         CalendarEvent(file = calendar_file, date_id = date,
                                       description = description).merge(session)
 
