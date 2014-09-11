@@ -19,7 +19,7 @@ def load_data():
     engine = create_engine('sqlite:////tmp/dada.sqlite')
     session = doeund.database(engine)
 
-    pal(session)
+   #pal(session)
     history(session)
    #notmuch(session)
    #fb(session)
