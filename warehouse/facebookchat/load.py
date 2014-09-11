@@ -29,24 +29,25 @@ UID = re.compile(r'xmpp:-([0-9]+)@chat.facebook.com')
 def parse_uid(uid):
     return str(int(re.match(UID, uid).group(1)))
 
-def convert_log(engine, filedate, session):
+def status_changes(engine, filedate, session):
     sql = 'SELECT rowid, uid, nick, ts, status FROM log_status'
     for rowid, uid, nick, ts, status in engine.execute(sql).fetchall():
         yield FacebookChatStatusChange(
             filedate = filedate,
             rowid = rowid,
             user_id = parse_uid(uid),
-            datetime = DateTime.new(datetime.datetime.fromtimestamp(ts)).merge(session),
+            datetime_id = datetime.datetime.fromtimestamp(ts),
             current_name = nick,
             status = status)
 
+def messages(engine, filedate, session):
     sql = 'SELECT rowid, uid, nick, ts, body FROM log_msg'
     for rowid, uid, nick, ts, body in engine.execute(sql).fetchall():
         yield FacebookMessage(
             filedate = filedate,
             rowid = rowid,
             user_id = parse_uid(uid),
-            datetime = DateTime.new(datetime.datetime.fromtimestamp(ts)).merge(session),
+            datetime = datetime.datetime.fromtimestamp(ts),
             current_name = nick,
             body = body)
 
@@ -98,9 +99,12 @@ def update(session, today = datetime.date.today()):
 
 
             # Add stuff
-            filedate = Date.new(filedate_id).merge(session)
-            session.add_all(chain(convert_log(engine, filedate, session),
-                                  online_durations(engine, filedate, session)))
+            session.add_all(status_changes(engine, filedate, session))
+            FacebookChatStatusChange.create_related(session)
+            session.add_all(messages(engine, filedate, session))
+            FacebookMessage.create_related(session)
+            session.add_all(online_durations(engine, filedate, session))
+            FacebookDuration.create_related(session)
             session.add(LogSqliteDb(filedate = filedate))
 
             # Commit at the end so that we can't have a partial import
