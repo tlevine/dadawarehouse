@@ -30,6 +30,7 @@ def update(session, calendars = CALENDARS):
 
         calendar_file = None
         with open(filename) as fp:
+            todo = []
             for line in fp:
                 line = line.rstrip()
                 if line.startswith('#'):
@@ -39,14 +40,14 @@ def update(session, calendars = CALENDARS):
                     calendar_file = File(pk = calendar_code,
                         filename = filename,
                         description = calendar_description)
-                    session.add(calendar_file)
+                    todo.append(calendar_file)
                 else:
                     for date, description in entry(line):
-                        description = Description.new(calendar_description).merge(session)
-                        session.add(CalendarEvent(file = calendar_file,
-                            date = m.Date.new(date).merge(session),
+                        description = Description.from_label(session, calendar_description)
+                        todo.append(CalendarEvent(file = calendar_file,
+                            date_id = date,
                             description = description))
-
+            session.add_all(todo)
         session.commit()
         logger.info('Inserted events from calendar %s' % filename)
 
