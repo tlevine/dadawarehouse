@@ -28,6 +28,11 @@ class Column(_Column):
 class DadaBase(Base):
     __abstract__ = True
 
+    @classmethod
+    def new(Class, **kwargs):
+        '''Default new method'''
+        return Class(**kwargs)
+
     def merge(self, session):
         'Merge the present instance and all of its references into the session.'
         if len(list(self._uniques())) > 0:
