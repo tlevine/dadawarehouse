@@ -72,7 +72,20 @@ class DadaBase(Base):
         return Class._label_mapping[value]
 
     @classmethod
+    def create_reference(Class, session, column_name):
+        from_column = Class.__table__[column_name]
+       #list(list(warehouse.pal.model.CalendarEvent.__table__.columns)[1].foreign_keys)[0].column
+       #list(list(warehouse.pal.model.CalendarEvent.__table__.columns)[1].foreign_keys)[0].column
+        to_columns = (fk.column for fk in to_column.foreign_keys)
+        for to_column in to_columns:
+            from_values = set(session.query(from_column).distinct())
+            to_values = set(session.query(to_column).distinct())
+            for value in to_values - from_values:
+                to_column.table(**{to_column.name: value})
+
+    @classmethod
     def create_related(ParentClass, session):
+        raise NotImplementedError
         # With each relationship,
         for colname, relname, Class in ParentClass._relationships():
             # look through all of the values of the foreign key column,
@@ -84,7 +97,7 @@ class DadaBase(Base):
             # Perhaps relationships may only involve primary key columns...
             # Can I do this with foreign keys and without relationships?
             parent = session.query(getattr(ParentClass, colname)).distinct()
-            pks = (for pk in set(reference) - set(parent))
+           #pks = (for pk in set(reference) - set(parent))
 
             session.add_all(Class(pk = pk) for pk in pks)
             session.commit()

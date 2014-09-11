@@ -10,7 +10,7 @@ from warehouse.pal.load import update as pal
 from warehouse.facebookchat.load import update as fb
 from warehouse.twitter.load import update as twitter
 from warehouse.gnucash.load import update as gnucash
-from warehouse.notmuch.load import update as notmuch
+# from warehouse.notmuch.load import update as notmuch
 
 CACHE_DIRECTORY = os.path.expanduser('~/.dadawarehouse')
 
