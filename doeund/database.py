@@ -30,11 +30,11 @@ class DadaBase(Base):
 
     @classmethod
     def _uniques(Class):
-        return [c.name for c in Class.__mapper__.columns if c.unique]
+        return [c for c in Class.__mapper__.columns if c.unique]
 
     @classmethod
     def _primary_keys(Class):
-        return [c.name for c in Class.__mapper__.columns if c.primary_key]
+        return [c for c in Class.__mapper__.columns if c.primary_key]
 
     _label_mapping = {}
     @classmethod
@@ -55,7 +55,10 @@ class DadaBase(Base):
                 Class._label_mapping[getattr(instance, unique.name)] = getattr(instance, primary_key.name)
 
         if value not in Class._label_mapping:
-            primary_key_value = max(Class._label_mapping.values())
+            if len(Class._label_mapping) == 0:
+                primary_key_value = 1
+            else:
+                primary_key_value = max(Class._label_mapping.values())
             kwargs = {primary_key.name: primary_key_value, unique.name: value}
             instance = Class(**kwargs)
             session.add(instance)
@@ -75,7 +78,7 @@ class DadaBase(Base):
                 raise ValueError(msg)
 
             from_column = list(relationship.local_columns)[0]
-            to_columns = (fk.column for fk in to_column.foreign_keys)
+            to_columns = (fk.column for fk in from_column.foreign_keys)
 
             for to_column in to_columns:
                 if not to_column.primary_key:
@@ -85,8 +88,8 @@ class DadaBase(Base):
 
                 from_values = set(session.query(from_column).distinct())
                 to_values = set(session.query(to_column).distinct())
-                values = to_values - from_values:
-                session.add_all(to_column.table(**{to_column.name: value})
+                session.add_all(relationship.argument(**{to_column.name: value}) \
+                                for value in to_values - from_values)
             session.commit()
             relationship.argument.create_related(session)
 
