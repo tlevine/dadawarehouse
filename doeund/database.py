@@ -29,14 +29,6 @@ class DadaBase(Base):
     __abstract__ = True
 
     @classmethod
-    def _relationships(Class):
-        for r in Class.__mapper__.relationships:
-            if len(r.local_columns) != 1:
-                msg = 'The relationship must have exactly one local column.'
-                raise ValueError(msg)
-            yield next(iter(r.local_columns)).name, r.key, r.argument
-
-    @classmethod
     def _uniques(Class):
         return [c.name for c in Class.__mapper__.columns if c.unique]
 
@@ -86,6 +78,11 @@ class DadaBase(Base):
             to_columns = (fk.column for fk in to_column.foreign_keys)
 
             for to_column in to_columns:
+                if not to_column.primary_key:
+                    msg = 'Skipping %s because it is not a primary key'
+                    logger.debug(msg % to_column.name)
+                    continue
+
                 from_values = set(session.query(from_column).distinct())
                 to_values = set(session.query(to_column).distinct())
                 values = to_values - from_values:
