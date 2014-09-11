@@ -76,13 +76,13 @@ class DadaBase(Base):
         '''
         Create entries in related tables.
         '''
-        for from_relationship in Class.__mapper__.relationships:
+        for relationship in Class.__mapper__.relationships:
 
-            if len(from_relationship.local_columns) != 1:
+            if len(relationship.local_columns) != 1:
                 msg = 'The relationship must have exactly one local column.'
                 raise ValueError(msg)
 
-            from_column = list(from_relationship.local_columns)[0]
+            from_column = list(relationship.local_columns)[0]
             to_columns = (fk.column for fk in to_column.foreign_keys)
 
             for to_column in to_columns:
@@ -90,31 +90,8 @@ class DadaBase(Base):
                 to_values = set(session.query(to_column).distinct())
                 values = to_values - from_values:
                 session.add_all(to_column.table(**{to_column.name: value})
-
-       #list(list(warehouse.pal.model.CalendarEvent.__table__.columns)[1].foreign_keys)[0].column
-       #list(list(warehouse.pal.model.CalendarEvent.__table__.columns)[1].foreign_keys)[0].column
-
-    '''
-    @classmethod
-    def create_related(ParentClass, session):
-        raise NotImplementedError
-        # With each relationship,
-        for colname, relname, Class in ParentClass._relationships():
-            # look through all of the values of the foreign key column,
-            # that aren't in the referenced table
-            import pdb; pdb.set_trace()
-            reference = session.query(getattr(Class, 'pk'))
-
-            # Where can I get pkname?
-            # Perhaps relationships may only involve primary key columns...
-            # Can I do this with foreign keys and without relationships?
-            parent = session.query(getattr(ParentClass, colname)).distinct()
-           #pks = (for pk in set(reference) - set(parent))
-
-            session.add_all(Class(pk = pk) for pk in pks)
             session.commit()
-            Class.create_related(session)
-    '''
+            relationship.argument.create_related(session)
 
 class Fact(DadaBase):
     '''
