@@ -19,25 +19,24 @@ def update(session):
         filename = message.get_filename()
         subject = message.get_header('subject')
 
-        dim_message = Message(
+        dim_message = session.merge(Message(
             pk = message.get_message_id(),
             datetime = dt,
             thread = thread,
             filename = filename,
             subject = subject,
             from_address = from_address,
-        )
-       #NotmuchMessage(message = dim_message).merge(session)
-        session.commit()
+        ))
+        session.merge(NotmuchMessage(pk = message.get_message_id()))
         try:
             for part_number, message_part in enumerate(message.get_message_parts()):
                 _content_type, name = parse_attachment_name(message_part)
                 if _content_type == None:
                     content_type = None
                 else:
-                    content_type = ContentType(content_type = _content_type)
+                    content_type = ContentType(content_type = _content_type).merge(session)
                 NotmuchAttachment(
-                    message = dim_message,
+                    message_id = message.get_message_id(),
                     part_number = part_number,
                     content_type = content_type,
                     name = name
