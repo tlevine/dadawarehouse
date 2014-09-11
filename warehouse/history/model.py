@@ -30,6 +30,7 @@ class ShellSession(Dimension):
 class Command(Fact):
     pk = m.PkColumn()
     shellsession_id = m.FkColumn(ShellSession.pk)
+    shellsession = relationship(ShellSession)
     datetime_id = m.DateTimeColumn()
     datetime = relationship(m.DateTime)
     command_id = m.FkColumn(CommandBody.pk)

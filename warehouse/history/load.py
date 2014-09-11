@@ -12,11 +12,11 @@ def update(session):
     previous_shells = (row[0] for row in session.query(ShellSession.filename))
     for log in historian(directory = HISTORY, skip = previous_shells):
         shell_session = ShellSession(filename = log['session'],
-                                     datetime = log['session_date'])
+                                     datetime = log['session_date']).merge(session)
         for command_datetime, command_string in log['commands']:
-            command = Command(datetime = command_datetime,
+            command_body = CommandBody(full_command = command_string)
+            command = Command(datetime_id = command_datetime,
+                              shellsession = shell_session,
                               command = command_body).merge(session)
-            shell_session.commands.append(command)
-        shell_session.merge(session)
         session.commit()
         logger.info('Inserted commands from shell "%s"' % log['session'])
