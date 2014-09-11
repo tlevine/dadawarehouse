@@ -71,12 +71,6 @@ class DadaBase(Base):
 
         return Class._label_mapping[value]
 
-
-
-
-
-
-
     @classmethod
     def create_related(Class, session):
         # With each relationship,
@@ -84,52 +78,13 @@ class DadaBase(Base):
             # look through all of the values of the foreign key column,
             # that aren't in the referenced table
             q = session.query(getattr(Class, colname)).distinct().where...
-            for fk in q:
-                # Where can I get pkname?
-                yield Class(**{pkname: fk})
 
-
-    @classmethod
-    def new_label...
-        session.query(*(getattr(Class, colname) for (colname, _, _) \
-                        in Class._relationships())).distinct()
-
-    def merge_pk(self, session):
-        for colname, relname, Class in self.__class__._relationships():
-            r = getattr(self, relname)
-
-            if r == None:
-                r = Class(pk = getattr(self, colname))
-
-            if r == None:
-                raise ValueError('The reference %s.%s and its column, %s.%s,'
-                    'are both None (not defined). This isn\'t allowed.' % \
-                    (self, relname, self, colname))
-
-            setattr(self, relname, r.merge(session))
-
-        return session.merge(self)
-
-    @classmethod
-    def from_label(self, session):
-        Class = self.__class__
-        filters = [(getattr(Class, column_name), getattr(self, column_name)) \
-                   for column_name in self._uniques()]
-
-        query = session.query(Class)
-        for unique_column, value in filters:
-            query = query.filter(unique_column == value)
-
-        record = query.first()
-        if record == None:
-            columns = self.__table__.columns
-            kwargs = {column.name: getattr(self, column.name) for column in columns}
-            record = Class(**kwargs)
-            record = session.add(record)
+            # Where can I get pkname?
+            # Perhaps relationships may only involve primary key columns...
+            # Can I do this with foreign keys and without relationships?
+            session.add_all(Class(**{pkname: fk}) for fk in q)
             session.commit()
-
-        return record
-
+            Class.create_related(session)
 
 class Fact(DadaBase):
     '''
