@@ -76,8 +76,8 @@ class DadaBase(Base):
 
         record = query.first()
         if record == None:
-            kwargs = {column.name: value for column, value in filters}
-            print(kwargs)
+            columns = self.__table__.columns
+            kwargs = {column.name: getattr(self, column.name) for column in columns}
             record = Class(**kwargs)
             record = session.add(record)
             session.commit()
