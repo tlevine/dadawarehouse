@@ -72,17 +72,22 @@ class DadaBase(Base):
         return Class._label_mapping[value]
 
     @classmethod
-    def create_reference(Class, session, column_name):
+    def create_related(Class, session, relationship_name):
+        from_relationship = Class.__mapper__.relationships[relationship_name]
+        if len(from_relationship.local_columns) != 1:
+            raise TypeError('There must be exactly one local column.')
         from_column = Class.__table__[column_name]
-       #list(list(warehouse.pal.model.CalendarEvent.__table__.columns)[1].foreign_keys)[0].column
-       #list(list(warehouse.pal.model.CalendarEvent.__table__.columns)[1].foreign_keys)[0].column
         to_columns = (fk.column for fk in to_column.foreign_keys)
         for to_column in to_columns:
             from_values = set(session.query(from_column).distinct())
             to_values = set(session.query(to_column).distinct())
-            for value in to_values - from_values:
-                to_column.table(**{to_column.name: value})
+            values = to_values - from_values:
+            session.add_all(to_column.table(**{to_column.name: value})
 
+       #list(list(warehouse.pal.model.CalendarEvent.__table__.columns)[1].foreign_keys)[0].column
+       #list(list(warehouse.pal.model.CalendarEvent.__table__.columns)[1].foreign_keys)[0].column
+
+    '''
     @classmethod
     def create_related(ParentClass, session):
         raise NotImplementedError
@@ -102,6 +107,7 @@ class DadaBase(Base):
             session.add_all(Class(pk = pk) for pk in pks)
             session.commit()
             Class.create_related(session)
+    '''
 
 class Fact(DadaBase):
     '''
