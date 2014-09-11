@@ -29,18 +29,6 @@ class DadaBase(Base):
     __abstract__ = True
 
     @classmethod
-    def new(Class, **kwargs):
-        '''Default new method'''
-        return Class(**kwargs)
-
-    def merge(self, session):
-        'Merge the present instance and all of its references into the session.'
-        if len(list(self._uniques())) > 0:
-            return self._merge_label(session)
-        else:
-            return self._merge_pk(session)
-
-    @classmethod
     def _relationships(Class):
         for r in Class.__mapper__.relationships:
             if len(r.local_columns) != 1:
@@ -54,7 +42,20 @@ class DadaBase(Base):
             if c.unique:
                 yield c.name 
 
-    def _merge_pk(self, session):
+    @classmethod
+    def create_relations(Class, session):
+        session.query(*(getattr(Class, colname) for (colname, _, _) \
+                        in Class._relationships())).distinct()
+
+        for colname, relname, Class in self.__class__._relationships():
+
+
+    @classmethod
+    def new_label...
+        session.query(*(getattr(Class, colname) for (colname, _, _) \
+                        in Class._relationships())).distinct()
+
+    def merge_pk(self, session):
         for colname, relname, Class in self.__class__._relationships():
             r = getattr(self, relname)
 
@@ -70,7 +71,8 @@ class DadaBase(Base):
 
         return session.merge(self)
 
-    def _merge_label(self, session):
+    @classmethod
+    def from_label(self, session):
         Class = self.__class__
         filters = [(getattr(Class, column_name), getattr(self, column_name)) \
                    for column_name in self._uniques()]
