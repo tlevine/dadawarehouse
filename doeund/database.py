@@ -58,7 +58,7 @@ class DadaBase(Base):
             if len(Class._label_mapping) == 0:
                 primary_key_value = 1
             else:
-                primary_key_value = max(Class._label_mapping.values())
+                primary_key_value = max(Class._label_mapping.values()) + 1
             kwargs = {primary_key.name: primary_key_value, unique.name: value}
             instance = Class(**kwargs)
             session.add(instance)
