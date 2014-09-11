@@ -9,7 +9,7 @@ from .base import Column
 class Time(Dimension):
     pk = Column(s.Time, primary_key = True)
     hour = Column(s.Integer)
-    minute = Column(s.Integer, default = d(lambda pk: pk.minute))
+    minute = Column(s.Integer)
 
     @classmethod
     def new(Class, pk):

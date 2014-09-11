@@ -42,7 +42,8 @@ def update(session, calendars = CALENDARS):
                 else:
                     for date, description in entry(line):
                         description = Description(description = calendar_description).merge(session)
-                        CalendarEvent(file = calendar_file, date_id = date,
+                        CalendarEvent(file = calendar_file,
+                                      date = m.Date.new(date).merge(session),
                                       description = description).merge(session)
 
         session.commit()

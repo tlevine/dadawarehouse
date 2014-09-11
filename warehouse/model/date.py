@@ -51,7 +51,7 @@ class Weekly(Dimension):
     @classmethod
     def new(Class, pk):
         return Class(pk = pk, year = pk.year,
-                     week = pk: pk.isocalendar()[1],
+                     week = pk.isocalendar()[1],
                      weekday = WeekDay.new(pk.weekday()))
 
 class Date(Dimension):
@@ -64,10 +64,10 @@ class Date(Dimension):
 
     @classmethod
     def new(Class, pk):
-        self.day_monthly = Monthly(pk = self.pk)
-        self.day_weekly = Weekly(pk = self.pk)
-        self.weekday = WeekDay(pk = self.pk.weekday())
-        return session.merge(self)
+        return Class(pk = pk,
+                     day_monthly = Monthly(pk = pk),
+                     day_weekly = Weekly(pk = pk),
+                     weekday = WeekDay(pk = pk.weekday()))
 
 def DateColumn(*args, **kwargs):
     return Column(s.Date, s.ForeignKey(Date.pk), *args, **kwargs)
