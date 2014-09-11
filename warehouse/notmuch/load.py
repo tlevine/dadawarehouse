@@ -27,7 +27,7 @@ def update(session):
             subject = subject,
             from_address = from_address,
         )
-        NotmuchMessage(message = dim_message).merge(session)
+       #NotmuchMessage(message = dim_message).merge(session)
         session.commit()
         try:
             for part_number, message_part in enumerate(message.get_message_parts()):
