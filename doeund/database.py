@@ -76,7 +76,7 @@ class DadaBase(Base):
         from_relationship = Class.__mapper__.relationships[relationship_name]
         if len(from_relationship.local_columns) != 1:
             raise TypeError('There must be exactly one local column.')
-        from_column = Class.__table__[column_name]
+        from_column = list(from_relationship.local_columns)[0]
         to_columns = (fk.column for fk in to_column.foreign_keys)
         for to_column in to_columns:
             from_values = set(session.query(from_column).distinct())
