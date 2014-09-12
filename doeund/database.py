@@ -99,6 +99,7 @@ class DadaBase(Base):
                                 for row in from_values - to_values)
 
             relationship.argument.create_related(session)
+            session.commit()
 
 class Fact(DadaBase):
     '''
