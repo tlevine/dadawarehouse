@@ -27,7 +27,7 @@ def download():
 
 UID = re.compile(r'xmpp:-([0-9]+)@chat.facebook.com')
 def parse_uid(uid):
-    return str(int(re.match(UID, uid).group(1)))
+    return int(re.match(UID, uid).group(1))
 
 def status_changes(engine, filedate_id, session):
     sql = 'SELECT rowid, uid, nick, ts, status FROM log_status'
