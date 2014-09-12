@@ -90,7 +90,7 @@ class DadaBase(Base):
                 to_values = set(session.query(to_column).distinct())
                 session.add_all(relationship.argument(**{to_column.name: row[0]}) \
                                 for row in from_values - to_values)
-            session.commit()
+
             relationship.argument.create_related(session)
 
 class Fact(DadaBase):

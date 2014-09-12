@@ -97,21 +97,22 @@ def update(session, today = datetime.date.today()):
             shutil.copy(os.path.join(LOCAL_CHAT, filename), '/tmp/fb.db')
             engine = sqlalchemy.create_engine('sqlite:////tmp/fb.db')
 
-
             # Add stuff
             session.add_all(status_changes(engine, filedate_id, session))
             FacebookChatStatusChange.create_related(session)
+
             session.add_all(messages(engine, filedate_id, session))
             FacebookMessage.create_related(session)
-            session.add_all(online_durations(engine, filedate_id, session))
-            FacebookDuration.create_related(session)
-            session.add(LogSqliteDb(filedate_id = filedate_id))
 
             # Something's wrong with durations; duplicates appear.
+            session.add_all(online_durations(engine, filedate_id, session))
+            FacebookDuration.create_related(session)
 
-            # Commit at the end so that we can't have a partial import
-            # for a given day.
+            session.add(LogSqliteDb(filedate_id = filedate_id))
+
+            # Commit only at the end so that we don't have partial file data.
             session.commit()
             logger.info('Finished %s' % filename)
+
         except KeyboardInterrupt:
             break
