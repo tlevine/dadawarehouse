@@ -27,7 +27,11 @@ def download():
 
 UID = re.compile(r'xmpp:-([0-9]+)@chat.facebook.com')
 def parse_uid(uid):
-    return int(re.match(UID, uid).group(1))
+    try:
+        return int(re.match(UID, uid).group(1))
+    except:
+        print(uid)
+        raise
 
 def status_changes(engine, filedate_id, session):
     sql = 'SELECT rowid, uid, nick, ts, status FROM log_status'
@@ -52,7 +56,8 @@ def messages(engine, filedate_id, session):
             body = body)
 
 def online_durations(engine, filedate_id, session):
-    for uid in engine.execute('SELECT DISTINCT uid FROM log_status;'):
+    for row in engine.execute('SELECT DISTINCT uid FROM log_status;'):
+        uid = row[0]
         duration = 0
         avail = False
         prev_ts = None
