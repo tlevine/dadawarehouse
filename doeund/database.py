@@ -93,12 +93,17 @@ class DadaBase(Base):
                     logger.debug(msg % to_column.name)
                     continue
 
+                # To be safe
+                session.commit()
+
                 from_values = set(session.query(from_column).distinct())
                 to_values = set(session.query(to_column).distinct())
-                session.add_all(relationship.argument(**{to_column.name: row[0]}) \
-                                for row in from_values - to_values)
+                values = [v[0] for v in from_values - to_values]
+                f = lambda value: relationship.argument(**{to_column.name: value})
+                session.add_all(map(f, values))
 
             relationship.argument.create_related(session)
+        session.commit()
 
 class Fact(DadaBase):
     '''

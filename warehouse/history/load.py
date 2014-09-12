@@ -23,7 +23,8 @@ def update(session):
 
         session.add(shell_session)
         ShellSession.create_related(session)
+
         session.add_all(todo)
         Command.create_related(session)
-        session.commit()
+
         logger.info('Inserted commands from shell "%s"' % log['session'])
