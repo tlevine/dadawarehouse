@@ -16,14 +16,16 @@ def update(session):
         if m in past_messages:
             continue
 
-        session.add(message(session, m))
-        NotmuchMessage.create_related(session)
+        session.add_all(message(session, m))
+        Message.create_related(session)
 
         session.add_all(attachments(session, m))
         NotmuchAttachment.create_related(session)
 
         session.add_all(correspondance(m))
         NotmuchCorrespondance.create_related(session)
+
+        past_messages.add(m.get_message_id())
 
 def correspondance(m):
     return []
@@ -45,7 +47,8 @@ def message(session, m):
         subject = subject,
         from_address_id = address_id,
     )
-    return NotmuchMessage(message = dim_message)
+    fact_message = NotmuchMessage(pk = m.get_message_id())
+    return [dim_message, fact_message]
 
 def attachments(session, message):
     try:
