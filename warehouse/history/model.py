@@ -5,13 +5,18 @@ from sqlalchemy.orm import relationship
 from doeund import Dimension, Fact
 
 import warehouse.model as m
+from warehouse.logger import logger
 
 def _arg(n, max_n = 3):
     'Make a "default" function that returns the n-th arg.'
     def default(context):
         command_string = context.current_parameters['full_command']
-        args = (shlex.split(command_string) + [None] * max_n)[:max_n]
-        return args[n]
+        try:
+            args = (shlex.split(command_string) + [None] * max_n)[:max_n]
+        except ValueError:
+            logger.warning('Error parsing command:\n %s' % command_string)
+        else:
+            return args[n]
     return default
 
 class CommandBody(Dimension):
