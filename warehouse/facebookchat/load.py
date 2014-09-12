@@ -107,6 +107,8 @@ def update(session, today = datetime.date.today()):
             FacebookDuration.create_related(session)
             session.add(LogSqliteDb(filedate_id = filedate_id))
 
+            # Something's wrong with durations; duplicates appear.
+
             # Commit at the end so that we can't have a partial import
             # for a given day.
             session.commit()
