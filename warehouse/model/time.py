@@ -11,9 +11,5 @@ class Time(Dimension):
     hour = Column(s.Integer)
     minute = Column(s.Integer)
 
-    @classmethod
-    def new(Class, pk):
-        return Class(pk = pk, hour = pk.hour, minute = pk.minute)
-
 def TimeColumn(*args, **kwargs):
     return Column(s.Time, s.ForeignKey(Time.pk), *args, **kwargs)

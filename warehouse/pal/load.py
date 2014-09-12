@@ -29,8 +29,8 @@ def update(session, calendars = CALENDARS):
                 raise ValueError('You must specify a filename.')
 
         calendar_file = None
+        todo = []
         with open(filename) as fp:
-            todo = []
             for line in fp:
                 line = line.rstrip()
                 if line.startswith('#'):
@@ -43,11 +43,13 @@ def update(session, calendars = CALENDARS):
                     todo.append(calendar_file)
                 else:
                     for date, description in entry(line):
-                        description = Description.from_label(session, calendar_description)
+                        description_id = Description.from_label(session, calendar_description)
                         todo.append(CalendarEvent(file = calendar_file,
                             date_id = date,
-                            description = description))
-            session.add_all(todo)
+                            description_id = description_id))
+        session.add_all(todo)
+        session.commit()
+        CalendarEvent.create_related(session)
         session.commit()
         logger.info('Inserted events from calendar %s' % filename)
 

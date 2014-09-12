@@ -88,8 +88,8 @@ class DadaBase(Base):
 
                 from_values = set(session.query(from_column).distinct())
                 to_values = set(session.query(to_column).distinct())
-                session.add_all(relationship.argument(**{to_column.name: value}) \
-                                for value in to_values - from_values)
+                session.add_all(relationship.argument(**{to_column.name: row[0]}) \
+                                for row in from_values - to_values)
             session.commit()
             relationship.argument.create_related(session)
 
