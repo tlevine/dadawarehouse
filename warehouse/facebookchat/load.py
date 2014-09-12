@@ -52,7 +52,7 @@ def messages(engine, filedate_id, session):
             body = body)
 
 def online_durations(engine, filedate_id, session):
-    for uid, nick in engine.execute('SELECT DISTINCT uid, nick FROM log_status;'):
+    for uid in engine.execute('SELECT DISTINCT uid FROM log_status;'):
         duration = 0
         avail = False
         prev_ts = None
