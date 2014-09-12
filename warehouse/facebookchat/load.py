@@ -47,7 +47,7 @@ def messages(engine, filedate_id, session):
             filedate_id = filedate_id,
             rowid = rowid,
             user_id = parse_uid(uid),
-            datetime = datetime.datetime.fromtimestamp(ts),
+            datetime_id = datetime.datetime.fromtimestamp(ts),
             current_name = nick,
             body = body)
 
@@ -77,8 +77,8 @@ def online_durations(engine, filedate_id, session):
                 raise AssertionError('This else condition shouldn\'t happen.')
 
         yield FacebookDuration(
-            date = filedate_id,
-            user = parse_uid(uid),
+            date_id = filedate_id,
+            user_id = parse_uid(uid),
             duration = duration
         )
 
