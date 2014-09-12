@@ -7,49 +7,69 @@ import warehouse.model as m
 
 from ..logger import logger
 from .model import NotmuchMessage, NotmuchAttachment, NotmuchCorrespondance,\
-                   Address, Thread, Message, ContentType
+                   Address, Message, ContentType
 
 def update(session):
     db = Database()
-    for message in Query(db,'').search_messages():
-        _dt = datetime.datetime.fromtimestamp(message.get_date())
-        dt = m.DateTime.new(_dt)
-        from_address = parse_email_address(message.get_header('from'))
-        thread = Thread(pk = message.get_thread_id())
-        filename = message.get_filename()
-        subject = message.get_header('subject')
+    past_messages = set(row[0] for row in session.query(Message.pk).distinct())
+    for m in Query(db,'').search_messages():
+        if m in past_messages:
+            continue
 
-        dim_message = session.merge(Message(
-            pk = message.get_message_id(),
-            datetime = dt,
-            thread = thread,
-            filename = filename,
-            subject = subject,
-            from_address = from_address,
-        ))
-        session.merge(NotmuchMessage(pk = message.get_message_id()))
-        try:
-            for part_number, message_part in enumerate(message.get_message_parts()):
-                _content_type, name = parse_attachment_name(message_part)
-                if _content_type == None:
-                    content_type = None
-                else:
-                    content_type = ContentType(content_type = _content_type).merge(session)
-                NotmuchAttachment(
-                    message_id = message.get_message_id(),
-                    part_number = part_number,
-                    content_type = content_type,
-                    name = name
-                ).merge(session)
-        except UnicodeDecodeError:
-            logger.warning('Encoding error at message %s' % message.get_message_id())
-            session.rollback()
-        finally:
-            session.commit()
+        session.add(message(session, m))
+        NotmuchMessage.create_related(session)
+
+        session.add_all(attachments(session, m))
+        NotmuchAttachment.create_related(session)
+
+        session.add_all(correspondance(m))
+        NotmuchCorrespondance.create_related(session)
+
+def correspondance(m):
+    return []
+
+def message(session, m): 
+    filename = m.get_filename()
+    subject = m.get_header('subject')
+
+    name, address = parse_email_address(m.get_header('from'))
+    address_id = Address.from_label(session, address)
+#   name_id = Name.from_label(name)
+#   AddressNames.from_label(address_id, name_id)
+
+    dim_message = Message(
+        pk = m.get_message_id(),
+        datetime_id = datetime.datetime.fromtimestamp(m.get_date()),
+        thread_id = m.get_thread_id(),
+        filename = filename,
+        subject = subject,
+        from_address_id = address_id,
+    )
+    return NotmuchMessage(message = dim_message)
+
+def attachments(session, message):
+    try:
+        for part_number, message_part in enumerate(message.get_message_parts()):
+            _content_type, name = parse_attachment_name(message_part)
+            if _content_type == None:
+                content_type_id = None
+            else:
+                content_type_id = ContentType.from_label(session, _content_type)
+            yield NotmuchAttachment(
+                message_id = message.get_message_id(),
+                part_number = part_number,
+                content_type_id = content_type_id,
+                name = name
+            )
+    except UnicodeDecodeError:
+        logger.warning('Encoding error at message %s' % message.get_message_id())
 
 def parse_email_address(email_address):
+    'Return (name, email address)'
     match = re.match(r'(?:(.+) <)?([^>]+)>?', email_address)
-    return Address(pk = match.group(2), name = match.group(1))
+    name = match.group(2)
+    address = match.group(1)
+    return name, address
 
 def parse_attachment_name(headers):
     if headers.get('Content-Disposition') == 'inline':

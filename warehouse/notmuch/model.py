@@ -6,22 +6,33 @@ import doeund as d
 import warehouse.model as m
 
 class Address(d.Dimension):
-    pk = m.Column(s.String, primary_key = True)
-    name = m.Column(s.String)
+    pk = m.PkColumn()
+    address = m.LabelColumn()
 
-class Thread(d.Dimension):
-    pk = m.Column(s.String, primary_key = True)
+class Name(d.Dimension):
+    pk = m.PkColumn()
+    name = m.LabelColumn()
+
+class ContentType(d.Dimension):
+    pk = m.PkColumn()
+    content_type = m.LabelColumn()
 
 class Message(d.Dimension):
     pk = m.Column(s.String, primary_key = True)
     datetime_id = m.DateTimeColumn()
     datetime = relationship(m.DateTime)
-    thread_id = m.Column(s.String, s.ForeignKey(Thread.pk))
-    thread = relationship(Thread)
+    thread_id = m.Column(s.String)
     filename = m.Column(s.String)
     subject = m.Column(s.String)
-    from_address_id = m.Column(s.String, s.ForeignKey(Address.pk))
+    from_address_id = m.FkColumn(Address.pk)
     from_address = relationship(Address)
+
+class AddressName(d.Fact):
+    pk = m.PkColumn()
+    address_id = m.FkColumn(Address.pk, unique = True)
+    address = relationship(Address)
+    name_id = m.FkColumn(Name.pk, unique = True)
+    name = relationship(Name)
 
 class NotmuchCorrespondance(d.Fact):
     '''
@@ -36,10 +47,6 @@ class NotmuchCorrespondance(d.Fact):
 class NotmuchMessage(d.Fact):
     pk = m.Column(s.String, s.ForeignKey(Message.pk), primary_key = True)
     message = relationship(Message)
-
-class ContentType(d.Dimension):
-    pk = m.PkColumn()
-    content_type = m.LabelColumn()
 
 class NotmuchAttachment(d.Fact):
     message_id = m.Column(s.String, s.ForeignKey(Message.pk), primary_key = True)
