@@ -36,7 +36,6 @@ class DadaBase(Base):
     def _primary_keys(Class):
         return [c for c in Class.__mapper__.columns if c.primary_key]
 
-    _label_mapping = {}
     @classmethod
     def from_label(Class, session, value):
         'Returns the primary key, creating the record if needed'
@@ -50,7 +49,8 @@ class DadaBase(Base):
             raise TypeError('To use %(c)s.from_label, %(c)s must have exactly one primary key column, not %(n)s' % {'c': Class.__name__, 'n': len(primary_keys)})
         primary_key = primary_keys[0]
 
-        if len(Class._label_mapping) == 0:
+        if not hasattr(Class, '_label_mapping'):
+            Class._label_mapping = {}
             for instance in session.query(Class):
                 Class._label_mapping[getattr(instance, unique.name)] = getattr(instance, primary_key.name)
 

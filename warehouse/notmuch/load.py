@@ -54,6 +54,7 @@ def attachments(session, message):
             if _content_type == None:
                 content_type_id = None
             else:
+                print(session.query(ContentType.content_type).distinct().all())
                 content_type_id = ContentType.from_label(session, _content_type)
             yield NotmuchAttachment(
                 message_id = message.get_message_id(),
