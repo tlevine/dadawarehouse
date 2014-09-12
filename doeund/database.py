@@ -1,3 +1,6 @@
+from logging import getLogger
+logger = getLogger('doeund')
+
 from collections import namedtuple
 from enum import Enum
 
@@ -83,6 +86,10 @@ class DadaBase(Base):
             for to_column in to_columns:
                 if not to_column.primary_key:
                     msg = 'Skipping %s because it is not a primary key'
+                    logger.debug(msg % to_column.name)
+                    continue
+                elif any(c.unique for c in to_column.table.columns):
+                    msg = 'Skipping %s because it is for a label column'
                     logger.debug(msg % to_column.name)
                     continue
 
