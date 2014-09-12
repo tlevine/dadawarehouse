@@ -1,3 +1,10 @@
 #!/usr/bin/env python3
+import sys
+sys.path.append('.')
+
 import warehouse.main
 warehouse.main.export_model()
+
+import subprocess
+subprocess.Popen(['slicer', 'serve', 'slicer.ini'],
+                 stdout = sys.stdout, stderr = sys.stderr).wait()
