@@ -6,12 +6,12 @@ import warehouse.model as m
 from .model import File, CalendarEvent, Description
 
 CALENDARS = [os.path.join(os.path.expanduser('~/.pal'), rest) for rest in [\
-    'secrets-nsa/secret-calendar.txt',
-    'p/activities.txt',
-    'p/to-do.txt',
-    'p/sleeping.txt',
-    'p/travel.txt',
-    'p/postponed.txt',
+    'secrets-nsa/secret-calendar.pal',
+    'p/activities.pal',
+    'p/to-do.pal',
+    'p/sleeping.pal',
+    'p/travel.pal',
+    'p/postponed.pal',
 ]]
     
 def update(session, calendars = CALENDARS):
@@ -48,7 +48,6 @@ def update(session, calendars = CALENDARS):
                             date_id = date,
                             description_id = description_id))
         session.add_all(todo)
-        session.commit()
         CalendarEvent.create_related(session)
         session.commit()
         logger.info('Inserted events from calendar %s' % filename)
