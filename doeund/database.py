@@ -61,6 +61,7 @@ class DadaBase(Base):
 
         if len(value) == 1:
             values = {uniques.keys()[0]: value[0]}
+            print(values)
 
         if uniques.keys() != values.keys():
             raise TypeError('Values must have the same keys as the unique columns\' names (%s).' % ', '.join(uniques.keys()))
