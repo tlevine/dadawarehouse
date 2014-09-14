@@ -26,9 +26,9 @@ def test_one_create_related():
     engine = s.create_engine('sqlite://')
     session = database(engine)
     date_id = datetime.date(2014,7,4)
-    session.add_all([
-        Event(date_id = date_id)
-    ] * 4)
+   #session.add_all([Event(date_id = date_id)] * 4)
+    session.add_all(Event(date_id = date_id) for _ in range(4))
+    session.commit()
     Event.create_related(session)
     session.commit()
 
@@ -37,16 +37,13 @@ def test_one_create_related():
     n.assert_equal(session.query(Date).count(), 1)
     n.assert_equal(session.query(Event).count(), 4)
 
-@n.nottest
 def test_multiple_create_related():
     engine = s.create_engine('sqlite://')
     session = database(engine)
     date_id_1 = datetime.date(2014,3,2)
     date_id_2 = datetime.date(2014,8,5)
-    session.add_all([
-        Event(date_id = date_id_1),
-        Event(date_id = date_id_2)
-    ] * 4)
+    session.add_all(Event(date_id = date_id_1) for _ in range(4))
+    session.add_all(Event(date_id = date_id_2) for _ in range(4))
     Event.create_related(session)
     session.commit()
 
