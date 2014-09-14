@@ -48,8 +48,6 @@ def update(session, calendars = CALENDARS):
                             date_id = date,
                             description_id = description_id))
 
-       #import warehouse.model.date as x
-       #print(session.query(x.Monthly.pk).all())
         session.add_all(todo)
         CalendarEvent.create_related(session)
         session.commit()

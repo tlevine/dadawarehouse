@@ -90,9 +90,9 @@ def online_durations(engine, filedate_id, session):
 def update(session, today = datetime.date.today()):
  #  download()
     FacebookDuration.create_related(session)
-    return
-    already_imported = session.query(LogSqliteDb.filedate_id).distinct()
-    for filename in set(os.listdir(LOCAL_CHAT)).difference(already_imported):
+    could_import = set(os.listdir(LOCAL_CHAT))
+    already_imported = set(session.query(LogSqliteDb.filedate_id).distinct())
+    for filename in sorted(could_import - already_imported, reverse = True):
         try:
             filedate_id = datetime.datetime.strptime(filename, '%Y-%m-%d.db').date()
             if filedate_id >= today:
@@ -113,7 +113,7 @@ def update(session, today = datetime.date.today()):
 
             # Something's wrong with durations; duplicates appear.
             session.add_all(online_durations(engine, filedate_id, session))
-         #  FacebookDuration.create_related(session)
+            FacebookDuration.create_related(session)
 
             session.add(LogSqliteDb(filedate_id = filedate_id))
 

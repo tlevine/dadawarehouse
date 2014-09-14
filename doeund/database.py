@@ -98,9 +98,6 @@ class DadaBase(Base):
                     logger.debug(msg % to_column.name)
                     continue
 
-                # To be safe
-                session.commit()
-
                 from_values = set(v[0] for v in session.query(from_column).distinct())
                 to_values = set(v[0] for v in session.query(to_column).distinct())
                 values = from_values - to_values
@@ -116,7 +113,6 @@ class DadaBase(Base):
                 session.add_all(map(f, values))
 
             relationship.argument.create_related(session)
-        session.commit()
 
 class Fact(DadaBase):
     '''
