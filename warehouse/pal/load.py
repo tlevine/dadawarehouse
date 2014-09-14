@@ -29,19 +29,19 @@ def update(session, calendars = CALENDARS):
             except NameError:
                 raise ValueError('You must specify a filename.')
 
-        calendar_file = None
         todo = []
         with open(filename) as fp:
             for line in fp:
                 line = line.rstrip()
                 if line.startswith('#'):
                     pass
-                elif calendar_file == None:
+                elif len(todo) == 0:
                     calendar_code, _, calendar_description = line.partition(' ')
                     todo.append(File(pk = calendar_code,
                         filename = filename,
                         description = calendar_description))
                 else:
+                    continue
                     for date, description in entry(line):
                         description_id = Description.from_label(session, calendar_description)
                         todo.append(CalendarEvent(
