@@ -7,7 +7,7 @@ import warehouse.model as m
 
 from ..logger import logger
 from .model import NotmuchMessage, NotmuchAttachment, NotmuchCorrespondance,\
-                   Address, Message, ContentType
+                   AddressName, Name, Address, Message, ContentType
 
 def update(session):
     db = Database()
@@ -36,8 +36,9 @@ def message(session, m):
 
     name, address = parse_email_address(m.get_header('from'))
     address_id = Address.from_label(session, address)
-#   name_id = Name.from_label(name)
-#   AddressNames.from_label(address_id, name_id)
+    name_id = Name.from_label(session, name)
+
+    AddressName.from_label(session, address_id, name_id)
 
     dim_message = Message(
         pk = m.get_message_id(),

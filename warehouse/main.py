@@ -21,8 +21,8 @@ def load_data():
 
    #pal(session)
    #history(session)
-   #notmuch(session)
-    fb(session)
+    notmuch(session)
+   #fb(session)
 
 def export_model():
     engine = create_engine("sqlite:///")
