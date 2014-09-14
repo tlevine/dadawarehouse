@@ -5,8 +5,17 @@ import nose.tools as n
 
 from doeund import database, Fact, Dimension, Column 
 
-class Date(Dimension):
+class Hierarchy1(Dimension):
     pk = Column(s.Date, primary_key = True)
+
+class Hierarchy2(Dimension):
+    pk = Column(s.Date, primary_key = True)
+
+class Date(Dimension):
+    pk = Column(s.Date, s.ForeignKey(Hierarchy1.pk),
+                s.ForeignKey(Hierarchy2.pk), primary_key = True)
+    hierarchy1 = s.orm.relationship(Hierarchy1)
+    hierarchy2 = s.orm.relationship(Hierarchy2)
 
 class Event(Fact):
     pk = Column(s.Integer, primary_key = True)
@@ -21,5 +30,7 @@ def test_create_related():
     Event.create_related(session)
     session.commit()
 
+    n.assert_equal(session.query(Hierarchy1).count(), 1)
+    n.assert_equal(session.query(Hierarchy2).count(), 1)
     n.assert_equal(session.query(Date).count(), 1)
     n.assert_equal(session.query(Event).count(), 4)
