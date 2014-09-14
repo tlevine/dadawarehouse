@@ -4,6 +4,8 @@ from .model import AccountType, Section, Account, \
                    Transaction, GnuCashSplit
 
 def update(session):
+    for table in [GnuCashSplit, Transaction, AccountType, Section, Account]:
+        session.query(table).delete()
     engine = get_engine()
 
     account_network = get_account_network(engine)
@@ -11,6 +13,11 @@ def update(session):
 
     session.add_all(transactions(engine))
     Transaction.create_related(session)
+
+    session.add_all(splits(engine))
+    Split.create_related(session)
+
+    session.commit()
 
 def splits(engine):
     sql = 'SELECT guid, account_guid, transaction_guid, memo, value_num, value_denom FROM transactions'
