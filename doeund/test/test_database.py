@@ -22,7 +22,23 @@ class Event(Fact):
     date_id = Column(s.Date, s.ForeignKey(Date.pk))
     date = s.orm.relationship(Date)
 
-def test_create_related():
+def test_one_create_related():
+    engine = s.create_engine('sqlite://')
+    session = database(engine)
+    date_id = datetime.date(2014,7,4)
+    session.add_all([
+        Event(date_id = date_id)
+    ] * 4)
+    Event.create_related(session)
+    session.commit()
+
+    n.assert_equal(session.query(Hierarchy1).count(), 1)
+    n.assert_equal(session.query(Hierarchy2).count(), 1)
+    n.assert_equal(session.query(Date).count(), 1)
+    n.assert_equal(session.query(Event).count(), 4)
+
+@n.nottest
+def test_multiple_create_related():
     engine = s.create_engine('sqlite://')
     session = database(engine)
     date_id_1 = datetime.date(2014,3,2)
