@@ -7,11 +7,11 @@ import warehouse.model as m
 Guid = s.String(32)
 
 class AccountType(Dimension):
-    pk = m.Column(Guid, primary_key = True)
+    guid = m.Column(Guid, primary_key = True)
     account_type = m.Column(s.String)
 
 class Section(Dimension):
-    pk = m.Column(Guid, primary_key = True)
+    guid = m.Column(Guid, primary_key = True)
     section = m.Column(s.String)
 
 class Account(Dimension):
@@ -22,16 +22,18 @@ class Account(Dimension):
     description = m.Column(s.String)
     commodity_guid = m.Column(Guid)
 
-    account_type_id = m.FkColumn(AccountType.pk, nullable = True)
+    account_type_id = m.FkColumn(AccountType.guid, nullable = True)
     account_type = s.orm.relationship(AccountType)
-    section_id = m.FkColumn(Section.pk, nullable = True)
+    section_id = m.FkColumn(Section.guid, nullable = True)
     section = s.orm.relationship(Section)
 
 class Transaction(Dimension):
     guid = m.Column(Guid, primary_key = True)
     currency = m.Column(Guid)
-    post_date = m.DateTimeColumn()
-    enter_date = m.DateTimeColumn()
+    post_date_id = m.DateTimeColumn()
+    post_date = s.orm.relationship(m.DateTime, foreign_keys = [post_date_id])
+    enter_date_id = m.DateTimeColumn()
+    enter_date = s.orm.relationship(m.DateTime, foreign_keys = [enter_date_id])
     description = m.Column(s.String)
 
 class GnuCashSplit(Fact):

@@ -5,10 +5,23 @@ from .model import AccountType, Section, Account, \
 
 def update(session):
     engine = get_engine()
-    account_network = get_account_network(engine)
-    session.add_all(parse(account_network))
 
-def parse(account_network):
+    account_network = get_account_network(engine)
+    session.add_all(accounts(account_network))
+
+    session.add_all(transactions(engine))
+    Transaction.create_related(session)
+
+def transactions(engine)
+    sql = 'SELECT guid, currency_guid, post_date, enter_date, description FROM transactions'
+    for guid, currency_guid, post_date, enter_date, description in engine.execute(sql).fetchall():
+        yield Transaction(guid = guid,
+                          currency = currency_guid,
+                          post_date_id = parse_date(post_date),
+                          enter_date_id = parse_date(enter_date),
+                          description = description)
+
+def accounts(account_network):
     sql = 'SELECT guid, name FROM accounts'
     name_mapping = dict(engine.execute(sql).fetchall())
 
@@ -19,9 +32,9 @@ WHERE guid = ?
 '''
     for account_type, section, account in get_hierarchy(account_network):
         name, code, description, cguid = engine.execute(sql, guid).fetchone()
-        account_type = AccountType(pk = account_type,
+        account_type = AccountType(guid = account_type,
                                    account_type = name_mapping[account_type])
-        section = Section(pk = section,
+        section = Section(guid = section,
                           section = name_mapping[section])
         yield Account(name = name,
                       code = code,
