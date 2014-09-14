@@ -7,12 +7,12 @@ import warehouse.model as m
 Guid = s.String(32)
 
 class AccountType(Dimension):
-    pk = m.PkColumn()
-    account_type = m.LabelColumn()
+    pk = m.Column(Guid, primary_key = True)
+    account_type = m.Column(s.String)
 
 class Section(Dimension):
-    pk = m.PkColumn()
-    section = m.LabelColumn()
+    pk = m.Column(Guid, primary_key = True)
+    section = m.Column(s.String)
 
 class Account(Dimension):
     guid = m.Column(Guid, primary_key = True)
@@ -22,8 +22,10 @@ class Account(Dimension):
     description = m.Column(s.String)
     commodity_guid = m.Column(Guid)
 
-    account_type = m.FkColumn(AccountType.pk)
-    section = m.FkColumn(Section.pk)
+    account_type_id = m.FkColumn(AccountType.pk, nullable = True)
+    account_type = s.orm.relationship(AccountType)
+    section_id = m.FkColumn(Section.pk, nullable = True)
+    section = s.orm.relationship(Section)
 
 class Transaction(Dimension):
     guid = m.Column(Guid, primary_key = True)

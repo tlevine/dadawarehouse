@@ -1,13 +1,34 @@
 from collections import defaultdict
 
-from .model import GnuCashSplit
+from .model import AccountType, Section, Account, \
+                   Transaction, GnuCashSplit
 
 def update(session):
     engine = get_engine()
     account_network = get_account_network(engine)
-    for account_type, section, account in get_hierarchy(account_network):
-        pass
+    session.add_all(parse(account_network))
 
+def parse(account_network):
+    sql = 'SELECT guid, name FROM accounts'
+    name_mapping = dict(engine.execute(sql).fetchall())
+
+    sql = '''
+SELECT name, code, description, commodity_guid
+FROM accounts
+WHERE guid = ?
+'''
+    for account_type, section, account in get_hierarchy(account_network):
+        name, code, description, cguid = engine.execute(sql, guid).fetchone()
+        account_type = AccountType(pk = account_type,
+                                   account_type = name_mapping[account_type])
+        section = Section(pk = section,
+                          section = name_mapping[section])
+        yield Account(name = name,
+                      code = code,
+                      description = description,
+                      commodity_guid = cguid,
+                      account_type = account_type,
+                      section = section)
 
 def get_hierarchy(account_network):
     network, placeholders = account_network
@@ -41,8 +62,3 @@ def get_account_network(engine)
         if placeholder:
             placeholders.add(guid)
     return account_network, placeholders
-
-guid|name|account_type|commodity_guid|commodity_scu|non_std_scu|parent_guid|code|description|hidden|placeholder
-3596d67413d80aa279457356c8323b4a|Root Account|ROOT|962b27c3d3ba3814d77c75089c074ec6|100|0||||0|0
-592369efc64bc358250eaed95c053a10|Assets|ASSET|962b27c3d3ba3814d77c75089c074ec6|100|0|3596d67413d80aa279457356c8323b4a||Assets|0|1
-a8c94fe5df8e88510e694521d23c58bb|Tompkins Trust|BANK|962b27c3d3ba3814d77c75089c074ec6|100|0|3332dea01b0c1c6685deeca9ce026640||Checking Account at Tompkins Trust|0|0
