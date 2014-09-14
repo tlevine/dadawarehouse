@@ -91,12 +91,16 @@ def update(session, today = datetime.date.today()):
  #  download()
     FacebookDuration.create_related(session)
     could_import = set(os.listdir(LOCAL_CHAT))
-    already_imported = set(session.query(LogSqliteDb.filedate_id).distinct())
-    for filename in sorted(could_import - already_imported, reverse = True):
+    already_imported = set(row[0] for row in session.query(LogSqliteDb.filedate_id).all())
+    for filename in sorted(could_import, reverse = True):
         try:
             filedate_id = datetime.datetime.strptime(filename, '%Y-%m-%d.db').date()
             if filedate_id >= today:
-                # Skip if it's from today because the file might not be complete.
+                logger.info('Skipping %s because it is from today' % filename)
+                # The file might not be complete.
+                continue
+            elif filedate_id in already_imported:
+                logger.info('Already imported %s' % filename)
                 continue
             logger.info('Importing %s' % filename)
 
