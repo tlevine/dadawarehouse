@@ -101,9 +101,9 @@ class DadaBase(Base):
                 values = to_values - from_values
                 f = lambda value: relationship.argument(**{to_column.name: value})
                 logger.debug(relationship.argument)
-                logger.debug('From values:', from_values)
-                logger.debug('To values:', to_values)
-                logger.debug('Adding:', values)
+                logger.debug('From values: %s' % list(sorted(from_values)))
+                logger.debug('To values: %s' % list(sorted(to_values)))
+                logger.debug('Adding these values: %s' % list(sorted(values)))
                 logger.debug('')
                 session.add_all(map(f, values))
 
