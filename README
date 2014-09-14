@@ -39,29 +39,6 @@ Some tables to create to assist in the creation of these tools
 * Cities I've been in, people I stayed with
 
 
-Notes on cubes
-====================
-Cubes has enough layers to confuse me, and it's not clear to me whether
-the documentation is up to date. Instead of defining my models as cubes
-model JSON files, I'm using the underlying stuff.
-
-Models are defined with
-`model providers <http://pythonhosted.org/cubes/extensions/providers.html>`_.
-The mixpanel model provider, in ``cubes/backends/mixpanel/store.py``,
-is a decent example. Here's the method where it loads the Mixpanel model.
-
-    def default_metadata(self, metadata=None):
-        """Return Mixpanel's default metadata."""
-
-        model = pkgutil.get_data("cubes.backends.mixpanel", "mixpanel_model.json")
-        metadata = json.loads(model)
-
-        return metadata
-
-So I want to define an SQLAlchemy model provider that takes an SQLAlchemy
-declarative base as input. I think.
-
-
 Structure of the repository
 ==============================
 
@@ -72,147 +49,12 @@ Structure of the repository
 The rest of ``warehouse``
     Connectors to different data sources
 
-Thing to consider
-http://docs.sqlalchemy.org/en/rel_0_9/orm/extensions/associationproxy.html
-
-To do
-=======
-
-* On update of a date or time column, make an appropriate entry in the
-    date or time fact table if such an entry does not exist.
-* On update of any column referencing a label column (unique column that
-    is not the primary key in a two-column table), create the reference if
-    it does not already exist.
-* http://docs.sqlalchemy.org/en/rel_0_8/orm/session.html#unitofwork-cascades
-* https://bitbucket.org/zzzeek/sqlalchemy/wiki/UsageRecipes/UniqueObject
-
-
-Queries that I want to exist
+How to use doeund
 ==============================
-Import stuff just in case.
+By following doeund's conventions, you can produce at once the
 
-    import dada
+1. Database schema
+2. Mapping with Python objects
+3. Cubes model
 
-List the cubes that are available.
-
-    cubes.keys()
-
-List the dimensions that are available.
-
-    cubes['command'].dimensions.keys()
-
-List the hierarchy within each dimension.
-
-    >>> cubes['command'].dimensions['date'].hierarchy()
-    ['year', 'month', 'day']
-
-Different hierarchies of the same "dimension" are modeled as separate
-dimension tables and are considered different dimensions.
-
-    >>> cubes['command'].dimensions['dayofweek'].hierarchy()
-    ['dayofweek']
-
-List the levels of a hierarchy.
-
-    >>> cubes['command'].dimensions['dayofweek'].levels()
-    ['Monday', 'Tuesday', ... ]
-
-You can also specify a partial hierarchy as the argument to levels.
-
-    >>> cubes['command'].dimensions['date'].levels(['year', 'month'])
-    [[2014, 'September'], [2014, 'August'], [2014, 'July'], ...]
-
-By default, ``.levels`` splits the dimension at the finest granularity
-available. For example, the following is true.
-
-    cubes['command'].dimensions['date'].levels() == \
-    cubes['command'].dimensions['date'].levels(['year', 'month', 'day'])
-
-``.rollup`` specifies that we should aggregate a cube by dicing it into
-many sub-cubes and applying some functions to each of the sub-cubes. It
-takes a dictionary of dimension-name keys and partial-hierarchy values
-(the same sort of argument as ``.levels`` takes).
-
-    >>> cubes['command'].rollup({'date': ['year', 'month']})
-    [[2014, 'September'], [2014, 'August'], [2014, 'July'], ...]
-
-This is the same output as the ``.levels`` call we saw above! One difference
-between ``.rollup`` and ``.levels`` is that ``.rollup`` can specify multiple
-dimensions.
-
-    >>> cubes['command'].rollup({'date': ['year', 'month'],
-                                 'language': ['language']})
-    [[2014, 'September', 'R'], [2014, 'August', 'R'], [2014, 'July', 'R'], ...,
-     [2014, 'September', 'shell'], [2014, 'August', 'shell'], [2014, 'July', 'shell'], ...]
-
-You can also specify aggregation functions as further arguments
-
-    import dada.rollups as r
-    >>> cubes['command'].rollup({'date': ['year']}, r.count('pk'))
-    [[2014, 32], ...]
-
-``dada.rollups.count`` returns the number of rows in the fact table that
-fit within the particular sub-cube (one cube per year, in this case).
-Theoretically, though, think of this as the number of rows in a single
-column (like the primary key column, ``pk``) of that fact table, because
-this will make the other rollups make more sense.
-
-If you are using only categorical data, count might be all that you need.
-But there are other rollups that work the same way. Here we look at how
-many Facebook chat sessions each person had, how long they were in total,
-and how long they were on median, by person.
-
-    >>> cubes['facebookchatsessions']\
-        .rollup({'date': ['year', 'month'], 'person': None},
-                r.count('pk'), r.sum('length'), r.median('length'))
-
-Here are some more examples.
-
-Produce a cube/table with the fields "language" (R or shell),
-"year", "month", "hour", computer (laptop, nsa, &c.), arg0
-(``$0``), "arg1" (``$1``) and, finally, "count", where count
-is the number of records that fit in the cell specified by
-the other fields.
-
-    cubes['command']\
-        .set_cut('language', [['R'],['shell']])\
-        .rollup({'time': ['hour'],
-                 'date': ['year', 'month'],
-                 'computer': None # Use smallest granularity, with all levels.
-                 'args': ['arg0', 'arg1']},
-                 dada.rollups.count('pk'))
-
-The parameters of rollup functions must be the names of fields
-in the fact table of the cube. (Or maybe not, but I'm starting
-with this in case it's complicated to do the other things.)
-To see exactly which fields are allowed, call ``.responses``
-(short for "response variables")
-
-    cubes['command'].responses()
-
-Ideas
-==========
-
-Only categorical data? That might mean that "count" is the only aggregation
-I need....
-
-
-
-
-http://alextechrants.blogspot.com/2013/11/10-common-stumbling-blocks-for.html
-https://groups.google.com/forum/?hl=en#!topic/sqlalchemy/eXNv9--B0bk
-
-
-
-
-
-
-
-
-
-
-
-
-It requires cubes version 6cdbcc1902855f91fda736c5696f6538c0dd8a4a from
-git@github.com:tlevine/cubes
-
+In addition, doeund assists you in creating snowflake schemas with many layers.
