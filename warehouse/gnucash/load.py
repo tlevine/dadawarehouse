@@ -12,6 +12,17 @@ def update(session):
     session.add_all(transactions(engine))
     Transaction.create_related(session)
 
+def splits(engine):
+    sql = 'SELECT guid, account_guid, transaction_guid, memo, value_num, value_denom FROM transactions'
+    for guid, account_guid, transaction_guid, memo, value_num, value_denom in engine.execute(sql).fetchall():
+        yield GnuCashSplit(guid = guid,
+                           account_guid = account_guid,
+                           transaction_guid = transaction_guid,
+                           memo = memo,
+                           value = value_num / value_denom,
+                           value_num = value_num,
+                           value_denom = value_denom)
+
 def transactions(engine)
     sql = 'SELECT guid, currency_guid, post_date, enter_date, description FROM transactions'
     for guid, currency_guid, post_date, enter_date, description in engine.execute(sql).fetchall():
