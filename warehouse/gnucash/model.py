@@ -14,10 +14,6 @@ class Section(Dimension):
     pk = m.PkColumn()
     section = m.LabelColumn()
 
-class SubSection(Dimension):
-    pk = m.PkColumn()
-    subsection = m.LabelColumn()
-
 class Account(Dimension):
     guid = m.Column(Guid, primary_key = True)
 
@@ -28,7 +24,6 @@ class Account(Dimension):
 
     account_type = m.FkColumn(AccountType.pk)
     section = m.FkColumn(Section.pk)
-    subsection = m.FkColumn(SubSection.pk, nullable = True)
 
 class Transaction(Dimension):
     guid = m.Column(Guid, primary_key = True)
