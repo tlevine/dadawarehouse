@@ -4,7 +4,7 @@ logger = getLogger('doeund')
 from collections import namedtuple
 from enum import Enum
 
-from sqlalchemy import Column as _Column
+from sqlalchemy import Column as _Column, UniqueConstraint
 from sqlalchemy.ext.declarative import \
     declarative_base as _declarative_base, declared_attr
 
@@ -33,7 +33,8 @@ class DadaBase(Base):
 
     @classmethod
     def _uniques(Class):
-        return [c for c in Class.__mapper__.columns if c.unique]
+        return [list(c.columns) for c in Class.__table__.constraints if isinstance(c, UniqueConstraint)]
+      # return [c for c in Class.__mapper__.columns if c.unique]
 
     @classmethod
     def _primary_keys(Class):
@@ -52,7 +53,11 @@ class DadaBase(Base):
             raise TypeError('To use %(c)s.from_label, %(c)s must have exactly one primary key column, not %(n)s' % {'c': Class.__name__, 'n': len(primary_keys)})
         primary_key = primary_keys[0]
 
-        uniques = Class._uniques()
+        if len(Class._uniques()) != 1:
+            logger.debug(Class._uniques())
+            raise TypeError('There may be only one unique constraint in the class.')
+
+        uniques = Class._uniques()[0]
         if len(uniques) != len(values):
             raise TypeError('You must provide as many values as their are uniques in %(c)s (%(n)d values)' % {'c': Class.__name__, 'n': len(uniques)})
 

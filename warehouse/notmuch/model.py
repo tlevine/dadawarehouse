@@ -31,9 +31,9 @@ class Message(d.Dimension):
 class AddressName(d.Fact):
     __table_args__ = (s.UniqueConstraint('address_id', 'name_id'),)
     pk = m.PkColumn()
-    address_id = m.FkColumn(Address.pk, unique = True)
+    address_id = m.FkColumn(Address.pk)
     address = relationship(Address)
-    name_id = m.FkColumn(Name.pk, unique = True)
+    name_id = m.FkColumn(Name.pk)
     name = relationship(Name)
 
 class NotmuchCorrespondance(d.Fact):
