@@ -1,5 +1,7 @@
 import datetime
 
+from ..logger import logger
+
 def entry(line):
     'Read a pal calendar entry'
     datespec, _, description = line.partition(' ')

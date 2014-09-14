@@ -41,9 +41,9 @@ def update(session, calendars = CALENDARS):
                         filename = filename,
                         description = calendar_description))
                 else:
-                    continue
                     for date, description in entry(line):
                         description_id = Description.from_label(session, calendar_description)
+                        continue
                         todo.append(CalendarEvent(
                             file_id = calendar_code,
                             date_id = date,
