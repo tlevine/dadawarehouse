@@ -43,11 +43,11 @@ def update(session, calendars = CALENDARS):
                 else:
                     for date, description in entry(line):
                         description_id = Description.from_label(session, calendar_description)
-                        continue
                         todo.append(CalendarEvent(
                             file_id = calendar_code,
                             date_id = date,
                             description_id = description_id))
+                        print(calendar_code, date, description_id)
         session.add_all(todo)
         CalendarEvent.create_related(session)
         session.commit()
