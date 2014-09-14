@@ -89,7 +89,12 @@ class DadaBase(Base):
                     logger.debug(msg % to_column.name)
                     continue
                 elif any(c.unique for c in to_column.table.columns):
-                    msg = 'Skipping %s because it is for a label column'
+                    msg = 'Skipping %s because it is for a label table'
+                    logger.debug(msg % to_column.name)
+                    continue
+                elif to_column.table != relationship.target:
+                    msg = 'Skipping %s because is a different reference' \
+                          'from the same foreign key relationship column'
                     logger.debug(msg % to_column.name)
                     continue
 
