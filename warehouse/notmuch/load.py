@@ -42,7 +42,7 @@ def message(session, m):
     address_id = Address.from_label(session, address)
     name_id = Name.from_label(session, name)
 
-    AddressName.from_label(session, address_id, name_id)
+    AddressName.from_label(session, address_id = address_id, name_id = name_id)
 
     dim_message = Message(
         notmuch_message_id = m.get_message_id(),
@@ -74,8 +74,8 @@ def attachments(session, message):
 def parse_email_address(email_address):
     'Return (name, email address)'
     match = re.match(r'(?:(.+) <)?([^>]+)>?', email_address)
-    name = match.group(2)
-    address = match.group(1)
+    name = match.group(1)
+    address = match.group(2)
     return name, address
 
 def parse_attachment_name(headers):
