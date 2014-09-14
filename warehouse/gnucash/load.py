@@ -52,20 +52,25 @@ SELECT name, code, description, commodity_guid
 FROM accounts
 WHERE guid = ?
 '''
+    account_types = {None: None}
+    sections = {None: None}
     for account_type, section, account in get_hierarchy(account_network):
         name, code, description, cguid = engine.execute(sql, account).fetchone()
-        if account_type != None:
-            account_type = AccountType(guid = account_type,
-                                       account_type = name_mapping[account_type])
-        if section != None:
-            section = Section(guid = section,
-                              section = name_mapping[section])
+
+        if account_type not in account_types:
+            account_types[account_type] = AccountType(
+                guid = account_type, account_type = name_mapping[account_type])
+
+        if section not in sections:
+            sections[section] = Section(
+                guid = section, section = name_mapping[section])
+
         yield Account(name = name,
                       code = code,
                       description = description,
                       commodity_guid = cguid,
-                      account_type = account_type,
-                      section = section)
+                      account_type = account_types[account_type],
+                      section = sections[section])
 
 def get_hierarchy(account_network):
     network, placeholders = account_network
