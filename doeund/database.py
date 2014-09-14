@@ -40,34 +40,40 @@ class DadaBase(Base):
         return [c for c in Class.__mapper__.columns if c.primary_key]
 
     @classmethod
-    def from_label(Class, session, value):
-        'Returns the primary key, creating the record if needed'
-        uniques = Class._uniques()
-        if len(uniques) != 1:
-            raise TypeError('To use %(c)s.from_label, %(c)s must have exactly one unique column, not %(n)s' % {'c': Class.__name__, 'n': len(uniques)})
-        unique = uniques[0]
+    def from_label(Class, session, *values):
+        '''
+        This returns the primary key, creating the record if needed.
 
+        The values are specified in the order of the table.
+        '''
+        values = tuple(values)
         primary_keys = Class._primary_keys()
         if len(primary_keys) != 1:
             raise TypeError('To use %(c)s.from_label, %(c)s must have exactly one primary key column, not %(n)s' % {'c': Class.__name__, 'n': len(primary_keys)})
         primary_key = primary_keys[0]
 
+        uniques = Class._uniques()
+        if len(uniques) != len(values):
+            raise TypeError('You must provide as many values as their are uniques in %(c)s (%(n)d values)' % {'c': Class.__name__, 'n': len(uniques)})
+
         if not hasattr(Class, '_label_mapping'):
             Class._label_mapping = {}
             for instance in session.query(Class):
-                Class._label_mapping[getattr(instance, unique.name)] = getattr(instance, primary_key.name)
+                key = tuple(getattr(instance, name) for name in uniques)
+                Class._label_mapping[key] = getattr(instance, primary_key.name)
 
-        if value not in Class._label_mapping:
+        if values not in Class._label_mapping:
             if len(Class._label_mapping) == 0:
                 primary_key_value = 1
             else:
                 primary_key_value = max(Class._label_mapping.values()) + 1
-            kwargs = {primary_key.name: primary_key_value, unique.name: value}
+            kwargs = {unique.name: value for unique, value in zip(uniques, values)}
+            kwargs[primary_key.name] = primary_key_value
             instance = Class(**kwargs)
             session.add(instance)
-            Class._label_mapping[value] = primary_key_value
+            Class._label_mapping[values] = primary_key_value
 
-        return Class._label_mapping[value]
+        return Class._label_mapping[values]
 
     @classmethod
     def create_related(Class, session):

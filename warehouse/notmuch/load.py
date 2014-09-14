@@ -26,6 +26,8 @@ def update(session):
         NotmuchCorrespondance.create_related(session)
 
         past_messages.add(m.get_message_id())
+        session.commit()
+        logger.info('Added message id:%s' % m.get_message_id())
 
 def correspondance(m):
     return []
