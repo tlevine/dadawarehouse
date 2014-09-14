@@ -1,4 +1,5 @@
 import os, shutil
+import datetime
 from collections import defaultdict
 
 from sqlalchemy import create_engine
@@ -80,8 +81,6 @@ def get_hierarchy(account_network):
                         if account not in network and account not in placeholders:
                             yield account_type, section, account
                         else:
-                            print(account in network, account in placeholders)
-                            print(account_type, section, account)
                             raise ValueError('The account with GUID %s does not fit in the three-tier hierarchy.' % account)
 
             
@@ -115,4 +114,4 @@ def get_account_network(engine):
     return dict(account_network), placeholders
 
 def _parse_date(raw):
-    assert False, [raw]
+    return datetime.datetime.strptime(raw, '%Y%m%d%H%M%S')
