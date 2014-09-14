@@ -98,13 +98,16 @@ class DadaBase(Base):
 
                 from_values = set(v[0] for v in session.query(from_column).distinct())
                 to_values = set(v[0] for v in session.query(to_column).distinct())
-                values = to_values - from_values
+                values = from_values - to_values
                 f = lambda value: relationship.argument(**{to_column.name: value})
+
+                logger.debug(to_column)
                 logger.debug(relationship.argument)
                 logger.debug('From values: %s' % list(sorted(from_values)))
                 logger.debug('To values: %s' % list(sorted(to_values)))
                 logger.debug('Adding these values: %s' % list(sorted(values)))
                 logger.debug('')
+
                 session.add_all(map(f, values))
 
             relationship.argument.create_related(session)
