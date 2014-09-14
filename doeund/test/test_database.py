@@ -25,12 +25,16 @@ class Event(Fact):
 def test_create_related():
     engine = s.create_engine('sqlite://')
     session = database(engine)
-    date_id = datetime.date(2014,3,2)
-    session.add_all(Event(date_id = date_id) for _ in range(4))
+    date_id_1 = datetime.date(2014,3,2)
+    date_id_2 = datetime.date(2014,8,5)
+    session.add_all([
+        Event(date_id = date_id_1),
+        Event(date_id = date_id_2)
+    ] * 4)
     Event.create_related(session)
     session.commit()
 
-    n.assert_equal(session.query(Hierarchy1).count(), 1)
-    n.assert_equal(session.query(Hierarchy2).count(), 1)
-    n.assert_equal(session.query(Date).count(), 1)
-    n.assert_equal(session.query(Event).count(), 4)
+    n.assert_equal(session.query(Hierarchy1).count(), 2)
+    n.assert_equal(session.query(Hierarchy2).count(), 2)
+    n.assert_equal(session.query(Date).count(), 2)
+    n.assert_equal(session.query(Event).count(), 8)
