@@ -59,7 +59,7 @@ class DadaBase(Base):
         if not hasattr(Class, '_label_mapping'):
             Class._label_mapping = {}
             for instance in session.query(Class):
-                key = tuple(getattr(instance, name) for name in uniques)
+                key = tuple(getattr(instance, unique.name) for unique in uniques)
                 Class._label_mapping[key] = getattr(instance, primary_key.name)
 
         if values not in Class._label_mapping:

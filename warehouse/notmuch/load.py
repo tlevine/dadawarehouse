@@ -11,23 +11,25 @@ from .model import NotmuchMessage, NotmuchAttachment, NotmuchCorrespondance,\
 
 def update(session):
     db = Database()
-    past_messages = set(row[0] for row in session.query(Message.pk).distinct())
+    past_messages = set(row[0] for row in session.query(Message.filename).distinct())
     for m in Query(db,'').search_messages():
-        if m in past_messages:
+        fn = m.get_filename()
+        if fn in past_messages:
+            logger.info('Already imported %s' % fn)
             continue
 
-        session.add_all(message(session, m))
+        message(session, m)
         Message.create_related(session)
 
-        session.add_all(attachments(session, m))
-        NotmuchAttachment.create_related(session)
+#       session.add_all(attachments(session, m))
+#       NotmuchAttachment.create_related(session)
 
-        session.add_all(correspondance(m))
-        NotmuchCorrespondance.create_related(session)
+#       session.add_all(correspondance(m))
+#       NotmuchCorrespondance.create_related(session)
 
         past_messages.add(m.get_message_id())
         session.commit()
-        logger.info('Added message id:%s' % m.get_message_id())
+        logger.info('Added message "id:%s"' % m.get_message_id())
 
 def correspondance(m):
     return []
@@ -43,15 +45,14 @@ def message(session, m):
     AddressName.from_label(session, address_id, name_id)
 
     dim_message = Message(
-        pk = m.get_message_id(),
+        notmuch_message_id = m.get_message_id(),
         datetime_id = datetime.datetime.fromtimestamp(m.get_date()),
         thread_id = m.get_thread_id(),
         filename = filename,
         subject = subject,
         from_address_id = address_id,
     )
-    fact_message = NotmuchMessage(pk = m.get_message_id())
-    return [dim_message, fact_message]
+    session.add(NotmuchMessage(message = dim_message))
 
 def attachments(session, message):
     try:

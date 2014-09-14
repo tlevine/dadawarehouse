@@ -18,7 +18,8 @@ class ContentType(d.Dimension):
     content_type = m.LabelColumn()
 
 class Message(d.Dimension):
-    pk = m.Column(s.String, primary_key = True)
+    pk = m.PkColumn()
+    notmuch_message_id = m.Column(s.String)
     datetime_id = m.DateTimeColumn()
     datetime = relationship(m.DateTime)
     thread_id = m.Column(s.String)
@@ -28,6 +29,7 @@ class Message(d.Dimension):
     from_address = relationship(Address)
 
 class AddressName(d.Fact):
+    __table_args__ = (s.UniqueConstraint('address_id', 'name_id'),)
     pk = m.PkColumn()
     address_id = m.FkColumn(Address.pk, unique = True)
     address = relationship(Address)
@@ -49,7 +51,7 @@ class NotmuchMessage(d.Fact):
     message = relationship(Message)
 
 class NotmuchAttachment(d.Fact):
-    message_id = m.Column(s.String, s.ForeignKey(Message.pk), primary_key = True)
+    message_id = m.FkColumn(Message.pk, primary_key = True)
     message = relationship(Message)
     part_number = m.Column(s.Integer, primary_key = True)
     content_type_id = m.FkColumn(ContentType.pk, nullable = True)
