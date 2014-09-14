@@ -19,12 +19,12 @@ def update(session):
     Transaction.create_related(session)
 
     session.add_all(splits(engine))
-    Split.create_related(session)
+    GnuCashSplit.create_related(session)
 
     session.commit()
 
 def splits(engine):
-    sql = 'SELECT guid, account_guid, transaction_guid, memo, value_num, value_denom FROM transactions'
+    sql = 'SELECT guid, account_guid, tx_guid, memo, value_num, value_denom FROM splits'
     for guid, account_guid, transaction_guid, memo, value_num, value_denom in engine.execute(sql).fetchall():
         yield GnuCashSplit(guid = guid,
                            account_guid = account_guid,
@@ -55,6 +55,10 @@ WHERE guid = ?
     account_types = {None: None}
     sections = {None: None}
     for account_type, section, account in get_hierarchy(account_network):
+        if account == None:
+            # A root account
+            continue
+
         name, code, description, cguid = engine.execute(sql, account).fetchone()
 
         if account_type not in account_types:
@@ -65,7 +69,8 @@ WHERE guid = ?
             sections[section] = Section(
                 guid = section, section = name_mapping[section])
 
-        yield Account(name = name,
+        yield Account(guid = account,
+                      name = name,
                       code = code,
                       description = description,
                       commodity_guid = cguid,
