@@ -15,6 +15,23 @@ GnuCash splits
 All my emails
     With ordinary email fields
 
+How to use
+=======================================
+Install the package. ::
+
+    pip3 install .
+
+Start loading the data. ::
+
+    dada-load
+
+Loading the data will take a while, but you don't have to wait until it's
+finished before you can start analyzing; just run this in another shell. ::
+
+    dada-model
+
+More ideas of sources of data
+========================================
 Here are some other possible cubes or data sources.
 
 * Git commits
