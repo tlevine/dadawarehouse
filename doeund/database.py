@@ -1,8 +1,6 @@
+from collections import OrderedDict
 from logging import getLogger
 logger = getLogger('doeund')
-
-from collections import namedtuple
-from enum import Enum
 
 from sqlalchemy import Column as _Column, UniqueConstraint
 from sqlalchemy.ext.declarative import \
@@ -61,18 +59,19 @@ class DadaBase(Base):
 
         if len(value) == 1:
             values = {uniques.keys()[0]: value[0]}
-            print(values)
 
-        if uniques.keys() != values.keys():
+        if set(uniques.keys()) != set(values.keys()):
             raise TypeError('Values must have the same keys as the unique columns\' names (%s).' % ', '.join(uniques.keys()))
 
+        ordered_unique_names = sorted(unique.name for unique in uniques)
         if not hasattr(Class, '_label_mapping'):
             Class._label_mapping = {}
             for instance in session.query(Class):
-                key = tuple(getattr(instance, unique.name) for unique in uniques)
+                key = tuple(getattr(instance, name) for name in ordered_unique_names)
                 Class._label_mapping[key] = getattr(instance, primary_key.name)
 
-        if values not in Class._label_mapping:
+        ordered_values = tuple(values[name] for name in ordered_unique_names)
+        if ordered_values not in Class._label_mapping:
             if len(Class._label_mapping) == 0:
                 primary_key_value = 1
             else:
@@ -81,9 +80,9 @@ class DadaBase(Base):
             kwargs[primary_key.name] = primary_key_value
             instance = Class(**kwargs)
             session.add(instance)
-            Class._label_mapping[values] = primary_key_value
+            Class._label_mapping[ordered_values] = primary_key_value
 
-        return Class._label_mapping[values]
+        return Class._label_mapping[ordered_values]
 
     @classmethod
     def create_related(Class, session):
