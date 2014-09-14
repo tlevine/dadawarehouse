@@ -33,21 +33,19 @@ class DadaBase(Base):
 
     @classmethod
     def _uniques(Class):
-        return [list(c.columns) for c in Class.__table__.constraints if isinstance(c, UniqueConstraint)]
-      # return [c for c in Class.__mapper__.columns if c.unique]
+        return [c.columns for c in Class.__table__.constraints if isinstance(c, UniqueConstraint)]
 
     @classmethod
     def _primary_keys(Class):
         return [c for c in Class.__mapper__.columns if c.primary_key]
 
     @classmethod
-    def from_label(Class, session, *values):
+    def from_label(Class, session, *value, **values):
         '''
         This returns the primary key, creating the record if needed.
 
         The values are specified in the order of the table.
         '''
-        values = tuple(values)
         primary_keys = Class._primary_keys()
         if len(primary_keys) != 1:
             raise TypeError('To use %(c)s.from_label, %(c)s must have exactly one primary key column, not %(n)s' % {'c': Class.__name__, 'n': len(primary_keys)})
@@ -58,8 +56,14 @@ class DadaBase(Base):
             raise TypeError('There may be only one unique constraint in the class.')
 
         uniques = Class._uniques()[0]
-        if len(uniques) != len(values):
-            raise TypeError('You must provide as many values as their are uniques in %(c)s (%(n)d values)' % {'c': Class.__name__, 'n': len(uniques)})
+        if (len(value) == 1 and len(values) > 0) or len(value) > 1 or (len(value) == 0 and len(values) == 0):
+            raise TypeError('You must specify the values as a single non-keyword argument or as one or more keyword arguments, but not as a combination.')
+
+        if len(value) == 1:
+            values = {uniques.keys()[0]: value[0]}
+
+        if uniques.keys() != values.keys():
+            raise TypeError('Values must have the same keys as the unique columns\' names (%s).' % ', '.join(uniques.keys()))
 
         if not hasattr(Class, '_label_mapping'):
             Class._label_mapping = {}
@@ -72,7 +76,7 @@ class DadaBase(Base):
                 primary_key_value = 1
             else:
                 primary_key_value = max(Class._label_mapping.values()) + 1
-            kwargs = {unique.name: value for unique, value in zip(uniques, values)}
+            kwargs = dict(values)
             kwargs[primary_key.name] = primary_key_value
             instance = Class(**kwargs)
             session.add(instance)
