@@ -17,7 +17,7 @@ def test_create_related():
     engine = s.create_engine('sqlite://')
     session = database(engine)
     date_id = datetime.date(2014,3,2)
-    session.add_all([Event(date_id = date_id)] * 4)
+    session.add_all(Event(date_id = date_id) for _ in range(4))
     Event.create_related(session)
     session.commit()
 
