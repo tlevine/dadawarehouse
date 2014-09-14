@@ -19,9 +19,10 @@ def load_data():
     engine = create_engine('sqlite:////tmp/dada.sqlite')
     session = doeund.database(engine)
 
+    gnucash(session)
    #pal(session)
    #history(session)
-    notmuch(session)
+   #notmuch(session)
    #fb(session)
 
 def export_model():
