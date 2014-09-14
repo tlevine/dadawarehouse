@@ -5,18 +5,25 @@ from .model import GnuCashSplit
 def update(session):
     engine = get_engine()
     account_network = get_account_network(engine)
-    hierarchy = get_hierarchy(account_network)
+    for account_type, section, account in get_hierarchy(account_network):
+        pass
 
 
 def get_hierarchy(account_network):
     network, placeholders = account_network
-    for account_type, placeholder in network.keys():
-        if len(network[account_type]) == 0:
-            yield account_type, None, None
+    for account_type in network.keys():
+        if len(network[account_type]) == 0 and account_type not in placeholders:
+            yield None, None, account_type
         else:
             for section in network[account_type]:
-                if len(network[section]) == 0:
-                for account in network[subsection]:
+                if len(network[section]) == 0 and section not in placeholders:
+                    yield account_type, None, section
+                else:
+                    for account in network[section]:
+                        if len(network[account]) == 0 and account not in placeholders:
+                            yield account_type, section, account
+                        else:
+                            raise ValueError('The account with GUID %s does not fit in the three-tier hierarchy.' % account)
 
             
 
