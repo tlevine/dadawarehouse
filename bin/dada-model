@@ -12,7 +12,7 @@ warehouse.main.export_model()
 slicer = subprocess.Popen(['slicer', 'serve', 'slicer.ini'],
                           stdout = sys.stdout, stderr = sys.stderr)
 
-if webbrowser.open_new('http://localhost:5000'):
+if webbrowser.open_new('file:///home/tlevine/git/cubesviewer/src/htmlviews/gui.html'):
     time.sleep(3)
     sys.stdout.write(' * Opened web browser\n')
     slicer.wait()
