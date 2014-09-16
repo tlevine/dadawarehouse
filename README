@@ -77,3 +77,9 @@ By following doeund's conventions, you can produce at once the
 3. Cubes model
 
 In addition, doeund assists you in creating snowflake schemas with many layers.
+
+
+To do
+==========
+It looks like mappings need to map dimensions to table *aliases*,
+not tables themselves.
