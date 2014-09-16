@@ -74,6 +74,7 @@ def joins(table):
         yield {
             'master': '%s.%s' % (from_table.name, from_column.name),
             'detail': '%s.%s' % (to_table.name, to_column.name),
+            'alias': 'dim_' + from_column.name.replace('_id', ''),
         }
         yield from joins(to_table)
 
