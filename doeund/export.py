@@ -66,17 +66,22 @@ def dim_levels(table):
     for column in named_primary_keys(table):
         yield named(column)
 
-def joins(table):
+def joins(table, prefix = []):
     '''
     List the joins from this fact table to dimension tables.
     '''
     for from_table, from_column, to_table, to_column in foreign_keys(table):
+        if is_crosswalk(to_table):
+            suffix = []
+        else:
+            suffix = [to_table.name]
+        path = DimensionPath(prefix + suffix)
         yield {
             'master': '%s.%s' % (from_table.name, from_column.name),
             'detail': '%s.%s' % (to_table.name, to_column.name),
-            'alias': 'dim_' + from_column.name.replace('_id', ''),
+            'alias': 'dim_' + _stringify_mapping(path, from_column)[1],
         }
-        yield from joins(to_table)
+        yield from joins(to_table, prefix = path)
 
 def _stringify_mapping(dimension_path, column):
     '''
