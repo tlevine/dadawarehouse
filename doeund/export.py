@@ -34,7 +34,7 @@ NUMERIC = (
     t.Boolean,
 )
 
-def aggregations(column):
+def aggregates(column):
     '''
     Choose aggregations based on column type.
     http://cubes.databrewery.org/dev/doc/backends/sql.html?highlight=avg
@@ -47,7 +47,7 @@ def aggregations(column):
 def fact_measures(table):
     for column in nonkey_columns(table):
         yield named(column, {
-            'aggregations': aggregations(column)
+            'aggregates': aggregates(column)
         })
 
 def dim_levels(table):
@@ -58,7 +58,7 @@ def dim_levels(table):
 
     # Normal levels
     for measure in fact_measures(table):
-        del(measure['aggregations'])
+        del(measure['aggregates'])
         yield measure
 
     # Put primary key last if it appears to be the most precise
@@ -126,6 +126,8 @@ def dimensions(fact_table):
     result = set()
     for dimension, column in _mappings(DimensionPath([fact_table.name]), fact_table):
         if len(dimension) == 0:
+            raise AssertionError('This shouldn\'t happen.')
+        elif len(dimension) == 1:
             # This is a measure from the fact table.
             pass
         elif dimension.name not in result:
