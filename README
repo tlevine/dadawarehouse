@@ -89,4 +89,4 @@ Fun ideas
 To do
 ==========
 It looks like mappings need to map dimensions to table *aliases*,
-not tables themselves.
+not tables themselves. Do joins have to be on aliases too...?
