@@ -93,10 +93,14 @@ def _stringify_mapping(dimension_path, column):
     '''
     if len(dimension_path) == 1:
         key = column.name
+        value = column.name
     else:
-        key = '%s.%s' % (dimension_path.name, column.name)
+        dimension = re.sub(r'^fact_', '', dimension_path[0])
+        attribute = re.sub(r'^dim_', '', DimensionPath(dimension_path[1:]).name)
+        key = '%s.%s' % (attribute, column.name)
+        value = 'dim_%s_%s.%s' % (dimension, attribute, column.name)
 
-    return key, '%s.%s' % (column.table.name, column.name)
+    return key, value
 
 def _mappings(prefix, table):
     for column in nonkey_columns(table):
