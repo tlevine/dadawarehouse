@@ -79,6 +79,13 @@ By following doeund's conventions, you can produce at once the
 In addition, doeund assists you in creating snowflake schemas with many layers.
 
 
+Fun ideas
+==============================
+
+* How many spaces after a period?
+* Connect website views to emails
+* Length of sentences (Saar Golde's idea)
+
 To do
 ==========
 It looks like mappings need to map dimensions to table *aliases*,
