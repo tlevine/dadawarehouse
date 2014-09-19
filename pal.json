@@ -8,31 +8,6 @@
           "master": "fact_calendarevent.file_id"
         },
         {
-          "detail": "dim_date.pk",
-          "alias": "dim_calendarevent",
-          "master": "fact_calendarevent.date_id"
-        },
-        {
-          "detail": "dim_weekly.pk",
-          "alias": "dim_calendarevent_weekly",
-          "master": "dim_date.pk"
-        },
-        {
-          "detail": "dim_weekday.pk",
-          "alias": "dim_calendarevent_weekly_weekday",
-          "master": "dim_weekly.weekday_id"
-        },
-        {
-          "detail": "dim_monthly.pk",
-          "alias": "dim_calendarevent_monthly",
-          "master": "dim_date.pk"
-        },
-        {
-          "detail": "dim_weekday.pk",
-          "alias": "dim_calendarevent_weekday",
-          "master": "dim_date.weekday_id"
-        },
-        {
           "detail": "dim_description.pk",
           "alias": "dim_calendarevent_description",
           "master": "fact_calendarevent.description_id"
@@ -41,22 +16,11 @@
       "name": "calendarevent",
       "mappings": {
         "file.description": "dim_calendarevent_file.description",
-        "weekly.year": "dim_calendarevent_weekly.year",
-        "weekly.week": "dim_calendarevent_weekly.week",
         "description.description": "dim_calendarevent_description.description",
-        "monthly.month": "dim_calendarevent_monthly.month",
-        "weekday.weekday": "dim_calendarevent_weekday.weekday",
-        "monthly.day": "dim_calendarevent_monthly.day",
-        "file.filename": "dim_calendarevent_file.filename",
-        "weekly_weekday.weekday": "dim_calendarevent_weekly_weekday.weekday",
-        "monthly.year": "dim_calendarevent_monthly.year"
+        "file.filename": "dim_calendarevent_file.filename"
       },
       "dimensions": [
         "calendarevent_file",
-        "calendarevent_weekly",
-        "calendarevent_weekly_weekday",
-        "calendarevent_monthly",
-        "calendarevent_weekday",
         "calendarevent_description"
       ],
       "measures": [],
@@ -169,164 +133,12 @@
       "label": "Gnucashsplit Transaction"
     },
     {
-      "name": "gnucashsplit_transaction_weekly",
-      "levels": [
-        {
-          "name": "memo",
-          "label": "Memo"
-        },
-        {
-          "name": "value",
-          "label": "Value"
-        },
-        {
-          "name": "value_num",
-          "label": "Numerator"
-        },
-        {
-          "name": "value_denom",
-          "label": "Denominator"
-        },
-        {
-          "name": "guid",
-          "label": "Guid"
-        }
-      ],
-      "label": "Gnucashsplit Transaction Weekly"
-    },
-    {
-      "name": "gnucashsplit_transaction_weekly_weekday",
-      "levels": [
-        {
-          "name": "memo",
-          "label": "Memo"
-        },
-        {
-          "name": "value",
-          "label": "Value"
-        },
-        {
-          "name": "value_num",
-          "label": "Numerator"
-        },
-        {
-          "name": "value_denom",
-          "label": "Denominator"
-        },
-        {
-          "name": "guid",
-          "label": "Guid"
-        }
-      ],
-      "label": "Gnucashsplit Transaction Weekly Weekday"
-    },
-    {
-      "name": "gnucashsplit_transaction_monthly",
-      "levels": [
-        {
-          "name": "memo",
-          "label": "Memo"
-        },
-        {
-          "name": "value",
-          "label": "Value"
-        },
-        {
-          "name": "value_num",
-          "label": "Numerator"
-        },
-        {
-          "name": "value_denom",
-          "label": "Denominator"
-        },
-        {
-          "name": "guid",
-          "label": "Guid"
-        }
-      ],
-      "label": "Gnucashsplit Transaction Monthly"
-    },
-    {
-      "name": "gnucashsplit_transaction_weekday",
-      "levels": [
-        {
-          "name": "memo",
-          "label": "Memo"
-        },
-        {
-          "name": "value",
-          "label": "Value"
-        },
-        {
-          "name": "value_num",
-          "label": "Numerator"
-        },
-        {
-          "name": "value_denom",
-          "label": "Denominator"
-        },
-        {
-          "name": "guid",
-          "label": "Guid"
-        }
-      ],
-      "label": "Gnucashsplit Transaction Weekday"
-    },
-    {
-      "name": "gnucashsplit_transaction_time",
-      "levels": [
-        {
-          "name": "memo",
-          "label": "Memo"
-        },
-        {
-          "name": "value",
-          "label": "Value"
-        },
-        {
-          "name": "value_num",
-          "label": "Numerator"
-        },
-        {
-          "name": "value_denom",
-          "label": "Denominator"
-        },
-        {
-          "name": "guid",
-          "label": "Guid"
-        }
-      ],
-      "label": "Gnucashsplit Transaction Time"
+      "name": "calendarevent_description",
+      "label": "Calendarevent Description"
     },
     {
       "name": "calendarevent_file",
-      "levels": [],
       "label": "Calendarevent File"
-    },
-    {
-      "name": "calendarevent_weekly",
-      "levels": [],
-      "label": "Calendarevent Weekly"
-    },
-    {
-      "name": "calendarevent_weekly_weekday",
-      "levels": [],
-      "label": "Calendarevent Weekly Weekday"
-    },
-    {
-      "name": "calendarevent_monthly",
-      "levels": [],
-      "label": "Calendarevent Monthly"
-    },
-    {
-      "name": "calendarevent_weekday",
-      "levels": [],
-      "label": "Calendarevent Weekday"
-    },
-    {
-      "name": "calendarevent_description",
-      "levels": [],
-      "label": "Calendarevent Description"
     }
   ]
 }
