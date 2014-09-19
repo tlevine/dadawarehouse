@@ -23,115 +23,16 @@
         "calendarevent_file",
         "calendarevent_description"
       ],
-      "measures": [],
+      "measures": [
+        {
+          "name": "date_id",
+          "aggregates": ["sum","min","max","count"]
+        }
+      ],
       "label": "Calendarevent"
     }
   ],
   "dimensions": [
-    {
-      "name": "gnucashsplit_account",
-      "levels": [
-        {
-          "name": "memo",
-          "label": "Memo"
-        },
-        {
-          "name": "value",
-          "label": "Value"
-        },
-        {
-          "name": "value_num",
-          "label": "Numerator"
-        },
-        {
-          "name": "value_denom",
-          "label": "Denominator"
-        },
-        {
-          "name": "guid",
-          "label": "Guid"
-        }
-      ],
-      "label": "Gnucashsplit Account"
-    },
-    {
-      "name": "gnucashsplit_account_accounttype",
-      "levels": [
-        {
-          "name": "memo",
-          "label": "Memo"
-        },
-        {
-          "name": "value",
-          "label": "Value"
-        },
-        {
-          "name": "value_num",
-          "label": "Numerator"
-        },
-        {
-          "name": "value_denom",
-          "label": "Denominator"
-        },
-        {
-          "name": "guid",
-          "label": "Guid"
-        }
-      ],
-      "label": "Gnucashsplit Account Accounttype"
-    },
-    {
-      "name": "gnucashsplit_account_section",
-      "levels": [
-        {
-          "name": "memo",
-          "label": "Memo"
-        },
-        {
-          "name": "value",
-          "label": "Value"
-        },
-        {
-          "name": "value_num",
-          "label": "Numerator"
-        },
-        {
-          "name": "value_denom",
-          "label": "Denominator"
-        },
-        {
-          "name": "guid",
-          "label": "Guid"
-        }
-      ],
-      "label": "Gnucashsplit Account Section"
-    },
-    {
-      "name": "gnucashsplit_transaction",
-      "levels": [
-        {
-          "name": "memo",
-          "label": "Memo"
-        },
-        {
-          "name": "value",
-          "label": "Value"
-        },
-        {
-          "name": "value_num",
-          "label": "Numerator"
-        },
-        {
-          "name": "value_denom",
-          "label": "Denominator"
-        },
-        {
-          "name": "guid",
-          "label": "Guid"
-        }
-      ],
-      "label": "Gnucashsplit Transaction"
-    },
     {
       "name": "calendarevent_description",
       "label": "Calendarevent Description"
