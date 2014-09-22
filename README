@@ -90,3 +90,25 @@ To do
 ==========
 It looks like mappings need to map dimensions to table *aliases*,
 not tables themselves. Do joins have to be on aliases too...?
+
+Front-ends to consider
+===============================
+My original plan was `cubes <http://cubes.dadabrewery.com>`_, but it doesn't
+work as it is documented.
+
+I can get an installation of BusinessObjects for $150/month on Amazon EC2.
+The AMI is called "SAP BusinessObjects 5 Named Users - BASIC". Or maybe that's
+$150/month plus about $12/hour.
+
+Microstrategy is $1/hour with the AMI
+"MicroStrategy Analytics Enterprise with SQL Server Standard (25 users)".
+
+I can get Oracle and Microsoft databases from Amazon RDS. Maybe they have
+OLAP servers? Well Microsoft does, but the Oracle one is confusing me.
+https://en.wikipedia.org/wiki/Microsoft_Analysis_Services
+
+And then there are a bunch of clients for MDX.
+https://en.wikipedia.org/wiki/MultiDimensional_eXpressions
+
+Hmm Mondrian looks okay actually.
+https://en.wikipedia.org/wiki/Mondrian_OLAP_server
