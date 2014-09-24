@@ -1,59 +1,35 @@
 import sqlalchemy as s
 from sqlalchemy.orm import relationship
 
-import doeund as d
-
 import warehouse.model as m
 
-class Address(d.Dimension):
-    pk = m.PkColumn()
-    address = m.LabelColumn()
-
-class Name(d.Dimension):
-    pk = m.PkColumn()
-    name = m.LabelColumn()
-
-class ContentType(d.Dimension):
-    pk = m.PkColumn()
-    content_type = m.LabelColumn()
-
-class Message(d.Dimension):
+class EmailMessage(m.Dimension):
     pk = m.PkColumn()
     notmuch_message_id = m.Column(s.String)
-    datetime_id = m.DateTimeColumn()
-    datetime = relationship(m.DateTime)
+    datetime = m.Column(s.DateTime)
     thread_id = m.Column(s.String)
     filename = m.Column(s.String)
     subject = m.Column(s.String)
-    from_address_id = m.FkColumn(Address.pk)
-    from_address = relationship(Address)
+    from_address = m.Column(s.String)
 
-class AddressName(d.Fact):
-    __table_args__ = (s.UniqueConstraint('address_id', 'name_id'),)
+class EmailAddressName(m.Fact):
+    __table_args__ = (s.UniqueConstraint('address', 'name'),)
     pk = m.PkColumn()
-    address_id = m.FkColumn(Address.pk)
-    address = relationship(Address)
-    name_id = m.FkColumn(Name.pk)
-    name = relationship(Name)
+    address = m.Column(s.String)
+    name = m.Column(s.String)
 
-class NotmuchCorrespondance(d.Fact):
+class EmailCorrespondance(m.Fact):
     '''
     to_address includes CC, BCC
     '''
     pk = m.PkColumn()
-    from_address_id = m.Column(s.String, s.ForeignKey(Address.pk))
-    from_address = relationship(Address, foreign_keys = [from_address_id])
-    to_address_id = m.Column(s.String, s.ForeignKey(Address.pk))
-    to_address = relationship(Address, foreign_keys = [to_address_id])
+    message_id = m.FkColumn(Message.pk)
+    from_address = m.Column(s.String)
+    to_address = m.Column(s.String))
 
-class NotmuchMessage(d.Fact):
-    pk = m.Column(s.String, s.ForeignKey(Message.pk), primary_key = True)
-    message = relationship(Message)
-
-class NotmuchAttachment(d.Fact):
+class EmailAttachment(m.Fact):
     message_id = m.FkColumn(Message.pk, primary_key = True)
     message = relationship(Message)
     part_number = m.Column(s.Integer, primary_key = True)
-    content_type_id = m.FkColumn(ContentType.pk, nullable = True)
-    content_type = relationship(ContentType)
+    content_type = m.Column(s.String)
     name = m.Column(s.String)
