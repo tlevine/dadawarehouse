@@ -14,15 +14,15 @@ from .twitter.load import update as twitter
 CACHE_DIRECTORY = os.path.expanduser('~/.dadawarehouse')
 
 def load_data():
-  # engine = create_engine('postgres:///tlevine')
-    engine = create_engine('sqlite:////tmp/dada.sqlite')
+    engine = create_engine('postgres:///tlevine')
+  # engine = create_engine('sqlite:////tmp/dada.sqlite')
 
     Base.metadata.create_all(engine) 
     session = sessionmaker(bind=engine)()
 
-   #pal(session)
-   #history(session)
-   #gnucash(session)
-   #fb(session)
-   #notmuch(session)
+    pal(session)
+    history(session)
+    gnucash(session)
+    fb(session)
+    notmuch(session)
     twitter(session)
