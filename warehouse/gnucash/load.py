@@ -4,18 +4,23 @@ from collections import defaultdict
 
 from sqlalchemy import create_engine
 
+from ..logger import logger
 from .model import Account, Transaction, Split
 
 def update(session):
     for table in [Split, Transaction, Account]:
         session.query(table).delete()
     engine = get_engine()
-
     account_network = get_account_network(engine)
+
     session.add_all(accounts(engine, account_network))
+    logger.info('Added GnuCash accounts')
     session.add_all(transactions(engine))
+    logger.info('Added GnuCash transactions')
     session.add_all(splits(engine))
+    logger.info('Added GnuCash splits')
     session.commit()
+    logger.info('Finished loading GnuCash')
 
 def splits(engine):
     sql = 'SELECT guid, account_guid, tx_guid, memo, value_num, value_denom FROM splits'
