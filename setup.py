@@ -8,6 +8,7 @@ setup(name='dadawarehouse',
       url='http://small.dada.pink/dadawarehouse',
       packages=['warehouse'],
       install_requires = [
+          'pyzmail>=1.0.3',
           'historian>=0.0.2',
           'SQLAlchemy>=0.9.4',
           'psycopg2>=2.5.4',

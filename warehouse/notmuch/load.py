@@ -1,7 +1,9 @@
 import re
 import datetime
+from itertools import chain
 
 from notmuch import Database, Query
+import pyzmail
 
 import warehouse.model as m
 
@@ -28,7 +30,18 @@ def update(session):
         logger.info('Added message "id:%s"' % m.get_message_id())
 
 def correspondances(m):
-    return []
+    message_id = m.get_message_id()
+    headers = ['to', 'cc', 'bcc']
+    with open(m.get_filename(), 'rb') as fp:
+        pyzm = pyzmail.PyzMessage.factory(fp)
+        for from_name, from_address in pyzm.get_addresses('from'):
+            to_pairs = chain(*(pyzm.get_addresses(header) for header in headers))
+            for to_name, to_address in to_pairs:
+                yield EmailCorrespondance(message_id = message_id,
+                                          from_name = from_name,
+                                          from_address = from_address,
+                                          to_name = to_name,
+                                          to_address = to_address)
 
 def message(session, m): 
     filename = m.get_filename()
