@@ -8,12 +8,12 @@ from ..facebookchat.model import FacebookMessage, FacebookChatStatusChange
 from ..notmuch.model import EmailCorrespondance
 from ..muttalias.model import MuttAlias
 
-from .model import Person, EmailAddress
+from .model import Person, Names, EmailAddress
 
 def update(session):
     # _mutt(session)
-    # _fb(FacebookMessage, session)
-    _fb(FacebookChatStatusChange, session)
+    _fb(FacebookMessage, session)
+    # _fb(FacebookChatStatusChange, session)
 
 def _mutt(session):
     # Start with mutt aliases.
@@ -46,5 +46,8 @@ def _fb(Class, session):
             if person == None:
                 session.merge(Person(pk = person_id, facebook = user_id))
                 logger.info('Added %s' % person_id)
+            else:
+                session.add(Names(name = name, person_id = person.pk))
+                logger.info('Added a name for %s' % person.pk)
             completed.add(name)
     session.commit()

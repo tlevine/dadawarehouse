@@ -9,6 +9,7 @@ class Person(Base):
     pk = Column(s.String, primary_key = True) # from the mutt alias file
     facebook = Column(s.BigInteger, nullable = True)
     twitter = Column(s.String, nullable = True)
+    names = relationship('Names')
     email_addresses = relationship('EmailAddress')
 
 class Names(Base):
