@@ -21,12 +21,17 @@ def load_data():
     Base.metadata.create_all(engine) 
     session = sessionmaker(bind=engine)()
 
-    branchable(session)
-    return
-
-    pal(session)
+    # Minutely updates
     history(session)
-    gnucash(session)
-    fb(session)
     notmuch(session)
+    branchable(session)
+
+    # Daily updates
+    fb(session)
+
+    # These delete existing state and thus take a while.
+    # Also, the data aren't updated that often.
+    # So we put them last.
     twitter(session)
+    pal(session)
+    gnucash(session)
