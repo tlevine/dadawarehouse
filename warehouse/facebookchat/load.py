@@ -1,5 +1,5 @@
 from collections import defaultdict
-from itertools import chain
+:rom itertools import chain
 import shutil
 import os
 import re
@@ -9,10 +9,8 @@ import subprocess
 import sqlalchemy
 
 from ..logger import logger
-from .model import LogSqliteDb, \
-                   FacebookChatStatusChange, FacebookMessage, \
+from .model import FacebookChatStatusChange, FacebookMessage, \
                    FacebookDuration
-from ..model import Date, DateTime
 
 WAREHOUSE = os.path.expanduser('~/.dadawarehouse')
 LOCAL_CHAT = os.path.join(WAREHOUSE, 'facebookchat')
@@ -33,29 +31,29 @@ def parse_uid(uid):
         print(uid)
         raise
 
-def status_changes(engine, filedate_id, session):
+def status_changes(engine, filedate, session):
     sql = 'SELECT rowid, uid, nick, ts, status FROM log_status'
-    for rowid, uid, nick, ts, status in engine.execute(sql).fetchall():
+    for rowid, uid, nick, ts, status in engine.execute(sql):
         yield FacebookChatStatusChange(
-            filedate_id = filedate_id,
+            filedate = filedate,
             rowid = rowid,
             user_id = parse_uid(uid),
-            datetime_id = datetime.datetime.fromtimestamp(ts),
+            datetime = datetime.datetime.fromtimestamp(ts),
             current_name = nick,
             status = status)
 
-def messages(engine, filedate_id, session):
+def messages(engine, filedate, session):
     sql = 'SELECT rowid, uid, nick, ts, body FROM log_msg'
-    for rowid, uid, nick, ts, body in engine.execute(sql).fetchall():
+    for rowid, uid, nick, ts, body in etch(engine.execute(sql)):
         yield FacebookMessage(
-            filedate_id = filedate_id,
+            filedate = filedate,
             rowid = rowid,
             user_id = parse_uid(uid),
-            datetime_id = datetime.datetime.fromtimestamp(ts),
+            datetime = datetime.datetime.fromtimestamp(ts),
             current_name = nick,
             body = body)
 
-def online_durations(engine, filedate_id, session):
+def online_durations(engine, filedate, session):
     for row in engine.execute('SELECT DISTINCT uid FROM log_status;'):
         uid = row[0]
         duration = 0
@@ -82,47 +80,43 @@ def online_durations(engine, filedate_id, session):
                 raise AssertionError('This else condition shouldn\'t happen.')
 
         yield FacebookDuration(
-            date_id = filedate_id,
+            date = filedate,
             user_id = parse_uid(uid),
             duration = duration
         )
 
 def update(session, today = datetime.date.today()):
  #  download()
-    FacebookDuration.create_related(session)
     could_import = set(os.listdir(LOCAL_CHAT))
-    already_imported = set(row[0] for row in session.query(LogSqliteDb.filedate_id).all())
+    already_imported = set(row[0] for row in session.query(FacebookChatStatusChange.filedate).all())
     for filename in sorted(could_import, reverse = True):
         try:
-            filedate_id = datetime.datetime.strptime(filename, '%Y-%m-%d.db').date()
-            if filedate_id >= today:
+            filedate = datetime.datetime.strptime(filename, '%Y-%m-%d.db').date()
+            if filedate >= today:
                 logger.info('Skipping %s because it is from today' % filename)
                 # The file might not be complete.
                 continue
-            elif filedate_id in already_imported:
+            elif filedate in already_imported:
                 logger.info('Already imported %s' % filename)
                 continue
             logger.info('Importing %s' % filename)
 
             # Copy to RAM so it's faster.
             shutil.copy(os.path.join(LOCAL_CHAT, filename), '/tmp/fb.db')
+            logger.info('* Copied database to RAM')
             engine = sqlalchemy.create_engine('sqlite:////tmp/fb.db')
 
             # Add stuff
-            session.add_all(status_changes(engine, filedate_id, session))
-            FacebookChatStatusChange.create_related(session)
-
-            session.add_all(messages(engine, filedate_id, session))
-            FacebookMessage.create_related(session)
-
-            session.add_all(online_durations(engine, filedate_id, session))
-            FacebookDuration.create_related(session)
-
-            session.add(LogSqliteDb(filedate_id = filedate_id))
+            session.add_all(status_changes(engine, filedate, session))
+            logger.info('* Added status changes')
+            session.add_all(messages(engine, filedate, session))
+            logger.info('* Added messages')
+            session.add_all(online_durations(engine, filedate, session))
+            logger.info('* Added durations')
 
             # Commit only at the end so that we don't have partial file data.
             session.commit()
-            logger.info('Finished %s' % filename)
+            logger.info('Finished %s\n' % filename)
 
         except KeyboardInterrupt:
             break

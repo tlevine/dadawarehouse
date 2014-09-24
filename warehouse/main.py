@@ -7,7 +7,7 @@ from .model import Base
 from .pal.load import update as pal
 from .history.load import update as history
 from .gnucash.load import update as gnucash
-#from .facebookchat.load import update as fb
+from .facebookchat.load import update as fb
 #from .twitter.load import update as twitter
 #from .notmuch.load import update as notmuch
 
@@ -22,6 +22,6 @@ def load_data():
 
    #pal(session)
    #history(session)
-    gnucash(session)
+   #gnucash(session)
+    fb(session)
    #notmuch(session)
-   #fb(session)
