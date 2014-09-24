@@ -1,22 +1,18 @@
-import sqlalchemy as s
-from doeund import Column as _Column
+from sqlalchemy.ext.declarative import \
+    declarative_base as _declarative_base, declared_attr
 
-def Column(*args, **kwargs):
-    'Column with good defaults'
-    _kwargs = dict(kwargs)
-    if 'nullable' not in _kwargs:
-        _kwargs['nullable'] = False
-    return _Column(*args, **kwargs) 
+Base = _declarative_base()
 
-def FkColumn(column, *args, **kwargs):
-    'Foreign key field'
-    return Column(s.Integer, s.ForeignKey(column), *args, **kwargs)
+class Fact(Base):
+    __abstract__ = True
 
-def PkColumn(*args, **kwargs):
-    'Primary key field'
-    return Column(s.Integer, primary_key = True, *args, **kwargs)
+    @declared_attr
+    def __tablename__(Class):
+        return 'dim_' + Class.__name__.lower()
 
-def LabelColumn(*args, **kwargs):
-    'A unique string column, for values in a two-column lookup table'
-    # Not unique because it works better somewhere
-    return Column(s.String, *args, unique = True, **kwargs)
+class Dimension(Base):
+    __abstract__ = True
+
+    @declared_attr
+    def __tablename__(Class):
+        return 'dim_' + Class.__name__.lower()
