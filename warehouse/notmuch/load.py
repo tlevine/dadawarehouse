@@ -20,7 +20,7 @@ def update(session):
 
         message(session, m)
         session.add_all(attachments(session, m))
-        session.add_all(correspondance(m))
+        session.add_all(correspondances(m))
 
         past_messages.add(m.get_message_id())
         session.commit()
@@ -36,9 +36,9 @@ def message(session, m):
 
     name, address = parse_email_address(m.get_header('from'))
 
-    return Message(
-        notmuch_message_id = m.get_message_id(),
-        datetime_id = datetime.datetime.fromtimestamp(m.get_date()),
+    return EmailMessage(
+        message_id = m.get_message_id(),
+        datetime = datetime.datetime.fromtimestamp(m.get_date()),
         thread_id = m.get_thread_id(),
         filename = filename,
         subject = subject,
@@ -50,7 +50,7 @@ def attachments(session, message):
     try:
         for part_number, message_part in enumerate(message.get_message_parts()):
             content_type, name = parse_attachment_name(message_part)
-            yield NotmuchAttachment(
+            yield EmailAttachment(
                 message_id = message.get_message_id(),
                 part_number = part_number,
                 content_type = content_type,

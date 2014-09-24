@@ -9,7 +9,7 @@ class EmailMessage(m.Fact):
     thread_id = m.Column(s.String)
     filename = m.Column(s.String)
     subject = m.Column(s.String)
-    from_name = m.Column(s.String)
+    from_name = m.Column(s.String, nullable = True)
     from_address = m.Column(s.String)
 
 class EmailCorrespondance(m.Fact):
@@ -17,13 +17,13 @@ class EmailCorrespondance(m.Fact):
     to_address includes CC, BCC
     '''
     pk = m.PkColumn()
-    message_id = m.FkColumn(Message.message_id)
+    message_id = m.FkColumn(EmailMessage.message_id)
     from_address = m.Column(s.String)
-    to_address = m.Column(s.String))
+    to_address = m.Column(s.String)
 
 class EmailAttachment(m.Fact):
-    message_id = m.FkColumn(Message.message_id, primary_key = True)
-    message = relationship(Message)
+    message_id = m.FkColumn(EmailMessage.message_id, primary_key = True)
+    message = relationship(EmailMessage)
     part_number = m.Column(s.Integer, primary_key = True)
-    content_type = m.Column(s.String)
-    name = m.Column(s.String)
+    content_type = m.Column(s.String, nullable = True)
+    name = m.Column(s.String, nullable = True)

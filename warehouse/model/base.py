@@ -8,7 +8,7 @@ class Fact(Base):
 
     @declared_attr
     def __tablename__(Class):
-        return 'dim_' + Class.__name__.lower()
+        return 'ft_' + Class.__name__.lower()
 
 class Dimension(Base):
     __abstract__ = True
