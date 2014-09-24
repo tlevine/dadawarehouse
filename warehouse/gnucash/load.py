@@ -17,6 +17,8 @@ def update(session):
     logger.info('Added GnuCash accounts')
     session.add_all(transactions(engine))
     logger.info('Added GnuCash transactions')
+    session.commit()
+
     session.add_all(splits(engine))
     logger.info('Added GnuCash splits')
     session.commit()
@@ -44,7 +46,7 @@ def transactions(engine):
 
 def accounts(engine, account_network):
     sql = 'SELECT guid, name FROM accounts'
-    name_mapping = dict(engine.execute(sql))
+    name_mapping = {k:v for k,v in engine.execute(sql)}
 
     sql = '''
 SELECT name, code, description, commodity_guid
