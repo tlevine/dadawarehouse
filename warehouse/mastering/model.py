@@ -11,6 +11,11 @@ class Person(Base):
     twitter = Column(s.String, nullable = True)
     email_addresses = relationship('EmailAddress')
 
+class Names(Base):
+    __tablename__ = 'master_names'
+    name = Column(s.String, primary_key = True)
+    person_id = Column(s.String, s.ForeignKey(Person.pk), primary_key = True)
+
 class EmailAddress(Base):
     __tablename__ = 'master_emailaddress'
     email_address = Column(s.String, primary_key = True)

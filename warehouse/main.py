@@ -14,6 +14,8 @@ from .branchable.load import update as branchable
 from .piwik.load import update as piwik
 from .muttalias.load import update as mutt
 
+from .mastering.load import update as master
+
 CACHE_DIRECTORY = os.path.expanduser('~/.dadawarehouse')
 
 
@@ -28,7 +30,7 @@ def load_data(engine = None):
     Base.metadata.create_all(engine) 
     session = sessionmaker(bind=engine)()
 
-    mutt(session)
+    master(session)
     return
     piwik(session)
     return
@@ -47,3 +49,4 @@ def load_data(engine = None):
     twitter(session)
     pal(session)
     gnucash(session)
+    mutt(session)

@@ -26,7 +26,7 @@ def mutt_aliases():
             if m != None:
                 name, address = m.group(1), m.group(2)
             elif name_address.count(' ') == 0:
-                name = ''
+                name = None
                 address = name_address
             else:
                 raise ValueError('This address is unusual; fix it:\n%s' % name_address)
