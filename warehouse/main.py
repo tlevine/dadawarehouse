@@ -20,9 +20,6 @@ def get_engine():
     return create_engine('postgres:///tlevine')
    #return create_engine('sqlite:////tmp/dada.sqlite')
 
-def get_session():
-    return sessionmaker(bind=get_engine())()
-
 def load_data(engine = None):
     if engine == None:
         engine = get_engine()

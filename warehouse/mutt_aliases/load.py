@@ -1,6 +1,7 @@
 import os
+import .model as m
 
-from .model import Person, EmailAddress
+from ..model.person import Person, EmailAddress
 
 def mutt_aliases():
     fn = os.path.expanduser('~/git/secrets-home/.mutt/aliases/people')
