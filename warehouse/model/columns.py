@@ -14,8 +14,6 @@ class Column(s.Column):
         info = _kwargs.pop('info', {})
         if 'label' in _kwargs:
             info['label'] = _kwargs.pop('label')
-        if 'aggregations' in _kwargs:
-            info['aggregations'] = _kwargs.pop('aggregations')
         if 'nullable' not in _kwargs:
             _kwargs['nullable'] = False
         s.Column.__init__(self, *args, info = info, **_kwargs)
