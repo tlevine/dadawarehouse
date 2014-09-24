@@ -1,5 +1,5 @@
 from collections import defaultdict
-:rom itertools import chain
+from itertools import chain
 import shutil
 import os
 import re
@@ -44,7 +44,7 @@ def status_changes(engine, filedate, session):
 
 def messages(engine, filedate, session):
     sql = 'SELECT rowid, uid, nick, ts, body FROM log_msg'
-    for rowid, uid, nick, ts, body in etch(engine.execute(sql)):
+    for rowid, uid, nick, ts, body in engine.execute(sql):
         yield FacebookMessage(
             filedate = filedate,
             rowid = rowid,
@@ -86,7 +86,9 @@ def online_durations(engine, filedate, session):
         )
 
 def update(session, today = datetime.date.today()):
- #  download()
+    logger.info('Downloading Facebook logs')
+    download()
+    logger.info('Assessing the existing Facebook imports')
     could_import = set(os.listdir(LOCAL_CHAT))
     already_imported = set(row[0] for row in session.query(FacebookChatStatusChange.filedate).all())
     for filename in sorted(could_import, reverse = True):
