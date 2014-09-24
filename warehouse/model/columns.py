@@ -1,6 +1,6 @@
 import sqlalchemy as s
 
-def Column(s.Column):
+class Column(s.Column):
     '''
     Column in a table with good defaults and some model metadata
 
@@ -18,7 +18,7 @@ def Column(s.Column):
             info['aggregations'] = _kwargs.pop('aggregations')
         if 'nullable' not in _kwargs:
             _kwargs['nullable'] = False
-        _Column.__init__(self, *args, info = info, **_kwargs)
+        s.Column.__init__(self, *args, info = info, **_kwargs)
 
 def FkColumn(column, *args, **kwargs):
     'Foreign key field'
