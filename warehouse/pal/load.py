@@ -16,7 +16,6 @@ CALENDARS = [os.path.join(os.path.expanduser('~/.pal'), rest) for rest in [\
 ]]
     
 def update(session, calendars = CALENDARS):
-    session.query(Description).delete()
     session.query(CalendarEvent).delete()
     session.query(File).delete()
     session.commit()
@@ -37,18 +36,17 @@ def update(session, calendars = CALENDARS):
                     pass
                 elif len(todo) == 0:
                     calendar_code, _, calendar_description = line.partition(' ')
-                    todo.append(File(pk = calendar_code,
+                    file_record = File(
+                        pk = calendar_code,
                         filename = filename,
                         description = calendar_description))
                 else:
                     for date, description in entry(line):
-                        description_id = Description.from_label(session, calendar_description)
                         todo.append(CalendarEvent(
-                            file_id = calendar_code,
+                            file = file_record,
                             date_id = date,
-                            description_id = description_id))
+                            description = calendar_description))
 
         session.add_all(todo)
-        CalendarEvent.create_related(session)
         session.commit()
         logger.info('Inserted events from calendar %s' % filename)
