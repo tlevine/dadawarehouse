@@ -67,6 +67,8 @@ Structure of the repository
     Overall configuration of the data warehouse
 The rest of ``warehouse``
     Connectors to different data sources
+``mastering``
+    Assemblage of master data
 
 How to use doeund
 ==============================
