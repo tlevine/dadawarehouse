@@ -12,6 +12,7 @@ from .notmuch.load import update as notmuch
 from .twitter.load import update as twitter
 from .branchable.load import update as branchable
 from .piwik.load import update as piwik
+from .mutt_aliases.load import update as mutt
 
 CACHE_DIRECTORY = os.path.expanduser('~/.dadawarehouse')
 
@@ -27,6 +28,8 @@ def load_data(engine = None):
     Base.metadata.create_all(engine) 
     session = sessionmaker(bind=engine)()
 
+    mutt(session)
+    return
     piwik(session)
     return
 

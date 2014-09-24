@@ -2,6 +2,4 @@
 import sys
 sys.path.append('.')
 import warehouse.main
-# warehouse.main.load_data()
-import mastering.load
-mastering.load.load()
+warehouse.main.load_data()
