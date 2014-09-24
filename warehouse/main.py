@@ -9,7 +9,7 @@ from .history.load import update as history
 from .gnucash.load import update as gnucash
 from .facebookchat.load import update as fb
 from .notmuch.load import update as notmuch
-#from .twitter.load import update as twitter
+from .twitter.load import update as twitter
 
 CACHE_DIRECTORY = os.path.expanduser('~/.dadawarehouse')
 
@@ -24,4 +24,5 @@ def load_data():
    #history(session)
    #gnucash(session)
    #fb(session)
-    notmuch(session)
+   #notmuch(session)
+    twitter(session)

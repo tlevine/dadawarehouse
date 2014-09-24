@@ -1,34 +1,35 @@
-import os, subprocess, json
-import io
+import os
 import re
 import datetime
 
-from .model import TwitterUser, TwitterAction
-from ..model import DateTime
+from notmuch import Database, Query
 
-NOTMUCH = ['notmuch', 'show', '--format=json', 'from:twitter.com']
-TMP = '/tmp/twitter'
-
-def emails():
-    if not os.path.isfile(TMP):
-        with open(TMP, 'wb') as fp:
-            notmuch = subprocess.Popen(NOTMUCH, stdout = fp,
-                                       stderr = subprocess.PIPE)
-        notmuch.wait()
-    with open(TMP) as fp:
-        result = json.load(fp)
-    return result[1:] # The first is empty?
+from ..logger import logger
+from .model import TwitterAction
 
 def update(session):
-    for email in emails():
-        subject = email[0][0]['headers']['Subject']
-        filename = email[0][0][0]['filename']
-        date = datetime.datetime.fromtimestamp(email[0][0]['timestamp'])
-        name, handle, action = parse_subject(subject)
-        yield TwitterAction(
-            user = TwitterUser(handle = handle, name = name).link(session),
-            action = ACTION_NAMES[action], email_file = filename,
-            datetime = DateTime(pk = date).link(session)).link(session)
+    db = Database()
+    q = session.query(TwitterAction.message_id)
+    new_messages = Query(db, 'from:twitter.com').search_messages()
+    old_message_ids = set(row[0] for row in q.distinct())
+    session.add_all(twitter_actions(session, new_messages, old_message_ids))
+
+def twitter_actions(session, new_messages, old_message_ids):
+    for m in new_messages:
+        message_id = m.get_message_id()
+        if message_id in old_message_ids:
+            logger.info('Already imported %s' % message_id)
+        else:
+            logger.info('Adding %s' % message_id)
+            subject = m.get_header('subject')
+            filename = m.get_filename()
+            date = datetime.datetime.fromtimestamp(m.get_date())
+            name, handle, action = parse_subject(subject)
+            yield TwitterAction(user_handle = handle,
+                                user_name = name,
+                                action = ACTION_NAMES[action],
+                                message_id = message_id,
+                                datetime = date)
 
 class actions:
     followed = re.compile(r'(?:(^[^(]+) \()?@([^)]+)\)? is now following you on Twitter!$')
@@ -43,6 +44,7 @@ class actions:
     do_you_know = re.compile(r'^Do you know .+ on Twitter?')
     direct_message_old = re.compile(r'^Direct message from .+')
     direct_message = re.compile(r'(^[^(]+) \(@([^)]+)\) has sent you a direct message on Twitter!')
+
 ACTION_NAMES = {
     actions.followed: 'follow',
     actions.followed_nameonly: 'follow',
@@ -53,6 +55,10 @@ ACTION_NAMES = {
     actions.retweeted: 'retweet',
     actions.direct_message: 'direct-message',
     actions.direct_message_old: 'direct-message',
+    actions.multiple: None,
+    actions.follower_in_body: None,
+    actions.do_you_know: None,
+    None: None,
 }
 
 def parse_subject(subject):
