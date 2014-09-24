@@ -137,7 +137,8 @@ def second_pass(session):
         ON ft_facebookchatstatuschange (datetime);
     '''
     Class = FacebookChatStatusChange
-    Class = FacebookMessage
+  # Class = FacebookMessage
+
     q = session.query(Class.user_id,
                       Class.current_name,
                       Class.datetime)\
