@@ -19,8 +19,9 @@ def update(session):
         with open(LOCAL_LOGDUMP) as fp:
             session.add_all(new_entries(fp, most_recent))
     except KeyboardInterrupt:
-        break
-    session.commit()
+        pass
+    else:
+        session.commit()
 
 def new_entries(fp, most_recent):
     for line in fp:

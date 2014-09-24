@@ -30,6 +30,9 @@ def load_data(engine = None):
     Base.metadata.create_all(engine) 
     session = sessionmaker(bind=engine)()
 
+    piwik(session)
+    return
+
     # Minutely updates
   # history(session)
   # notmuch(session)

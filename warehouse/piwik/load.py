@@ -1,9 +1,10 @@
 import os
 
 from ..util import i_should_copy
-from .nfsn import mysqldump
+from .nfsn import mysqldump, restore
 
 LOCAL_DUMP = os.path.expanduser('~/.dadawarehouse/piwik.sql')
 def update(session):
-    if i_should_copy(LOCAL_DUMP):
-        mysqldump(LOCAL_DUMP)
+   #if i_should_copy(LOCAL_DUMP):
+   #    mysqldump(LOCAL_DUMP)
+    restore(LOCAL_DUMP)
