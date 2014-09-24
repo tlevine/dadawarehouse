@@ -37,11 +37,13 @@ def load_data(engine = None):
     # Minutely updates
   # history(session)
   # notmuch(session)
-  # branchable(session)
-  # piwik(session)
 
     # Daily updates
     fb(session)
+
+    # These updates involve downloading biggish files
+    branchable(session)
+    piwik(session)
 
     # These delete existing state and thus take a while.
     # Also, the data aren't updated that often.

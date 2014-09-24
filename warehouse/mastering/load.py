@@ -24,19 +24,23 @@ def _mutt(session):
                                        email_address = alias.email_address))
 
 def _fb(Class, session):
+    '''
+    This index should help. ::
+
+        CREATE INDEX facebook_status_current_name
+        ON ft_facebookchatstatuschange (current_name);
+
+    '''
     q = session.query(Class.user_id, Class.current_name)\
                .distinct()
-    logger.info('Making note of people with the same names')
-    result = list(q)
-    counts = Counter(name for uid, name in result)
-    logger.info('Merging Facebook users')
-    for user_id, name in result:
+    completed = defaultdict(lambda: set())
+    for user_id, name in q:
         logger.debug('Checking Facebook user %d' % user_id)
-        if counts['name'] > 1:
+        if name in completed and user_id not in completed[name]:
             logger.info('Skipping "%s" because multiple people have the name' % name)
         else:
             person_id = name.lower().replace(' ', '.')
-            person = session.query(Person).filter(pk = person_id).first()
+            person = session.query(Person).filter(Person.pk = person_id).first()
             if person == None:
                 session.add(Person(pk = person_id, facebook = user_id))
                 session.commit()
