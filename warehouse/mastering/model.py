@@ -2,8 +2,7 @@ import sqlalchemy as s
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 
-from .base import Base
-from .columns import Column
+from ..model import Base, Column
 
 class Person(Base):
     __tablename__ = 'master_person'
