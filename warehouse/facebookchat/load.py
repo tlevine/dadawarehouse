@@ -136,11 +136,13 @@ def second_pass(session):
         CREATE INDEX facebook_status_datetime
         ON ft_facebookchatstatuschange (datetime);
     '''
-    q = session.query(FacebookChatStatusChange.user_id,
-                      FacebookChatStatusChange.current_name,
-                      FacebookChatStatusChange.datetime)\
-               .order_by(FacebookChatStatusChange.user_id,
-                         FacebookChatStatusChange.datetime)
+    Class = FacebookChatStatusChange
+    Class = FacebookMessage
+    q = session.query(Class.user_id,
+                      Class.current_name,
+                      Class.datetime)\
+               .order_by(Class.user_id,
+                         Class.datetime)
 
     session.add_all(name_changes(q))
     session.commit()

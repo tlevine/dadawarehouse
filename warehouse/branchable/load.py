@@ -15,8 +15,11 @@ def update(session):
     most_recent = session.query(BranchableLog.datetime)\
                   .order_by(desc(BranchableLog.datetime))\
                   .limit(1).scalar()
-    with open(LOCAL_LOGDUMP) as fp:
-        session.add_all(new_entries(fp, most_recent))
+    try:
+        with open(LOCAL_LOGDUMP) as fp:
+            session.add_all(new_entries(fp, most_recent))
+    except KeyboardInterrupt:
+        break
     session.commit()
 
 def new_entries(fp, most_recent):

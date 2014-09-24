@@ -30,10 +30,6 @@ def load_data(engine = None):
     Base.metadata.create_all(engine) 
     session = sessionmaker(bind=engine)()
 
-    master(session)
-    return
-
-
     # Minutely updates
   # history(session)
   # notmuch(session)
@@ -52,3 +48,6 @@ def load_data(engine = None):
     pal(session)
     gnucash(session)
     mutt(session)
+
+    # Assemble master data
+    master(session)
