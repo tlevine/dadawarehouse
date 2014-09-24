@@ -11,6 +11,7 @@ from .facebookchat.load import update as fb
 from .notmuch.load import update as notmuch
 from .twitter.load import update as twitter
 from .branchable.load import update as branchable
+from .piwik.load import update as piwik
 
 CACHE_DIRECTORY = os.path.expanduser('~/.dadawarehouse')
 
@@ -20,6 +21,9 @@ def load_data():
 
     Base.metadata.create_all(engine) 
     session = sessionmaker(bind=engine)()
+
+    piwik(session)
+    return
 
     # Minutely updates
     history(session)

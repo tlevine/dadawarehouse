@@ -2,6 +2,7 @@ import os, subprocess, datetime
 
 from sqlalchemy import desc
 
+from ..util import i_should_copy
 from ..logger import logger
 from .parser import entry
 from .model import BranchableLog
@@ -9,7 +10,7 @@ from .model import BranchableLog
 LOCAL_LOGDUMP = os.path.expanduser('~/.dadawarehouse/branchable-logdump')
 
 def update(session):    
-    if i_should_copy_the_log(LOCAL_LOGDUMP):
+    if i_should_copy(LOCAL_LOGDUMP):
         copy_log(LOCAL_LOGDUMP)
     most_recent = session.query(BranchableLog.datetime)\
                   .order_by(desc(BranchableLog.datetime))\
@@ -27,14 +28,6 @@ def new_entries(fp, most_recent):
         else:
             if most_recent == None or e.datetime >= most_recent:
                 yield e
-
-def i_should_copy_the_log(local_filename):
-    if not os.path.exists(local_filename):
-        return True
-
-    mtime = datetime.datetime.fromtimestamp(os.stat(local_filename).st_mtime)
-    a_day_ago = datetime.datetime.now() - datetime.timedelta(days = 1)
-    return mtime < a_day_ago
 
 def copy_log(local_filename):
     command = ['ssh', 'b-thomaslevine@thomaslevine.branchable.com', 'logdump']
