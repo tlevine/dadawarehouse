@@ -24,7 +24,7 @@ def update(session):
 
 def splits(engine):
     sql = 'SELECT guid, account_guid, tx_guid, memo, value_num, value_denom FROM splits'
-    for guid, account_guid, transaction_guid, memo, value_num, value_denom in engine.execute(sql).fetchall():
+    for guid, account_guid, transaction_guid, memo, value_num, value_denom in engine.execute(sql):
         yield Split(guid = guid,
                     account_guid = account_guid,
                     transaction_guid = transaction_guid,
@@ -35,7 +35,7 @@ def splits(engine):
 
 def transactions(engine):
     sql = 'SELECT guid, currency_guid, post_date, enter_date, description FROM transactions'
-    for guid, currency_guid, post_date, enter_date, description in engine.execute(sql).fetchall():
+    for guid, currency_guid, post_date, enter_date, description in engine.execute(sql):
         yield Transaction(guid = guid,
                           currency = currency_guid,
                           post_date = _parse_date(post_date),
@@ -44,7 +44,7 @@ def transactions(engine):
 
 def accounts(engine, account_network):
     sql = 'SELECT guid, name FROM accounts'
-    name_mapping = dict(engine.execute(sql).fetchall())
+    name_mapping = dict(engine.execute(sql))
 
     sql = '''
 SELECT name, code, description, commodity_guid
@@ -94,10 +94,10 @@ def get_account_network(engine):
     placeholders = set()
 
     sql = 'SELECT guid FROM accounts WHERE parent_guid IS NULL'
-    root_guids = set(row[0] for row in engine.execute(sql).fetchall())
+    root_guids = set(row[0] for row in engine.execute(sql))
 
     sql = 'select parent_guid, guid, placeholder from accounts WHERE parent_guid NOT NULL'
-    for parent_guid, guid, placeholder in engine.execute(sql).fetchall():
+    for parent_guid, guid, placeholder in engine.execute(sql):
         if parent_guid in root_guids:
             parent_guid = None
         account_network[parent_guid].add(guid)
