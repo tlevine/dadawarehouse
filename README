@@ -21,14 +21,14 @@ Install the package. ::
 
     pip3 install .
 
+You need to enable `fuzzystrmatch` with the Postgres super user.
+
+    $ su postgres 'psql tlevine'
+    > CREATE EXTENSION fuzzystrmatch;
+
 Start loading the data. ::
 
     dada-load
-
-Loading the data will take a while, but you don't have to wait until it's
-finished before you can start analyzing; just run this in another shell. ::
-
-    dada-model
 
 More ideas of sources of data
 ========================================
@@ -70,51 +70,9 @@ The rest of ``warehouse``
 ``mastering``
     Assemblage of master data
 
-How to use doeund
-==============================
-By following doeund's conventions, you can produce at once the
-
-1. Database schema
-2. Mapping with Python objects
-3. Cubes model
-
-In addition, doeund assists you in creating snowflake schemas with many layers.
-
-
 Fun ideas
 ==============================
 
 * How many spaces after a period?
 * Connect website views to emails
 * Length of sentences (Saar Golde's idea)
-
-To do
-==========
-It looks like mappings need to map dimensions to table *aliases*,
-not tables themselves. Do joins have to be on aliases too...?
-
-Front-ends to consider
-===============================
-My original plan was `cubes <http://cubes.dadabrewery.com>`_, but it doesn't
-work as it is documented.
-
-I can get an installation of BusinessObjects for $150/month on Amazon EC2.
-The AMI is called "SAP BusinessObjects 5 Named Users - BASIC". Or maybe that's
-$150/month plus about $12/hour.
-
-Microstrategy is $1/hour with the AMI
-"MicroStrategy Analytics Enterprise with SQL Server Standard (25 users)".
-
-I can get Oracle and Microsoft databases from Amazon RDS. Maybe they have
-OLAP servers? Well Microsoft does, but the Oracle one is confusing me.
-https://en.wikipedia.org/wiki/Microsoft_Analysis_Services
-
-And then there are a bunch of clients for MDX.
-https://en.wikipedia.org/wiki/MultiDimensional_eXpressions
-
-Hmm Mondrian looks okay actually.
-https://en.wikipedia.org/wiki/Mondrian_OLAP_server
-
-* http://www.pivot4j.org/
-* http://meteorite.bi/saiku
-* http://jpivot.sourceforge.net/
