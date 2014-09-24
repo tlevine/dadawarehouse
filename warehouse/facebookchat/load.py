@@ -10,7 +10,7 @@ import sqlalchemy
 
 from ..logger import logger
 from .model import FacebookChatStatusChange, FacebookMessage, \
-                   FacebookDuration
+                   FacebookDuration, FacebookNameChange
 
 WAREHOUSE = os.path.expanduser('~/.dadawarehouse')
 LOCAL_CHAT = os.path.join(WAREHOUSE, 'facebookchat')
@@ -86,6 +86,10 @@ def online_durations(engine, filedate, session):
         )
 
 def update(session, today = datetime.date.today()):
+   #first_pass(session, today)
+    second_pass(session)
+
+def first_pass(session, today):
     logger.info('Downloading Facebook logs')
     download()
     logger.info('Assessing the existing Facebook imports')
@@ -122,3 +126,38 @@ def update(session, today = datetime.date.today()):
 
         except KeyboardInterrupt:
             break
+
+def second_pass(session):
+    '''
+    Get name changes.
+
+    This index should help. ::
+
+        CREATE INDEX facebook_status_datetime
+        ON ft_facebookchatstatuschange (datetime);
+    '''
+    q = session.query(FacebookChatStatusChange.user_id,
+                      FacebookChatStatusChange.current_name,
+                      FacebookChatStatusChange.datetime)\
+               .order_by(FacebookChatStatusChange.user_id,
+                         FacebookChatStatusChange.datetime)
+
+    session.add_all(name_changes(q))
+    session.commit()
+    
+def name_changes(q):
+    prev_user = None
+    prev_name = None
+    for user, name, date in q:
+        if user != prev_user:
+            # If this is a new user, reset.
+            logger.info('Scanning user %s (%s) for name changes' % (user, name))
+            prev_user = user
+            prev_name = name
+        elif name != prev_name:
+            # If this is the same user but a new name, record it.
+            yield FacebookNameChange(user_id = user,
+                                     datetime = date,
+                                     new_name = name)
+            prev_name = name
+        # Otherwise, this is the same user with the same name

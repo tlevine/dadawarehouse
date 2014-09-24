@@ -33,13 +33,12 @@ def load_data(engine = None):
     master(session)
     return
 
-    piwik(session)
-    return
 
     # Minutely updates
-    history(session)
-    notmuch(session)
-    branchable(session)
+  # history(session)
+  # notmuch(session)
+  # branchable(session)
+  # piwik(session)
 
     # Daily updates
     fb(session)

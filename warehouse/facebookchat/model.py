@@ -15,6 +15,11 @@ class FacebookMessage(Fact):
     current_name = m.Column(s.String, label = 'Full Name')
     body = m.Column(s.String)
 
+  # Why doesn't this work???
+  # @s.ext.declarative.declared_attr
+  # def __table_args__(cls):
+  #     return (s.schema.Index('%s_datetime' % cls.__tablename__, 'datetime'),)
+
 class FacebookChatStatusChange(Fact):
     # Two-column primary key
     filedate = m.Column(s.Date, primary_key = True, label = 'File Date')
@@ -33,3 +38,9 @@ class FacebookDuration(Fact):
     user_id = m.Column(s.BigInteger, primary_key = True)
     date = m.Column(s.Date, primary_key = True)
     duration = m.Column(s.Integer) # in seconds
+
+class FacebookNameChange(Fact):
+    pk = m.PkColumn()
+    user_id = m.Column(s.BigInteger)
+    datetime = m.Column(s.DateTime)
+    new_name = m.Column(s.String)
