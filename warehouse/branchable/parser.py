@@ -4,17 +4,19 @@ import string
 
 import pyparsing as p
 
+from .model import BranchableLog
+
 def _entry(parser, line):
     pyparse = parser.parseString(line)
-    datestamp = pyparse['datetime'][0][0]
+    datestamp = pyparse['datetime'][0]
     dateformat = '%d/%b/%Y:%H:%M:%S'
-    return {
-        'route': pyparse['requestURI'],
-        'status_code': pyparse['status_code'],
-        'ip_address': pyparse['ip_address'],
-        'datetime': datetime.datetime.strptime(datestamp, dateformat)
-        'user_agent': pyparse['user_agent'],
-    }
+    return BranchableLog(
+        route = pyparse['requestURI'],
+        status_code = pyparse['status_code'],
+        ip_address = pyparse['ip_address'],
+        datetime = datetime.datetime.strptime(datestamp, dateformat),
+        user_agent = pyparse['user_agent'],
+    )
 
 def getCmdFields( s, l, t ):
     t["method"],t["requestURI"],t["protocolVersion"] = t[0].strip('"').split()

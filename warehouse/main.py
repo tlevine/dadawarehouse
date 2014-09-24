@@ -10,6 +10,7 @@ from .gnucash.load import update as gnucash
 from .facebookchat.load import update as fb
 from .notmuch.load import update as notmuch
 from .twitter.load import update as twitter
+from .branchable.load import update as branchable
 
 CACHE_DIRECTORY = os.path.expanduser('~/.dadawarehouse')
 
@@ -19,6 +20,9 @@ def load_data():
 
     Base.metadata.create_all(engine) 
     session = sessionmaker(bind=engine)()
+
+    branchable(session)
+    return
 
     pal(session)
     history(session)
