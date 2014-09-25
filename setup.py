@@ -19,4 +19,8 @@ setup(name='dadawarehouse',
       scripts = [os.path.join('bin', 'dadawarehouse')],
       version='0.0.1',
       license='AGPL',
+      classifiers=[
+          'Programming Language :: Python :: 2.7',
+          'Programming Language :: Python :: 3.4',
+      ],
 )
