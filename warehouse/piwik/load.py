@@ -113,8 +113,8 @@ def reify_visit(v):
         lastActionDate = datetime.datetime.fromtimestamp(v['lastActionTimestamp']),
         
         location = v['location'],
-        latitude = float(v['latitude']),
-        longitude = float(v['longitude']),
+        latitude = None if v['latitude'] == None else float(v['latitude']),
+        longitude = None if v['longitude'] == None else float(v['longitude']),
         
         operatingSystem = v['operatingSystem'],
         operatingSystemCode = v['operatingSystemCode'],
