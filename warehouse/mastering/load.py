@@ -2,7 +2,7 @@ from collections import Counter
 
 from pylev import levenshtein
 from unidecode import unidecode
-from sqlalchemy import or_
+from sqlalchemy import and_, or_
 
 from ..logger import logger
 from ..facebookchat.model import FacebookMessage, FacebookChatStatusChange
@@ -48,7 +48,10 @@ def _fb(Class, session):
                 session.merge(Person(pk = person_id, facebook = user_id))
                 logger.info('Added %s' % person_id)
             else:
-                session.merge(Names(name = name, person_id = person.pk))
-                logger.info('Added a name for %s' % person.pk)
+                condition = and_(Names.name == name, Names.person_id == person.pk)
+                if session.query(Names).filter(condition).first() == None:
+                    session.add(Names(name = name, person_id = person.pk))
+                    session.flush()
+                    logger.info('Added a name for %s' % person.pk)
             completed.add(name)
     session.commit()
