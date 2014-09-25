@@ -6,6 +6,7 @@ import datetime
 import requests
 from sqlalchemy import desc
 
+from ..logger import logger
 from .model import PiwikAction, PiwikVisit
 
 def update(session):
@@ -16,7 +17,7 @@ def update(session):
     # The most recent date
     most_recent = session.query(PiwikVisit.serverDateTime)\
                          .order_by(desc(PiwikVisit.serverDateTime))\
-                         .scalar()
+                         .limit(1).scalar()
     if most_recent == None:
         date = oldest_visit(os.environ[key]).date()
 
@@ -28,13 +29,14 @@ def update(session):
         session.query(PiwikVisit)\
                .filter(PiwikVisit.serverDateTime >= _datetime)\
                .delete()
-        session.query(Action).filter(Action.datetime >= _datetime).delete()
+        session.query(PiwikAction)\
+               .filter(PiwikAction.datetime >= _datetime).delete()
         session.commit()
 
     while date <= datetime.date.today():
         session.add_all(visits(os.environ[key], date))
         session.commit()
-        date += date + datetime.timedelta(days = 1)
+        date += datetime.timedelta(days = 1)
         logger.info('Loaded visits for %s' % date.isoformat())
 
 def visits(token, date):

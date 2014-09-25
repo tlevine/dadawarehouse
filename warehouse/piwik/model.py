@@ -4,17 +4,17 @@ import warehouse.model as m
 
 class PiwikAction(m.Fact):
     visit_id = m.Column(s.Integer,
-                        s.ForeignKey('dim_piwikvisit.idVisit'),
+    #                   s.ForeignKey('dim_piwikvisit.idVisit'),
                         primary_key = True)
     visit_action_id = m.Column(s.Integer, primary_key = True)
 
     page_id = m.Column(s.Integer)
-    page_id_action = m.Column(s.Integer)
+    page_id_action = m.Column(s.Integer, nullable = True)
 
-    page_title = m.Column(s.String)
+    page_title = m.Column(s.String, nullable = True)
     datetime = m.Column(s.DateTime)
     action_type = m.Column(s.String)
-    url = m.Column(s.String)
+    url = m.Column(s.String, nullable = True)
 
 class PiwikVisit(m.Dimension):
     idVisit = m.Column(s.Integer, primary_key = True)
