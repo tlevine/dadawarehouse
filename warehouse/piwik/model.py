@@ -16,7 +16,7 @@ class PiwikAction(m.Fact):
     action_type = m.Column(s.String)
     url = m.Column(s.String, nullable = True)
 
-class PiwikVisit(m.Dimension):
+class PiwikVisit(m.Fact):
     idVisit = m.Column(s.Integer, primary_key = True)
 
     serverDateTime = m.Column(s.DateTime)
