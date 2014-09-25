@@ -45,5 +45,63 @@ def get_visits(token, date, page):
     }
     return requests.get(url, params = params)
 
-def reify_visit(blob):
-    pass
+def reify_visit(v):
+    Visit(idVisit = int(v['idVisit']),
+          serverDateTime = ,
+          clientDateTime = ,
+
+          actions = int(v['actions'])
+          browserCode = v['browserCode']
+          browserFamily = v['browserFamily']
+          browserFamilyDescription = v['browserFamilyDescription']
+          browserName = v['browserName']
+          browserVersion = v['browserVersion']
+
+    city = v['city']
+    continent = v['continent']
+    continentCode = v['continentCode']
+    country = v['country']
+    countryCode = v['countryCode']
+
+    daysSinceFirstVisit = int(v['daysSinceFirstVisit'])
+    daysSinceLastVisit = int(v['daysSinceLastVisit'])
+
+    deviceType = v['deviceType']
+    events = int(v['deviceType'])
+
+    idSite = int(v['idSite'])
+    firstActionDate = m.Column(s.DateTime)
+    lastActionDate = m.Column(s.DateTime)
+
+    location = v['location']
+    latitude = float(v['latitude'])
+    longitude = float(v['longitude'])
+
+    operatingSystem = v['operatingSystem']
+    operatingSystemCode = v['operatingSystemCode']
+    operatingSystemShortName = v['operatingSystemShortName']
+
+#   plugins = 'pdf, flash, java, quicktime',
+
+    provider = v['provider']
+    providerName = v['providerName']
+    providerUrl = v['providerUrl']
+    referrerKeyword = v['referrerKeyword']
+    referrerKeywordPosition = v['referrerKeywordPosition']
+    referrerName = v['referrerName']
+    referrerSearchEngineUrl = v['referrerSearchEngineUrl']
+    referrerType = v['referrerType']
+    referrerTypeName = v['referrerTypeName']
+    referrerUrl = v['referrerUrl']
+    region = v['region']
+    regionCode = v['regionCode']
+
+    screen_width = int(v['screen_width'])
+    screen_height = int(v['screen_height'])
+    screenType = v['screenType']
+    searches = int(v['searches'])
+    visitCount = int(v['visitCount'])
+    visitDuration = int(v['visitDuration'])
+    visitIp = v['visitIp']
+    visitorId = v['visitorId']
+    visitorType = v['visitorType']
