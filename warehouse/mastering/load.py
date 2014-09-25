@@ -12,9 +12,9 @@ from ..muttalias.model import MuttAlias
 from .model import Person, Names, EmailAddress
 
 def update(session):
-    # _mutt(session)
-    _fb(FacebookMessage, session)
-    # _fb(FacebookChatStatusChange, session)
+#   _mutt(session)
+#   _fb(FacebookMessage, session)
+    _fb(FacebookChatStatusChange, session)
 
 def _mutt(session):
     # Start with mutt aliases.
