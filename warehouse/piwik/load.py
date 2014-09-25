@@ -36,8 +36,8 @@ def update(session):
     while date <= datetime.date.today():
         session.add_all(visits(os.environ[key], date))
         session.commit()
-        date += datetime.timedelta(days = 1)
         logger.info('Loaded visits for %s' % date.isoformat())
+        date += datetime.timedelta(days = 1)
 
 def visits(token, date):
     for offset in itertools.count(0, 100):
