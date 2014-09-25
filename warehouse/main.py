@@ -1,4 +1,5 @@
 import os
+from concurrent.futures import ThreadPoolExecutor
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -29,28 +30,26 @@ def load_data(engine = None):
 
     Base.metadata.create_all(engine) 
     sm = sessionmaker(bind=engine)
-    session = sm()
 
+    with ThreadPoolExecutor(max_workers = 4) as e:
+        # Minutely updates
+        e.submit(history, sm())
+        e.submit(notmuch, sm())
+        e.submit(piwik, sm())
 
-    # Minutely updates
-    history(session)
-    notmuch(session)
-    piwik(session)
+        # Daily updates
+        e.submit(fb, sm())
 
-    # Daily updates
-    fb(session)
+        # This involves downloading a biggish file.
+        e.submit(branchable, sm())
 
-    # These updates involve downloading biggish files
-    branchable(session)
-    piwik(session)
-
-    # These delete existing state and thus take a while.
-    # Also, the data aren't updated that often.
-    # So we put them last.
-    twitter(session)
-    pal(session)
-    gnucash(session)
-    mutt(session)
+        # These delete existing state and thus take a while.
+        # Also, the data aren't updated that often.
+        # So we put them last.
+        e.submit(twitter, sm())
+        e.submit(pal, sm())
+        e.submit(gnucash, sm())
+        e.submit(mutt, sm())
 
     # Assemble master data
     master(session)
