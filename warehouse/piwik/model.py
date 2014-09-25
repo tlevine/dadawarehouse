@@ -70,30 +70,28 @@ class PiwikLogVisit(m.Fact):
 #   KEY `index_idsite_idvisitor` (`idsite`,`idvisitor`)
 
 CREATE TABLE `piwik_log_link_visit_action` (
-  `idlink_va` int(11) NOT NULL AUTO_INCREMENT,
-  `idsite` int(10) unsigned NOT NULL,
-  `idvisitor` binary(8) NOT NULL,
-  `server_time` datetime NOT NULL,
-  `idvisit` int(10) unsigned NOT NULL,
-  `idaction_url` int(10) unsigned DEFAULT NULL,
-  `idaction_url_ref` int(10) unsigned DEFAULT '0',
-  `idaction_name` int(10) unsigned DEFAULT NULL,
-  `idaction_name_ref` int(10) unsigned NOT NULL,
-  `idaction_event_category` int(10) unsigned DEFAULT NULL,
-  `idaction_event_action` int(10) unsigned DEFAULT NULL,
-  `time_spent_ref_action` int(10) unsigned NOT NULL,
-  `custom_var_k1` varchar(200) DEFAULT NULL,
-  `custom_var_v1` varchar(200) DEFAULT NULL,
-  `custom_var_k2` varchar(200) DEFAULT NULL,
-  `custom_var_v2` varchar(200) DEFAULT NULL,
-  `custom_var_k3` varchar(200) DEFAULT NULL,
-  `custom_var_v3` varchar(200) DEFAULT NULL,
-  `custom_var_k4` varchar(200) DEFAULT NULL,
-  `custom_var_v4` varchar(200) DEFAULT NULL,
-  `custom_var_k5` varchar(200) DEFAULT NULL,
-  `custom_var_v5` varchar(200) DEFAULT NULL,
-  `custom_float` float DEFAULT NULL,
-  PRIMARY KEY (`idlink_va`),
-  KEY `index_idvisit` (`idvisit`),
-  KEY `index_idsite_servertime` (`idsite`,`server_time`)
-) ENGINE=MyISAM AUTO_INCREMENT=560350 DEFAULT CHARSET=utf8;
+    idlink_va = m.Column(s.Integer)
+    idsite = m.Column(s.Integer)
+    idvisitor = m.Column(s.LargeBinary(8))
+    server_time = m.Column(s.DateTime)
+    idvisit = m.Column(s.Integer)
+    idaction_url = m.Column(s.Integer, nullable = True)
+    idaction_url_ref = m.Column(s.Integer, default = 0)
+    idaction_name = m.Column(s.Integer, nullable = True)
+    idaction_name_ref = m.Column(s.Integer)
+    idaction_event_category = m.Column(s.Integer, nullable = True)
+    idaction_event_action = m.Column(s.Integer, nullable = True)
+    time_spent_ref_action = m.Column(s.Integer)
+    custom_var_k1 = m.Column(s.VARCHAR(200), nullable = True)
+    custom_var_v1 = m.Column(s.VARCHAR(200), nullable = True)
+    custom_var_k2 = m.Column(s.VARCHAR(200), nullable = True)
+    custom_var_v2 = m.Column(s.VARCHAR(200), nullable = True)
+    custom_var_k3 = m.Column(s.VARCHAR(200), nullable = True)
+    custom_var_v3 = m.Column(s.VARCHAR(200), nullable = True)
+    custom_var_k4 = m.Column(s.VARCHAR(200), nullable = True)
+    custom_var_v4 = m.Column(s.VARCHAR(200), nullable = True)
+    custom_var_k5 = m.Column(s.VARCHAR(200), nullable = True)
+    custom_var_v5 = m.Column(s.VARCHAR(200), nullable = True)
+    custom_float = m.Column(s.Float, nullable = True)
+  # KEY `index_idvisit` (`idvisit`),
+  # KEY `index_idsite_servertime` (`idsite`,`server_time`)
