@@ -31,6 +31,7 @@ def load_data(engine = None):
     Base.metadata.create_all(engine) 
     sm = sessionmaker(bind=engine)
 
+    # Import separate data marts in parallel.
     with ThreadPoolExecutor(max_workers = 4) as e:
         # Minutely updates
         e.submit(history, sm())
@@ -52,4 +53,4 @@ def load_data(engine = None):
         e.submit(mutt, sm())
 
     # Assemble master data
-    master(session)
+    master(sm())
