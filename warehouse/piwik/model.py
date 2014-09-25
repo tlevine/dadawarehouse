@@ -3,10 +3,13 @@ import sqlalchemy as s
 import warehouse.model as m
 
 class PiwikAction(m.Fact):
-    visit_id = m.Column(s.Integer, s.ForeignKey('dim_piwikvisit.idVisit'))
+    visit_id = m.Column(s.Integer,
+                        s.ForeignKey('dim_piwikvisit.idVisit'),
+                        primary_key = True)
+    visit_action_id = m.Column(s.Integer, primary_key = True)
 
-    page_id = m.Column(s.Integer, primary_key = True)
-    page_id_action = m.Column(s.Integer, primary_key = True)
+    page_id = m.Column(s.Integer)
+    page_id_action = m.Column(s.Integer)
 
     page_title = m.Column(s.String)
     datetime = m.Column(s.DateTime)
@@ -17,7 +20,7 @@ class PiwikVisit(m.Dimension):
     idVisit = m.Column(s.Integer, primary_key = True)
 
     serverDateTime = m.Column(s.DateTime)
-    clientTime = m.Column(s.DateTime)
+    clientTime = m.Column(s.Time)
 
     actions = m.Column(s.Integer)
     browserCode = m.Column(s.String)
@@ -55,13 +58,13 @@ class PiwikVisit(m.Dimension):
     provider = m.Column(s.String)
     providerName = m.Column(s.String)
     providerUrl = m.Column(s.String)
-    referrerKeyword = m.Column(s.String)
+    referrerKeyword = m.Column(s.String, nullable = True)
     referrerKeywordPosition = m.Column(s.Integer, nullable = True)
-    referrerName = m.Column(s.String)
+    referrerName = m.Column(s.String, nullable = True)
     referrerSearchEngineUrl = m.Column(s.String, nullable = True)
     referrerType = m.Column(s.String)
     referrerTypeName = m.Column(s.String)
-    referrerUrl = m.Column(s.String)
+    referrerUrl = m.Column(s.String, nullable = True)
     region = m.Column(s.String)
     regionCode = m.Column(s.String)
 

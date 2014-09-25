@@ -142,18 +142,18 @@ def reify_visit(v):
         visitorType = v['visitorType'],
     )
     yield visit
-    for action in v['actionDetails']:
+    for visit_action_id, action in enumerate(v['actionDetails']):
         time = datetime.time(*map(int, action['serverTimePretty'].split(' ')[-1].split(':')))
         _datetime = datetime.datetime.combine(visit.serverDateTime.date(), time)
-        print(action)
         yield PiwikAction(
             visit_id = int(v['idVisit']),
+            visit_action_id = visit_action_id,
 
             page_id = int(action['pageId']),
             page_id_action = action['pageIdAction'],
 
             page_title = action['pageTitle'],
-            action_type = action['actionType'],
+            action_type = action['type'],
             datetime = _datetime,
             url = action['url'],
         )
