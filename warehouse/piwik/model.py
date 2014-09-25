@@ -3,13 +3,13 @@ import sqlalchemy as s
 import warehouse.model as m
 
 class Action(m.Fact):
-    visit_id = m.Column(s.Integer, s.ForeignKey(Visit), primary_key = True)
-    action_id = m.Column(s.Integer, primary_key = True)
+    visit_id = m.Column(s.Integer, s.ForeignKey(Visit))
 
-    page_id = m.Column(s.Integer)
-    page_id_action = m.Column(s.Integer)
+    page_id = m.Column(s.Integer, primary_key = True)
+    page_id_action = m.Column(s.Integer, primary_key = True)
+
     page_title = m.Column(s.String)
-    server_time = m.Column(s.DateTime)
+    datetime = m.Column(s.DateTime)
     action_type = m.Column(s.String)
     url = m.Column(s.String)
 
@@ -17,7 +17,7 @@ class Visit(m.Dimension):
     idVisit = m.Column(s.Integer, primary_key = True)
 
     serverDateTime = m.Column(s.DateTime)
-    clientDateTime = m.Column(s.DateTime)
+    clientTime = m.Column(s.DateTime)
 
     actions = m.Column(s.Integer)
     browserCode = m.Column(s.String)
