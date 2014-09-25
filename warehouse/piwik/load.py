@@ -41,7 +41,7 @@ def update(session):
 
 def visits(token, date):
     for offset in itertools.count(0, 100):
-        response = get_visits(token, date, offset)
+        response = get_visits(date, offset, token = token)
         rawvisits = json.loads(response.text)
         yield from itertools.chain(*map(reify_visit, rawvisits))
         if len(rawvisits) == 0:
@@ -61,11 +61,12 @@ def oldest_visit(token):
         'filter_sort_order': 'asc',
         'showColumns': 'serverDate',
     }
-    response = requests.get(url, params = params)
+    response = get(url, params = params)
     rawdate = json.loads(response.text)[0]['serverDate']
     return datetime.datetime.strptime(rawdate, '%Y-%m-%d')
 
-def get_visits(token, date, offset): 
+@cache('~/.dadawarehouse/piwik-api-requests')
+def get_visits(date, offset, token = None): 
     url = 'http://piwik.thomaslevine.com'
     params = {
         'module': 'API',
@@ -78,7 +79,7 @@ def get_visits(token, date, offset):
         'filter_limit': 100,
         'filter_offset': offset,
     }
-    return requests.get(url, params = params)
+    return get(url, params = params)
 
 def reify_visit(v):
     screen_width, screen_height = tuple(map(int, v['resolution'].split('x')))
