@@ -31,12 +31,11 @@ def load_data(engine = None):
     sm = sessionmaker(bind=engine)
     session = sm()
 
-    piwik(session)
-    return
 
     # Minutely updates
-  # history(session)
-  # notmuch(session)
+    history(session)
+    notmuch(session)
+    piwik(session)
 
     # Daily updates
     fb(session)

@@ -12,19 +12,20 @@ from .model import EmailMessage, EmailAttachment, EmailCorrespondance
 
 def update(session):
     db = Database()
-    q = session.query(EmailMessage.filename)
+    q = session.query(EmailMessage.message_id)
     past_messages = set(row[0] for row in q.distinct())
     for m in Query(db,'').search_messages():
-        fn = m.get_filename()
-        if fn in past_messages:
-            logger.info('Already imported %s' % fn)
+        message_id = m.get_message_id()
+        if message_id in past_messages:
+            logger.info('Already imported %s' % message_id)
             continue
 
-        message(session, m)
+        session.add(message(session, m))
+        session.flush() # for foreign key constraints
         session.add_all(attachments(session, m))
         session.add_all(correspondances(m))
 
-        past_messages.add(m.get_message_id())
+        past_messages.add(message_id)
         session.commit()
 
         logger.info('Added message "id:%s"' % m.get_message_id())
