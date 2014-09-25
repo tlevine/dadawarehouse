@@ -3,6 +3,7 @@ import itertools
 import json
 import datetime
 
+from picklecache import cache
 import requests
 from sqlalchemy import desc
 
@@ -61,7 +62,7 @@ def oldest_visit(token):
         'filter_sort_order': 'asc',
         'showColumns': 'serverDate',
     }
-    response = get(url, params = params)
+    response = requests.get(url, params = params)
     rawdate = json.loads(response.text)[0]['serverDate']
     return datetime.datetime.strptime(rawdate, '%Y-%m-%d')
 
@@ -79,7 +80,7 @@ def get_visits(date, offset, token = None):
         'filter_limit': 100,
         'filter_offset': offset,
     }
-    return get(url, params = params)
+    return requests.get(url, params = params)
 
 def reify_visit(v):
     screen_width, screen_height = tuple(map(int, v['resolution'].split('x')))
@@ -119,8 +120,6 @@ def reify_visit(v):
         operatingSystemCode = v['operatingSystemCode'],
         operatingSystemShortName = v['operatingSystemShortName'],
         
-    #   plugins = 'pdf, flash, java, quicktime',
-        
         provider = v['provider'],
         providerName = v['providerName'],
         providerUrl = v['providerUrl'],
@@ -144,6 +143,9 @@ def reify_visit(v):
         visitorId = v['visitorId'],
         visitorType = v['visitorType'],
     )
+    for plugin in v['plugins'].split(', '):
+        setattr(visit, 'plugin_' + plugin, True)
+
     yield visit
     for visit_action_id, action in enumerate(v['actionDetails']):
         time = datetime.time(*map(int, action['serverTimePretty'].split(' ')[-1].split(':')))

@@ -29,12 +29,6 @@ class PiwikVisit(m.Dimension):
     browserName = m.Column(s.String)
     browserVersion = m.Column(s.String)
 
-    city = m.Column(s.String)
-    continent = m.Column(s.String)
-    continentCode = m.Column(s.String)
-    country = m.Column(s.String)
-    countryCode = m.Column(s.String)
-
     daysSinceFirstVisit = m.Column(s.Integer)
     daysSinceLastVisit = m.Column(s.Integer)
 
@@ -45,15 +39,31 @@ class PiwikVisit(m.Dimension):
     firstActionDate = m.Column(s.DateTime)
     lastActionDate = m.Column(s.DateTime)
 
+    city = m.Column(s.String, nullable = True)
+    continent = m.Column(s.String)
+    continentCode = m.Column(s.String)
+    country = m.Column(s.String)
+    countryCode = m.Column(s.String)
     location = m.Column(s.String)
-    latitude = m.Column(s.Float)
-    longitude = m.Column(s.Float)
+    region = m.Column(s.String, nullable = True)
+    regionCode = m.Column(s.String, nullable = True)
+    latitude = m.Column(s.Float, nullable = True)
+    longitude = m.Column(s.Float, nullable = True)
 
     operatingSystem = m.Column(s.String)
     operatingSystemCode = m.Column(s.String)
     operatingSystemShortName = m.Column(s.String)
 
-#   plugins = 'pdf, flash, java, quicktime',
+    plugin_pdf = m.Column(s.Boolean, default = False)
+    plugin_flash = m.Column(s.Boolean, default = False)
+    plugin_java = m.Column(s.Boolean, default = False)
+    plugin_director = m.Column(s.Boolean, default = False)
+    plugin_quicktime = m.Column(s.Boolean, default = False)
+    plugin_realplayer = m.Column(s.Boolean, default = False)
+    plugin_windowsmedia = m.Column(s.Boolean, default = False)
+    plugin_gears = m.Column(s.Boolean, default = False)
+    plugin_silverlight = m.Column(s.Boolean, default = False)
+    plugin_cookie = m.Column(s.Boolean, default = False)
 
     provider = m.Column(s.String)
     providerName = m.Column(s.String)
@@ -62,11 +72,9 @@ class PiwikVisit(m.Dimension):
     referrerKeywordPosition = m.Column(s.Integer, nullable = True)
     referrerName = m.Column(s.String, nullable = True)
     referrerSearchEngineUrl = m.Column(s.String, nullable = True)
-    referrerType = m.Column(s.String)
+    referrerType = m.Column(s.String, nullable = True)
     referrerTypeName = m.Column(s.String)
     referrerUrl = m.Column(s.String, nullable = True)
-    region = m.Column(s.String)
-    regionCode = m.Column(s.String)
 
     screen_width = m.Column(s.Integer)
     screen_height = m.Column(s.Integer)
