@@ -83,7 +83,10 @@ def get_visits(date, offset, token = None):
     return requests.get(url, params = params)
 
 def reify_visit(v):
-    screen_width, screen_height = tuple(map(int, v['resolution'].split('x')))
+    if v['resolution'].count('x') == 1:
+        screen_width, screen_height = tuple(map(int, v['resolution'].split('x')))
+    else:
+        screen_width = screen_height = 0
     visit = PiwikVisit(
         idVisit = int(v['idVisit']),
         serverDateTime = datetime.datetime.fromtimestamp(v['serverTimestamp']),

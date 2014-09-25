@@ -28,7 +28,8 @@ def load_data(engine = None):
         engine = get_engine()
 
     Base.metadata.create_all(engine) 
-    session = sessionmaker(bind=engine)()
+    sm = sessionmaker(bind=engine)
+    session = sm()
 
     piwik(session)
     return
