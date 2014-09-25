@@ -33,6 +33,10 @@ def _fb(Class, session):
         CREATE INDEX facebook_status_current_name
         ON ft_facebookchatstatuschange (current_name);
 
+    Or maybe something like this
+    https://bitbucket.org/zzzeek/sqlalchemy/wiki/UsageRecipes/PostgreSQLInheritance
+
+    Or maybe I can order by primary key?
     '''
     q = session.query(Class.user_id, Class.current_name)\
                .distinct()
