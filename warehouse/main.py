@@ -31,6 +31,7 @@ def load_data(engine = None):
     Base.metadata.create_all(engine) 
     sm = sessionmaker(bind=engine)
 
+    fb(sm())
     master(sm())
     return
 

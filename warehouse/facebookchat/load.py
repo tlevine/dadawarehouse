@@ -135,6 +135,8 @@ def second_pass(session):
 
         CREATE INDEX facebook_status_datetime
         ON ft_facebookchatstatuschange (datetime);
+
+    Or maybe I can order by primary key?
     '''
     Class = FacebookChatStatusChange
   # Class = FacebookMessage
@@ -142,25 +144,23 @@ def second_pass(session):
     q = session.query(Class.user_id,
                       Class.current_name,
                       Class.datetime)\
-               .order_by(Class.user_id,
-                         Class.datetime)
+               .order_by(Class.filedate,
+                         Class.rowid)
 
     session.add_all(name_changes(q))
     session.commit()
     
 def name_changes(q):
-    prev_user = None
-    prev_name = None
+    prev_names = {}
     for user, name, date in q:
-        if user != prev_user:
-            # If this is a new user, reset.
-            logger.info('Scanning user %s (%s) for name changes' % (user, name))
-            prev_user = user
-            prev_name = name
-        elif name != prev_name:
+        if user not in prev_names:
+            prev_names[user] = name
+        elif name != prev_names[user]:
             # If this is the same user but a new name, record it.
             yield FacebookNameChange(user_id = user,
                                      datetime = date,
                                      new_name = name)
-            prev_name = name
+            prev_names[user] = name
+            logger.info('Detected a name change for %s on %s' % \
+                        (user, date.isoformat()))
         # Otherwise, this is the same user with the same name
