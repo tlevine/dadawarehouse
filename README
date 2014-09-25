@@ -9,22 +9,23 @@ Facebook messages
 Facebook chat status changes
     When people go online and offline
 Twitter notifications
-    When people direct message, follow, &c. me.
+    When people direct message, follow, &c. me., based on emails from Twitter
 GnuCash splits
     Along with their transactions, accounts, &c.
 All my emails
     With ordinary email fields
+Web logs from Branchable
+    HTTP requests for http://thomaslevine.com
+Piwik database
+    Stuff that Piwik tracks for http://thomaslevine.com
+Mutt aliases
+    Person and email address
 
 How to use
 =======================================
 Install the package. ::
 
     pip3 install .
-
-You need to enable `fuzzystrmatch` with the Postgres super user.
-
-    $ su postgres 'psql tlevine'
-    > CREATE EXTENSION fuzzystrmatch;
 
 Start loading the data. ::
 
@@ -46,10 +47,6 @@ Here are some other possible cubes or data sources.
 * Other Google services, mainly for stuff from years ago
 * Text messages
 * Meetup.com history
-* Facebook chat
-* Server logs
-* Piwik database
-* Mutt aliases
 
 Some tables to create to assist in the creation of these tools
 
