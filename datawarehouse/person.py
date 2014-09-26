@@ -13,6 +13,7 @@ I use the last of these if the others would be ambiguous
 because different people have the same name.
 '''
 import os
+import csv
 
 import sqlalchemy as s
 from sqlalchemy.orm import relationship, sessionmaker
@@ -72,10 +73,20 @@ file_mapping = [
     ('emailaddress.csv', EmailAddress),
     ('ipaddress.csv', IPAddress),
 ]
+
+def _strip_keys(dictionary):
+    return {k.strip():v for k,v in dictionary.items()}
+
 def load(directory, engine):
     session = sessionmaker(bind=engine)()
     for filename, Class in file_mapping:
-        with open(os.path.join(directory, filename)) as fp:
-            reader = csv.DictReader(fp)
-            session.add_all(Class(**row) for row in reader)
+        path = os.path.join(directory, filename)
+        if os.path.exists(path):
+            with open(path) as fp:
+                reader = csv.DictReader(fp)
+                session.add_all(Class(**_strip_keys(row)) for row in reader)
+        else:
+            with open(path, 'w') as fp:
+                writer = csv.writer(fp)
+                writer.writerow(Class.__table__.columns.keys())
     session.commit()
