@@ -23,7 +23,7 @@ class ShellSession(m.Dimension):
     filename = m.Column(s.String, label = 'File Name')
 
 class ShellCommand(m.Fact):
-    pk = m.PkColumn()
+    pk = m.PkColumn(hide = True)
     shellsession_id = m.FkColumn(ShellSession.pk)
     shellsession = relationship(ShellSession)
     datetime = m.Column(s.DateTime, label = 'Command run')
