@@ -3,7 +3,7 @@ import os
 from sqlalchemy.orm import relationship
 from sqlalchemy import ForeignKey, String, Date
 
-import warehouse.model as m
+import doeund as m
 
 class PalFile(m.Dimension):
     pk = m.Column(String(2), primary_key = True, label = 'Two-letter code')

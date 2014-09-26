@@ -1,6 +1,6 @@
 import sqlalchemy as s
 
-import warehouse.model as m
+import doeund as m
 
 class PiwikAction(m.Fact):
     visit_id = m.Column(s.Integer,

@@ -5,7 +5,7 @@ from itertools import chain
 from notmuch import Database, Query
 import pyzmail
 
-import warehouse.model as m
+import doeund as m
 
 from ..logger import logger
 from .model import EmailMessage, EmailAttachment, EmailCorrespondance

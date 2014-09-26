@@ -3,7 +3,7 @@ import os
 import sqlalchemy as s
 from sqlalchemy.orm import relationship
 
-import warehouse.model as m
+import doeund as m
 
 class TwitterAction(m.Fact):
     pk = m.PkColumn()

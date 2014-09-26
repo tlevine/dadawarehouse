@@ -18,7 +18,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.postgres import CIDR
 
-from doeund.base import Base, Fact, Dimension, Column
+from doeund import Base, Fact, Dimension, Column
 from datamarts import (
     BranchableLog,
     FacebookMessage, FacebookChatStatusChange,
@@ -27,10 +27,8 @@ from datamarts import (
     NotmuchMessage, NotmuchRecipient, NotmuchAttachment,
 )
 
-GidColumn = Column(s.String, nullable = True)
-
 class Person(Dimension):
-    pk = GidColumn
+    pk = Column(s.String, primary_key = True)
     ip_addresses = relationship(IPAddress, lazy = 'dynamic',
         primaryjoin = 'Person.pk == IPAddress.global_id')
     facebooks = relationship(Person, lazy = 'dynamic',
@@ -39,6 +37,8 @@ class Person(Dimension):
         primaryjoin = 'Person.pk == EmailAddress.global_id')
     twitters = relationship(Twitter, lazy = 'dynamic',
         primaryjoin = 'Person.pk == Twitter.global_id')
+
+GidColumn = Column(s.String, s.ForeignKey(Person.pk), nullable = True)
 
 class Facebook(Dimension):
     global_id = GidColumn

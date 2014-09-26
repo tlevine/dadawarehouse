@@ -2,8 +2,8 @@ import os
 
 import sqlalchemy as s
 
-from ..model import Fact
-import warehouse.model as m
+from .model import Fact
+import doeund as m
 
 class FacebookMessage(Fact):
     # Two-column primary key

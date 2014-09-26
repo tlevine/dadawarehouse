@@ -2,7 +2,7 @@ import sqlalchemy as s
 from sqlalchemy.dialects.postgres import CIDR
 from sqlalchemy.orm import relationship
 
-from ..model import Fact, PkColumn, Column
+from doeund import Fact, PkColumn, Column
 
 class BranchableLog(Fact):
     pk = PkColumn()

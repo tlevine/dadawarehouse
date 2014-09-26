@@ -3,7 +3,7 @@ import shlex
 
 from historian_reader.shell import historian
 
-import warehouse.model as m
+import doeund as m
 from ..logger import logger
 from .model import ShellSession, ShellCommand
 

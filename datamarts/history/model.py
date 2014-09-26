@@ -2,7 +2,7 @@ import shlex
 import sqlalchemy as s
 from sqlalchemy.orm import relationship
 
-import warehouse.model as m
+import doeund as m
 from ..logger import logger
 
 def _arg(n, max_n = 3):

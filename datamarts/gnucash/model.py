@@ -1,7 +1,7 @@
 import sqlalchemy as s
 
-from ..model import Fact, Dimension
-import warehouse.model as m
+from .model import Fact, Dimension
+import doeund as m
 
 Guid = s.String(32)
 

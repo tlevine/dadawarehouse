@@ -2,8 +2,8 @@ import os
 import datetime
 
 from ..logger import logger
-import warehouse.model as m
-from .model import CalendarFile, CalendarEvent
+import doeund as m
+from .model import PalFile, PalEvent
 from .parsers import entry, read_date, dates
 
 CALENDARS = [os.path.join(os.path.expanduser('~/.pal'), rest) for rest in [\
@@ -16,8 +16,8 @@ CALENDARS = [os.path.join(os.path.expanduser('~/.pal'), rest) for rest in [\
 ]]
     
 def update(session, calendars = CALENDARS):
-    session.query(CalendarEvent).delete()
-    session.query(CalendarFile).delete()
+    session.query(PalEvent).delete()
+    session.query(PalFile).delete()
 
     for filename in calendars:
 
@@ -35,14 +35,14 @@ def update(session, calendars = CALENDARS):
                     pass
                 elif len(todo) == 0:
                     calendar_code, _, calendar_description = line.partition(' ')
-                    file_record = CalendarFile(
+                    file_record = PalFile(
                         pk = calendar_code,
                         filename = filename,
                         description = calendar_description)
                     todo.append(file_record)
                 else:
                     for date, description in entry(line):
-                        todo.append(CalendarEvent(
+                        todo.append(PalEvent(
                             file = file_record,
                             date = date,
                             description = calendar_description))

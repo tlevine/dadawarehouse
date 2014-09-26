@@ -4,7 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from .model import Base
+from doeund import Base
 from .pal.load import update as pal
 from .history.load import update as history
 from .gnucash.load import update as gnucash

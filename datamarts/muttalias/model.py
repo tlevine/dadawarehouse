@@ -1,6 +1,6 @@
 import sqlalchemy as s
 
-from ..model import Fact, Column
+from .model import Fact, Column
 
 class MuttAlias(Fact):
     pk = Column(s.String, primary_key = True)
