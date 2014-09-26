@@ -31,29 +31,25 @@ GidColumn = Column(s.String, nullable = True)
 
 class Person(Dimension):
     pk = GidColumn
-    ip_addresses = relationship(IPAddress, backref = 'person',
+    ip_addresses = relationship(IPAddress, lazy = 'dynamic',
         primaryjoin = 'Person.pk == IPAddress.global_id')
-    facebooks = relationship(Person, backref = 'person',
+    facebooks = relationship(Person, lazy = 'dynamic',
         primaryjoin = 'Person.pk == Facebook.global_id')
-    email_addresses = relationship(EmailAddress, backref = 'person',
+    email_addresses = relationship(EmailAddress, lazy = 'dynamic',
         primaryjoin = 'Person.pk == EmailAddress.global_id')
-     = relationship(,
-        primaryjoin = 'Person.pk == .global_id')
-     = relationship(,
-        primaryjoin = 'Person.pk == .global_id')
-    twitters = relationship(Twitter, backref = 'person',
+    twitters = relationship(Twitter, lazy = 'dynamic',
         primaryjoin = 'Person.pk == Twitter.global_id')
 
 class Facebook(Dimension):
     global_id = GidColumn
     local_id = Column(s.BigInteger, primary_key = True)
-    messages = relationship(FacebookMessage, 
+    messages = relationship(FacebookMessage, lazy = 'dynamic',
         primaryjoin = 'FacebookMessage.user_id == Facebook.local_id')
-    chat_status_changes = relationship(FacebookChatStatusChange,
+    chat_status_changes = relationship(FacebookChatStatusChange, lazy = 'dynamic',
         primaryjoin = 'FacebookChatStatusChange.user_id == Facebook.local_id')
-    durations = relationship(FacebookDuration,
+    durations = relationship(FacebookDuration, lazy = 'dynamic',
         primaryjoin = 'FacebookDuration.user_id == Facebook.local_id')
-    name_changes = relationship(FacebookNameChange,
+    name_changes = relationship(FacebookNameChange, lazy = 'dynamic',
         primaryjoin = 'FacebookNameChanges.user_id == Facebook.local_id')
 
 class Twitter(Dimension):
