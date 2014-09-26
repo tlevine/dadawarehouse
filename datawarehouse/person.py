@@ -45,29 +45,32 @@ FacebookNameChange.add_join('dim_facebook', [('user_id', 'local_id')])
 
 class Twitter(Dimension):
     global_id = GidColumn()
+    person = relationship(Person)
     local_id = Column(s.String, primary_key = True)
 
 class Name(Fact):
     pk = PkColumn()
     global_id = GidColumn()
+    person = relationship(Person)
     name = Column(s.String)
 
 class IPAddress(Dimension):
     pk = PkColumn()
     global_id = GidColumn()
+    person = relationship(Person)
     ip_address = Column(CIDR)
 
 BranchableLog.add_join('dim_ipaddress', [('ip_address', 'ip_address')])
 
 class EmailAddress(Dimension):
     global_id = GidColumn()
+    person = relationship(Person)
     email_address = Column(s.String, primary_key = True)
 
 NotmuchMessage.add_join('dim_emailaddress', [('email_address', 'from_address')])
 NotmuchMessage.add_join('dim_emailaddress', [('email_address', 'to_address')])
 
 file_mapping = [
-    ('person.csv', Person),
     ('facebook.csv', Facebook),
     ('name.csv', Name),
     ('emailaddress.csv', EmailAddress),
@@ -83,8 +86,11 @@ def load(directory, engine):
         path = os.path.join(directory, filename)
         if os.path.exists(path):
             with open(path) as fp:
-                reader = csv.DictReader(fp)
-                session.add_all(Class(**_strip_keys(row)) for row in reader)
+                rows = list(map(_strip_keys, csv.DictReader(fp)))
+                new_global_ids = set(row['global_id'] for row in rows) - \
+                                 set(session.query(Class.global_id))
+                session.add_all(Person(pk = pk) for pk in new_global_ids)
+                session.add_all(Class(**row) for row in rows)
         else:
             with open(path, 'w') as fp:
                 writer = csv.writer(fp)
