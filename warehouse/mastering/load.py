@@ -52,3 +52,5 @@ def _fb(Class, session):
             logger.info('Added %s from Facebook' % person.pk)
     session.add_all(go())
     session.commit()
+
+# select distinct * from (select distinct to_name, to_address from ft_emailcorrespondance union (select distinct from_name, from_address from ft_emailcorrespondance)) as b limit 8;
