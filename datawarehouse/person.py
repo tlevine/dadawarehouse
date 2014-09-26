@@ -12,9 +12,10 @@ my mutt alias file, which is approximately one of these.
 I use the last of these if the others would be ambiguous
 because different people have the same name.
 '''
+import os
 
 import sqlalchemy as s
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.postgres import CIDR
 

@@ -19,7 +19,6 @@ def load(engine):
     Base.metadata.create_all(engine) 
     sm = sessionmaker(bind=engine)
 
-    pal(sm())
     return
 
     # Import separate data marts in parallel.
