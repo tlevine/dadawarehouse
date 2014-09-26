@@ -29,28 +29,17 @@ from datamarts import (
 
 class Person(Dimension):
     pk = Column(s.String, primary_key = True)
-    ip_addresses = relationship('IPAddress', lazy = 'dynamic',
-        primaryjoin = 'Person.pk == IPAddress.global_id')
-    facebooks = relationship('Person', lazy = 'dynamic',
-        primaryjoin = 'Person.pk == Facebook.global_id')
-    email_addresses = relationship('EmailAddress', lazy = 'dynamic',
-        primaryjoin = 'Person.pk == EmailAddress.global_id')
-    twitters = relationship('Twitter', lazy = 'dynamic',
-        primaryjoin = 'Person.pk == Twitter.global_id')
 
 GidColumn = lambda: Column(s.String, s.ForeignKey(Person.pk), nullable = True)
 
 class Facebook(Dimension):
     global_id = GidColumn()
     local_id = Column(s.BigInteger, primary_key = True)
-    messages = relationship(FacebookMessage, lazy = 'dynamic',
-        primaryjoin = 'FacebookMessage.user_id == Facebook.local_id')
-    chat_status_changes = relationship(FacebookChatStatusChange, lazy = 'dynamic',
-        primaryjoin = 'FacebookChatStatusChange.user_id == Facebook.local_id')
-    durations = relationship(FacebookDuration, lazy = 'dynamic',
-        primaryjoin = 'FacebookDuration.user_id == Facebook.local_id')
-    name_changes = relationship(FacebookNameChange, lazy = 'dynamic',
-        primaryjoin = 'FacebookNameChanges.user_id == Facebook.local_id')
+
+FacebookMessage.add_join('dim_facebook', [('user_id', 'local_id')])
+FacebookChatStatusChange.add_join('dim_facebook', [('user_id', 'local_id')])
+FacebookDuration.add_join('dim_facebook', [('user_id', 'local_id')])
+FacebookNameChange.add_join('dim_facebook', [('user_id', 'local_id')])
 
 class Twitter(Dimension):
     global_id = GidColumn()
@@ -65,13 +54,12 @@ class IPAddress(Dimension):
     pk = PkColumn()
     global_id = GidColumn()
     ip_address = Column(CIDR)
-    branchable_logs = relationship(BranchableLog,
-        primaryjoin = 'BranchableLog.ip_address == IPAddress.ip_address')
+
+BranchableLog.add_join('dim_ipaddress', [('ip_address', 'ip_address')])
 
 class EmailAddress(Dimension):
     global_id = GidColumn()
     email_address = Column(s.String, primary_key = True)
-    emails_from = relationship(NotmuchMessage, lazy = 'dynamic',
-        primaryjoin = 'NotmuchAddress.email_address == NotmuchMessage.from_address')
-    emails_to = relationship(NotmuchMessage, lazy = 'dynamic',
-        primaryjoin = 'NotmuchAddress.email_address == NotmuchMessage.to_address')
+
+NotmuchMessage.add_join('dim_emailaddress', [('email_address', 'from_address')])
+NotmuchMessage.add_join('dim_emailaddress', [('email_address', 'to_address')])
