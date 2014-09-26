@@ -19,8 +19,6 @@ def load(engine):
     Base.metadata.create_all(engine) 
     sm = sessionmaker(bind=engine)
 
-    return
-
     # Import separate data marts in parallel.
     with ThreadPoolExecutor(max_workers = 4) as e:
         # Minutely updates
