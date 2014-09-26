@@ -77,8 +77,8 @@ file_mapping = [
     ('ipaddress.csv', IPAddress),
 ]
 
-def _strip_keys(dictionary):
-    return {k.strip():v for k,v in dictionary.items()}
+def _strip(dictionary):
+    return {k.strip():v.strip() for k,v in dictionary.items()}
 
 def load(directory, engine):
     session = sessionmaker(bind=engine)()
@@ -86,9 +86,10 @@ def load(directory, engine):
         path = os.path.join(directory, filename)
         if os.path.exists(path):
             with open(path) as fp:
-                rows = list(map(_strip_keys, csv.DictReader(fp)))
+                rows = list(map(_strip, csv.DictReader(fp)))
                 new_global_ids = set(row['global_id'] for row in rows) - \
-                                 set(session.query(Class.global_id))
+                                 set(session.query(Person.pk))
+                session.query(Class).delete()
                 session.add_all(Person(pk = pk) for pk in new_global_ids)
                 session.add_all(Class(**row) for row in rows)
         else:
