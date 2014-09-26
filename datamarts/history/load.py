@@ -1,3 +1,4 @@
+import subprocess
 import os
 import shlex
 
@@ -7,10 +8,19 @@ import doeund as m
 from ..logger import logger
 from .model import ShellSession, ShellCommand
 
+HISTORY = os.path.join(os.path.expanduser('~'), 'history')
+
+def download():
+    RSYNC = ['rsync', '--archive', '--sparse']
+    remotes = ['history-nsa', 'history-home', 'history-laptop']
+    rsync = subprocess.Popen(RSYNC + remotes + [HISTORY])
+    rsync.wait()
+
 def update(session):
-    HISTORY = os.path.join(os.path.expanduser('~'), 'history', 'shell')
+    download()
+    shell_history = os.path.join(HISTORY, 'shell')
     previous_shells = (row[0] for row in session.query(ShellSession.filename))
-    for log in historian(directory = HISTORY, skip = previous_shells):
+    for log in historian(directory = shell_history, skip = previous_shells):
         shell_session = ShellSession(filename = log['session'],
                                      datetime = log['session_date'])
         todo = [shell_session]
