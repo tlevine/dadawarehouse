@@ -5,10 +5,12 @@ from sqlalchemy import create_engine
 
 import sys
 sys.path.append('.')
+from doeund import Base
 import datamarts
 import datawarehouse
 
 engine = create_engine('postgres:///tlevine')
-#datamarts.load(engine)
+Base.metadata.create_all(engine) 
 
+#datamarts.load(engine)
 datawarehouse.load(engine)

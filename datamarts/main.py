@@ -4,7 +4,6 @@ from concurrent.futures import ThreadPoolExecutor
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from doeund import Base
 from .pal.load import update as pal
 from .history.load import update as history
 from .gnucash.load import update as gnucash
@@ -16,7 +15,6 @@ from .piwik.load import update as piwik
 from .muttalias.load import update as mutt
 
 def load(engine):
-    Base.metadata.create_all(engine) 
     sm = sessionmaker(bind=engine)
 
     # Import separate data marts in parallel.

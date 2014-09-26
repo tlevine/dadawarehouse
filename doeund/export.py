@@ -17,7 +17,7 @@ def make_cubes(tables):
 
 def aliased_column_name(column):
     alias = '%s_%s' % (re.sub(r'^(?:ft_|dim_)', '', column.table.name), column.name)
-    return '"%s"."%s" AS "%s"' % (table.name, column.name, alias)
+    return '"%s"."%s" AS "%s"' % (column.table.name, column.name, alias)
 
 def unaliased_column_name(column):
     return '"%s"."%s"' % (column.table.name, column.name)
@@ -26,11 +26,11 @@ def columns_to_select(table, aliased = False):
     '''
     Come up with a list of columns to put in the select statement.
     '''
-    from_table = table
     do_not_select = set()
     for on_columns in joins(table):
-        for from_column, _ in on_columns:
-            do_not_select.add(from_column.table.name, from_column.name)
+        to_table = on_columns[0][1].table
+        for from_column, to_column in on_columns:
+            do_not_select.add((from_column.table.name, from_column.name))
         yield from columns_to_select(to_table, aliased = True)
 
     for column in table.columns:
