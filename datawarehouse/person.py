@@ -68,7 +68,7 @@ class EmailAddress(Dimension):
     email_address = Column(s.String, primary_key = True)
 
 NotmuchMessage.add_join('dim_emailaddress', [('from_address', 'email_address')])
-NotmuchMessage.add_join('dim_emailaddress', [('to_address', 'email_address')])
+# NotmuchMessage.add_join('dim_emailaddress', [('to_address', 'email_address')])
 
 file_mapping = [
     ('facebook.csv', Facebook),
@@ -89,8 +89,10 @@ def load(directory, engine):
                 rows = list(map(_strip, csv.DictReader(fp)))
                 new_global_ids = set(row['global_id'] for row in rows) - \
                                  set(session.query(Person.pk))
-                session.query(Class).delete()
+                print(new_global_ids)
+                break
                 session.add_all(Person(pk = pk) for pk in new_global_ids)
+                session.query(Class).delete()
                 session.add_all(Class(**row) for row in rows)
         else:
             with open(path, 'w') as fp:
