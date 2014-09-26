@@ -49,13 +49,13 @@ class Twitter(Dimension):
     local_id = Column(s.String, primary_key = True)
 
 class Name(Fact):
-    pk = PkColumn()
+    pk = PkColumn(hide = True)
     global_id = GidColumn()
     person = relationship(Person)
     name = Column(s.String)
 
 class IPAddress(Dimension):
-    pk = PkColumn()
+    pk = PkColumn(hide = True)
     global_id = GidColumn()
     person = relationship(Person)
     ip_address = Column(CIDR)

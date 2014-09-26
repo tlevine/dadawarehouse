@@ -15,24 +15,27 @@ def make_cubes(tables):
                 columns = list(columns_to_select(table)),
                 joins = list(joins(table)))
 
-def full_column_name(table_name, column_name):
+def aliased_column_name(table_name, column_name):
     alias = '%s_%s' % (re.sub(r'^(?:ft_|dim_)', '', table_name), column_name)
     return '"%s"."%s" AS "%s"' % (table_name, column_name, alias)
 
-def columns_to_select(table):
+def unaliased_column_name(table_name, column_name):
+    return '"%s"."%s"' % (table_name, column_name)
+
+def columns_to_select(table, aliased = False):
     '''
     Come up with a list of columns to put in the select statement.
     '''
     do_not_select = set()
     for from_table, from_columns, to_table, _ in foreign_keys(table):
         for from_column in from_columns:
-            do_not_select.add(full_column_name(from_table.name, from_column.name))
-        yield from columns_to_select(to_table)
+            do_not_select.add((from_table.name, from_column.name))
+        yield from columns_to_select(to_table, aliased = True)
 
     for column in table.columns:
-        name = full_column_name(table.name, column.name)
-        if name not in do_not_select and not column.info['hide']:
-            yield name
+        f = aliased_column_name if aliased else unaliased_column_name
+        if (table.name, column.name) not in do_not_select and not column.info['hide']:
+            yield f(table.name, column.name)
 
 def joins(table):
     '''
