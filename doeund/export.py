@@ -13,7 +13,7 @@ def make_cubes(tables):
             yield create_view.substitute(
                 fact_table_base = fact_table_base,
                 columns = list(columns_to_select(table)),
-                joins = list(joins(table)))
+                joins = list(join_strings(table)))
 
 def aliased_column_name(column):
     alias = '%s_%s' % (re.sub(r'^(?:ft_|dim_)', '', column.table.name), column.name)
@@ -64,8 +64,9 @@ def joins(table):
 
 def join_strings(table):
     for on_columns in joins(table):
+        to_table = on_columns[0][1].table
         for from_column, to_column in on_columns:
-            yield (on_columns[0].table.name, [(
+            yield (to_table, [(
                 unaliased_column_name(from_column),
                 unaliased_column_name(to_column),
             ) for from_column, to_column in on_columns])
