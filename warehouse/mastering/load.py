@@ -53,4 +53,18 @@ def _fb(Class, session):
     session.add_all(go())
     session.commit()
 
-# select distinct * from (select distinct to_name, to_address from ft_emailcorrespondance union (select distinct from_name, from_address from ft_emailcorrespondance)) as b limit 8;
+'''
+INSERT INTO proto_master (context, local_id, global_id)
+SELECT
+  'notmuch_name' AS context,
+  replace(to_name, ' ', '.') AS local_id,
+  to_address AS global_id
+FROM (
+  SELECT DISTINCT to_name, to_address
+  FROM ft_emailcorrespondance
+  UNION (
+    SELECT DISTINCT from_name, from_address
+    FROM ft_emailcorrespondance
+  ) as from_side
+);
+'''
