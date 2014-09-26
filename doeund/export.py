@@ -1,4 +1,5 @@
 import re
+import itertools
 
 from sqlalchemy.sql.schema import ForeignKeyConstraint
 
@@ -11,6 +12,17 @@ def make_cubes(tables):
             yield drop_view.substitute(fact_table_base = fact_table_base)
             yield create_view.substitute(fact_table_base = fact_table_base,
                                          joins = list(joins(table)))
+
+def columns_to_select(table):
+    '''
+    Come up with a list of columns to put in the select statement.
+    '''
+    do_not_select = set()
+    for from_table, from_columns, to_table, to_columns in foreign_keys(table):
+        for from_column in from_columns:
+            do_not_select.add('%s.%s' % (from_table, from_column))
+        for to_column in to_columns:
+            do_not_select.add('%s.%s' % (to_table, to_column))
 
 def joins(table):
     '''
