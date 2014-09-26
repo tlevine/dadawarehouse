@@ -9,7 +9,7 @@ def joins(table):
     List the joins from this fact table to dimension tables.
     '''
     for from_table, from_columns, to_table, to_columns in foreign_keys(table):
-        yield (from_table, to_table, [(
+        yield (to_table, [(
                 '%s.%s' % (from_table, from_column),
                 '%s.%s' % (to_table, to_column),
         ) for from_column, to_column in zip(from_columns, to_columns)])
