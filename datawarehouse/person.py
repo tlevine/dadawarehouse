@@ -67,8 +67,8 @@ class EmailAddress(Dimension):
     person = relationship(Person)
     email_address = Column(s.String, primary_key = True)
 
-NotmuchMessage.add_join('dim_emailaddress', [('email_address', 'from_address')])
-NotmuchMessage.add_join('dim_emailaddress', [('email_address', 'to_address')])
+NotmuchMessage.add_join('dim_emailaddress', [('from_address', 'email_address')])
+NotmuchMessage.add_join('dim_emailaddress', [('to_address', 'email_address')])
 
 file_mapping = [
     ('facebook.csv', Facebook),
