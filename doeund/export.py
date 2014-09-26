@@ -16,7 +16,7 @@ def make_cubes(tables):
                 joins = list(joins(table)))
 
 def full_column_name(table_name, column_name):
-    alias = '%s_%s' % (table_name, column_name)
+    alias = '%s_%s' % (re.sub(r'^(?:ft_|dim_)', '', table_name), column_name)
     return '"%s"."%s" AS "%s"' % (table_name, column_name, alias)
 
 def columns_to_select(table):
