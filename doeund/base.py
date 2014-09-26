@@ -15,4 +15,11 @@ class Dimension(Base):
 
     @declared_attr
     def __tablename__(Class):
+
+class Helper(Base):
+    __abstract__ = True
+
+    @declared_attr
+    def __tablename__(Class):
+        return 'helper_' + Class.__name__.lower()
         return 'dim_' + Class.__name__.lower()

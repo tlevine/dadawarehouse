@@ -12,14 +12,13 @@ class EmailMessage(m.Fact):
     from_name = m.Column(s.String, nullable = True)
     from_address = m.Column(s.String)
 
-class EmailCorrespondance(m.Fact):
+class EmailRecipients(m.Helper):
     '''
     to_address includes CC, BCC
     '''
     pk = m.PkColumn()
     message_id = m.Column(s.String, s.ForeignKey(EmailMessage.message_id))
-    from_name = m.Column(s.String)
-    from_address = m.Column(s.String)
+    message = relationship(EmailMessage)
     to_name = m.Column(s.String)
     to_address = m.Column(s.String)
 
