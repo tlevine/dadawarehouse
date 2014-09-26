@@ -47,7 +47,6 @@ def joins(table):
     foreign keys, use the add_join class method.
     '''
     yield from table.info.get('joins', [])
-
     for constraint in table.constraints:
         if isinstance(constraint, ForeignKeyConstraint):
             from_columns = [col for col in constraint.columns]
@@ -58,8 +57,7 @@ def joins(table):
                 raise AssertionError('This shouldn\'t happen.')
             to_table = to_columns[0].table
 
-            yield [(from_column,to_column) \
-                   for from_column, to_column in zip(from_columns, to_columns)]
+            yield list(zip(from_columns, to_columns))
             yield from joins(to_table)
 
 def join_strings(table):

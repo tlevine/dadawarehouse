@@ -13,9 +13,10 @@ class DadaBase(Base):
         if 'joins' not in from_table.info:
             from_table.info['joins'] = []
 
-        from_table.info['joins'].append([
-            (from_column, to_column) \
-            for from_column, to_column in on_columns])
+        from_table.info['joins'].append([(
+            from_column.table.columns[from_column.name],
+            to_column.table.columns[to_column.name],
+        ) for from_column, to_column in on_columns])
 
 class Fact(DadaBase):
     __abstract__ = True
