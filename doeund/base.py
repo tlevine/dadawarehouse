@@ -14,6 +14,8 @@ class DadaBase(Base):
             '%s.%s' % (from_table.name, from_column_name),
             '%s.%s' % (to_table_name, to_column_name),
         ) for from_column_name, to_column_name in on_columns])
+        if not hasattr(Class.__table__, '__joins__'):
+            Class.__table__.__joins__ = []
         Class.__table__.__joins__.append(the_join)
 
 class Fact(DadaBase):

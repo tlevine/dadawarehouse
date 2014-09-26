@@ -41,13 +41,13 @@ def joins(table):
     "from table" and "to table" from the list in the right
     of the tuple.
     '''
-    yield from table.__joins__
+    yield from getattr(table, '__joins__', [])
     for from_table, from_columns, to_table, to_columns in foreign_keys(table):
         yield (to_table.name, [(
                 '%s.%s' % (from_table.name, from_column.name),
                 '%s.%s' % (to_table.name, to_column.name),
         ) for from_column, to_column in zip(from_columns, to_columns)])
-      # yield from joins(to_table)
+        yield from joins(to_table)
 
 def foreign_keys(table):
     '''
@@ -56,10 +56,12 @@ def foreign_keys(table):
     '''
     for constraint in table.constraints:
         if isinstance(constraint, ForeignKeyConstraint):
-            from_table = table
             from_columns = [col for col in constraint.columns]
+            from_table = constraint.table
 
-            to_table = constraint.table
             to_columns = [fk.column for fk in constraint.elements]
+            if len(set(to_column.table.name for to_column in to_columns)) != 1:
+                raise AssertionError('This shouldn\'t happen.')
+            to_table = to_columns[0].table
 
             yield from_table, from_columns, to_table, to_columns
