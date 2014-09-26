@@ -11,5 +11,4 @@ import datawarehouse
 engine = create_engine('postgres:///tlevine')
 datamarts.load(engine)
 
-directory = os.path.expanduser('~/git/dadawarehouse-manual')
-datawarehouse.load(directory, engine)
+datawarehouse.load(engine)
