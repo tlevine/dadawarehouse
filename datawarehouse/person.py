@@ -89,7 +89,6 @@ def load(directory, engine):
                 rows = list(map(_strip, csv.DictReader(fp)))
                 new_global_ids = set(row['global_id'] for row in rows) - \
                                  set(session.query(Person.pk))
-                print(new_global_ids)
                 break
                 session.add_all(Person(pk = pk) for pk in new_global_ids)
                 session.query(Class).delete()

@@ -19,12 +19,17 @@ def columns_to_select(table):
     '''
     Come up with a list of columns to put in the select statement.
     '''
+    do_not_select = set()
     for from_table, from_columns, to_table, _ in foreign_keys(table):
-        do_not_select = set(from_column.name for from_column in from_columns)
-        for column in from_table.columns:
-            if column.name not in do_not_select:
-                yield '%s.%s' % (from_table.name, from_column.name)
+        for from_column in from_columns:
+            full_column_name = '"%s"."%s"' % (from_table.name, from_column.name)
+            do_not_select.add(full_column_name)
         yield from columns_to_select(to_table)
+
+    for column in table.columns:
+        full_column_name = '"%s"."%s"' % (table.name, column.name)
+        if full_column_name not in do_not_select:
+            yield full_column_name
 
 def joins(table):
     '''
@@ -58,8 +63,8 @@ def joins(table):
     yield from getattr(table, '__joins__', [])
     for from_table, from_columns, to_table, to_columns in foreign_keys(table):
         yield (to_table.name, [(
-                '%s.%s' % (from_table.name, from_column.name),
-                '%s.%s' % (to_table.name, to_column.name),
+                '"%s"."%s"' % (from_table.name, from_column.name),
+                '"%s"."%s"' % (to_table.name, to_column.name),
         ) for from_column, to_column in zip(from_columns, to_columns)])
         yield from joins(to_table)
 
