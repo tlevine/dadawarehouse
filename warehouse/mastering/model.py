@@ -35,7 +35,7 @@ class ProtoMaster(Base):
     '''
     __tablename__ = 'proto_master'
     pk = PkColumn()
-    service = Column(s.String)
+    context = Column(s.String)
     global_id = GidColumn()
     local_id = Column(s.BigInteger)
 
