@@ -62,8 +62,8 @@ def joins(table):
 
 def join_strings(table):
     for on_columns in joins(table):
-        to_table = on_columns[0][1].table
         for from_column, to_column in on_columns:
+            to_table = to_column.table
             yield (to_table, [(
                 unaliased_column_name(from_column),
                 unaliased_column_name(to_column),
