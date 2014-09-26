@@ -10,19 +10,21 @@ def make_cubes(tables):
         if table.name.startswith('ft_'):
             fact_table_base = re.sub(r'^ft_', '', table.name)
             yield drop_view.substitute(fact_table_base = fact_table_base)
-            yield create_view.substitute(fact_table_base = fact_table_base,
-                                         joins = list(joins(table)))
+            yield create_view.substitute(
+                fact_table_base = fact_table_base,
+                columns = list(columns_to_select(table)),
+                joins = list(joins(table)))
 
 def columns_to_select(table):
     '''
     Come up with a list of columns to put in the select statement.
     '''
-    do_not_select = set()
-    for from_table, from_columns, to_table, to_columns in foreign_keys(table):
-        for from_column in from_columns:
-            do_not_select.add('%s.%s' % (from_table, from_column))
-        for to_column in to_columns:
-            do_not_select.add('%s.%s' % (to_table, to_column))
+    for from_table, from_columns, to_table, _ in foreign_keys(table):
+        do_not_select = set(from_column.name for from_column in from_columns)
+        for column in from_table.columns:
+            if column.name not in do_not_select:
+                yield '%s.%s' % (from_table.name, from_column.name)
+        yield from columns_to_select(to_table)
 
 def joins(table):
     '''
