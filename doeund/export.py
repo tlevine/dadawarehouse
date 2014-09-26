@@ -8,7 +8,6 @@ def make_cubes(tables):
     for table in tables.values():
         if table.name.startswith('ft_'):
             fact_table_base = re.sub(r'^ft_', '', table.name)
-            print(fact_table_base)
             yield drop_view.substitute(fact_table_base = fact_table_base)
             yield create_view.substitute(fact_table_base = fact_table_base,
                                          joins = list(joins(table)))
@@ -18,11 +17,11 @@ def joins(table):
     List the joins from this fact table to dimension tables.
     '''
     for from_table, from_columns, to_table, to_columns in foreign_keys(table):
-        yield (to_table, [(
-                '%s.%s' % (from_table, from_column),
-                '%s.%s' % (to_table, to_column),
+        yield (to_table.name, [(
+                '%s.%s' % (from_table.name, from_column.name),
+                '%s.%s' % (to_table.name, to_column.name),
         ) for from_column, to_column in zip(from_columns, to_columns)])
-        yield from joins(to_table)
+#       yield from joins(to_table)
 
 def foreign_keys(table):
     '''
@@ -31,10 +30,10 @@ def foreign_keys(table):
     '''
     for constraint in table.constraints:
         if isinstance(constraint, ForeignKeyConstraint):
-            from_table = table.name
-            from_columns = [col.name for col in constraint.columns]
+            from_table = table
+            from_columns = [col for col in constraint.columns]
 
-            to_table = constraint.table.name
-            to_columns = [fk.column.name for fk in constraint.elements]
+            to_table = constraint.table
+            to_columns = [fk.column for fk in constraint.elements]
 
             yield from_table, from_columns, to_table, to_columns
