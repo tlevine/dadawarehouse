@@ -3,13 +3,13 @@ import os
 import sqlalchemy as s
 from sqlalchemy.orm import relationship
 
-import doeund as m
+from doeund import Fact, PkColumn, Column
 
-class TwitterAction(m.Fact):
-    pk = m.PkColumn(hide = True)
-    user_handle = s.Column(s.String)
-    user_name = s.Column(s.String)
-    datetime = m.Column(s.DateTime)
-    action = s.Column(s.Enum('mention','favorite','retweet','follow','photo',
+class TwitterAction(Fact):
+    pk = PkColumn(hide = True)
+    user_handle = Column(s.String)
+    user_name = Column(s.String)
+    datetime = Column(s.DateTime)
+    action = Column(s.Enum('mention','favorite','retweet','follow','photo',
                              name = 'twitter_action'))
-    message_id = s.Column(s.String)
+    message_id = Column(s.String)

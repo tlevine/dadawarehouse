@@ -15,6 +15,10 @@ def make_cubes(tables):
                 columns = list(columns_to_select(table)),
                 joins = list(joins(table)))
 
+def full_column_name(table_name, column_name):
+    alias = '%s_%s' % (table_name, column_name)
+    return '"%s"."%s" AS "%s"' % (table_name, column_name, alias)
+
 def columns_to_select(table):
     '''
     Come up with a list of columns to put in the select statement.
@@ -22,14 +26,13 @@ def columns_to_select(table):
     do_not_select = set()
     for from_table, from_columns, to_table, _ in foreign_keys(table):
         for from_column in from_columns:
-            full_column_name = '"%s"."%s"' % (from_table.name, from_column.name)
-            do_not_select.add(full_column_name)
+            do_not_select.add(full_column_name(from_table.name, from_column.name))
         yield from columns_to_select(to_table)
 
     for column in table.columns:
-        full_column_name = '"%s"."%s"' % (table.name, column.name)
-        if full_column_name not in do_not_select and not column.info['hide']:
-            yield full_column_name
+        name = full_column_name(table.name, column.name)
+        if name not in do_not_select and not column.info['hide']:
+            yield name
 
 def joins(table):
     '''

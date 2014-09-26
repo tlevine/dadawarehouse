@@ -13,10 +13,8 @@ class Column(s.Column):
         _kwargs = dict(kwargs) # copy it rather than mutating it
         info = _kwargs.pop('info', {})
 
-        if 'hide' not in info and 'hide' in _kwargs:
-            info['hide'] = _kwargs.pop('hide')
-        elif 'hide' not in _kwargs:
-            info['hide'] = False
+        if 'hide' not in info:
+            info['hide'] = _kwargs.pop('hide', False)
 
         if 'label' in _kwargs:
             info['label'] = _kwargs.pop('label')
