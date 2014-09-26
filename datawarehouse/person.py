@@ -32,10 +32,11 @@ class Facebook(Dimension):
     person_id = GidColumn()
     local_id = Column(s.BigInteger, primary_key = True)
 
-FacebookMessage.add_join(Facebook, [('user_id', 'local_id')])
-FacebookChatStatusChange.add_join(Facebook, [('user_id', 'local_id')])
-FacebookDuration.add_join(Facebook, [('user_id', 'local_id')])
-FacebookNameChange.add_join(Facebook, [('user_id', 'local_id')])
+FacebookMessage.add_join([(FacebookMessage.user_id, Facebook.local_id)])
+FacebookChatStatusChange.add_join([(FacebookChatStatusChange.user_id,
+                                  Facebook.local_id)])
+FacebookDuration.add_join([(FacebookDuration.user_id, Facebook.local_id)])
+FacebookNameChange.add_join([(FacebookNameChange.user_id, Facebook.local_id)])
 
 class Twitter(Dimension):
     person_id = GidColumn()
@@ -47,5 +48,5 @@ class EmailAddress(Dimension):
     person = relationship(Person)
     local_id = Column(s.String, primary_key = True)
 
-NotmuchMessage.add_join(EmailAddress, [('from_address', 'local_id')])
+NotmuchMessage.add_join([(NotmuchMessage.from_address, EmailAddress.local_id)])
 # NotmuchMessage.add_join(EmailAddress, [('to_address', 'email_address')])
