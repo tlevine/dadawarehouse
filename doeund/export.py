@@ -2,12 +2,13 @@ import re
 
 from sqlalchemy.sql.schema import ForeignKeyConstraint
 
-from .templates import drop_view, create_view
+from doeund.templates import drop_view, create_view
 
 def make_cubes(tables):
     for table in tables.values():
         if table.name.startswith('ft_'):
             fact_table_base = re.sub(r'^ft_', '', table.name)
+            print(fact_table_base)
             yield drop_view.substitute(fact_table_base = fact_table_base)
             yield create_view.substitute(fact_table_base = fact_table_base,
                                          joins = list(joins(table)))
@@ -30,11 +31,10 @@ def foreign_keys(table):
     '''
     for constraint in table.constraints:
         if isinstance(constraint, ForeignKeyConstraint):
-            for foreign_key in column.foreign_keys:
-                from_table = table.name
-                from_columns = [col.name for col in foreign_key.columns]
+            from_table = table.name
+            from_columns = [col.name for col in constraint.columns]
 
-                to_table = foreign_key.column.table.name
-                to_columns = [fk.column.name for fk in foreign_key.elements]
+            to_table = constraint.table.name
+            to_columns = [fk.column.name for fk in constraint.elements]
 
-                yield from_table, from_columns, to_table, to_columns
+            yield from_table, from_columns, to_table, to_columns

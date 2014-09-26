@@ -1,4 +1,4 @@
-from tempia import Template
+from tempita import Template
 
 drop_view = Template('DROP VIEW IF EXISTS cube_{{fact_table_base}};')
 
