@@ -1,5 +1,7 @@
 import csv
 
+from sqlalchemy.orm import sessionmaker
+
 from .person import Person, Facebook, Twitter, Name, EmailAddress, IPAddress
 
 file_mapping = [
@@ -9,8 +11,10 @@ file_mapping = [
     ('emailaddress.csv', EmailAddress),
     ('ipaddress.csv', IPAddress),
 ]
-def load(session):
+def load(directory, engine):
+    session = sessionmaker(bind=engine)()
     for filename, Class in file_mapping:
-        with open(filename) as fp:
+        with open(os.path.join(directory, filename)) as fp:
             reader = csv.DictReader(fp)
             session.add_all(Class(**row) for row in reader)
+    session.commit()
