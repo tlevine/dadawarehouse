@@ -1,4 +1,6 @@
-A data warehouse for Tom's personal life with the following cubes
+This is a data warehouse for Tom's personal life
+
+We start with these data marts.
 
 Terminal commands
     From shell history files
@@ -21,9 +23,22 @@ Piwik database
 Mutt aliases
     Person and email address
 
-Dimension tables are for things that I probably don't want
-to look at on their own, and fact tables are for things that
-I probably do want to look at on their own.
+I link the following dimensions quite nicely because there is a clear
+one-to-many relationship.
+
+Person
+    Real persons are linked to email addresses, Facebook accounts, &c.
+Dates
+    Dates and datetimes are converted into one thing.
+
+And I have some way of handling these many-to-many relationships.
+
+Fuzzy person
+    Real persons are guessed based on IP addresses, names, &c.
+Topics
+    Whether the fact references a particular topic, probably determined based on the presence of specific URLs and other key words.
+Location
+    I associate the fact with locations based on time zones, persons, topics, &c.
 
 How to use
 =======================================
@@ -57,7 +72,6 @@ Some tables to create to assist in the creation of these tools
 * Unique identifiers for people with links to email addresses, phone
     numbers, &c.
 * Cities I've been in, people I stayed with
-
 
 Structure of the repository
 ==============================
@@ -93,8 +107,8 @@ all the way down. For example, consider the schema below.
 * There is an email address dimension table that contains a global
     person identifier and an email address.
 
-To query this table, we select the email addresses that belong to the
-global person identifier, and then we select the email messages that came
+To query this table, I select the email addresses that belong to the
+global person identifier, and then I select the email messages that came
 from those email addresses.
 
 This is accomplished through a filter on either a join or a subquery.
