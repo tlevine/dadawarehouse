@@ -3,23 +3,27 @@ from sqlalchemy.ext.declarative import \
 
 Base = _declarative_base()
 
-class Fact(Base):
+class DadaBase(Base):
+    __abstract__ = True
+    __joins__ = []
+
+class Fact(DadaBase):
     __abstract__ = True
 
     @declared_attr
     def __tablename__(Class):
         return 'ft_' + Class.__name__.lower()
 
-class Dimension(Base):
+class Dimension(DadaBase):
     __abstract__ = True
 
     @declared_attr
     def __tablename__(Class):
+        return 'dim_' + Class.__name__.lower()
 
-class Helper(Base):
+class Helper(DadaBase):
     __abstract__ = True
 
     @declared_attr
     def __tablename__(Class):
         return 'helper_' + Class.__name__.lower()
-        return 'dim_' + Class.__name__.lower()
