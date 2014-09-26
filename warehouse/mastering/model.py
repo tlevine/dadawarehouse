@@ -16,6 +16,7 @@ because different people have the same name.
 import sqlalchemy as s
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.dialects.postgres import CIDR
 
 from .base import Base, Dimension, Column
 
@@ -43,6 +44,13 @@ class Name(Dimension):
     pk = PkColumn()
     global_id = GidColumn
     name = Column(s.String)
+
+class IPAddress(Dimension):
+    pk = PkColumn()
+    global_id = GidColumn
+    ip_address = Column(CIDR)
+    branchable_logs = relationship(IPAddress,
+        primaryjoin = 'BranchableLog.ip_address == IPAddress.ip_address')
 
 class EmailAddress(Dimension):
     global_id = GidColumn
