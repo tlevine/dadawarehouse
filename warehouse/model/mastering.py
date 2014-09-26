@@ -17,10 +17,7 @@ import sqlalchemy as s
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 
-from ..model import Base, Dimension, Column
-
-def GidColumn():
-    return Column(s.String)
+from .base import Base, Dimension, Column
 
 class ProtoMaster(Base):
     '''
@@ -29,25 +26,24 @@ class ProtoMaster(Base):
     __tablename__ = 'proto_master'
     pk = PkColumn()
     context = Column(s.String)
-    global_id = GidColumn()
-    local_id = Column(s.BigInteger)
+    global_id = Column(s.String)
+    local_id = Column(s.String)
+
+GidColumn = Column(s.String, nullable = True)
 
 class Facebook(Dimension):
-    pk = PkColumn()
-    global_id = GidColumn()
-    local_id = Column(s.BigInteger, unique = True)
+    global_id = GidColumn
+    local_id = Column(s.BigInteger, primary_key = True)
 
 class Twitter(Dimension):
-    pk = PkColumn()
-    global_id = GidColumn()
-    local_id = Column(s.String, unique = True)
+    global_id = GidColumn
+    local_id = Column(s.String, primary_key = True)
 
 class Name(Dimension):
     pk = PkColumn()
-    global_id = GidColumn()
+    global_id = GidColumn
     name = Column(s.String)
 
 class EmailAddress(Dimension):
-    pk = PkColumn()
-    global_id = GidColumn()
-    email_address = Column(s.String, unique = True)
+    global_id = GidColumn
+    email_address = Column(s.String, primary_key = True)
