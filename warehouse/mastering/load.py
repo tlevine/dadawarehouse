@@ -12,6 +12,12 @@ from ..muttalias.model import MuttAlias
 from .model import ProtoMaster
 
 def update(session):
+    proto_master(session)
+
+def master(session):
+    'This is where we populate the Names table.'
+
+def proto_master(session):
     _mutt(session)
     _fb(FacebookChatStatusChange, session)
 
