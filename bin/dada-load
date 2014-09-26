@@ -1,5 +1,15 @@
 #!/usr/bin/env python3
+import os
+
+from sqlalchemy import create_engine
+
 import sys
 sys.path.append('.')
-import datamarts.main
-datamarts.main.load_data()
+import datamarts
+import datawarehouse
+
+engine = create_engine('postgres:///tlevine')
+datamarts.load(engine)
+
+directory = os.path.expanduser('~/git/dadawarehouse-manual')
+datawarehouse.load(directory)

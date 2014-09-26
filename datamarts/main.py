@@ -17,13 +17,7 @@ from .muttalias.load import update as mutt
 
 CACHE_DIRECTORY = os.path.expanduser('~/.dadawarehouse')
 
-def get_engine():
-    return create_engine('postgres:///tlevine')
-
-def load_data(engine = None):
-    if engine == None:
-        engine = get_engine()
-
+def load_data(engine):
     Base.metadata.create_all(engine) 
     sm = sessionmaker(bind=engine)
 
