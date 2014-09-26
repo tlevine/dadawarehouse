@@ -47,25 +47,7 @@ def joins(table):
     foreign keys, use the add_join class method.
     '''
     yield from table.info.get('joins', [])
-    for from_table, from_columns, to_table, to_columns in foreign_keys(table):
-        yield [(from_column,to_column) \
-               for from_column, to_column in zip(from_columns, to_columns)]
-        yield from joins(to_table)
 
-def join_strings(table):
-    for on_columns in joins(table):
-        for from_column, to_column in on_columns:
-            yield (on_columns[0].table.name, [(
-                unaliased_column_name(from_column),
-                unaliased_column_name(to_column),
-            ) for from_column, to_column in on_columns])
-
-
-def foreign_keys(table):
-    '''
-    Columns (usually from other tables) that are referenced by this table's
-    foreign keys
-    '''
     for constraint in table.constraints:
         if isinstance(constraint, ForeignKeyConstraint):
             from_columns = [col for col in constraint.columns]
@@ -76,4 +58,14 @@ def foreign_keys(table):
                 raise AssertionError('This shouldn\'t happen.')
             to_table = to_columns[0].table
 
-            yield from_table, from_columns, to_table, to_columns
+            yield [(from_column,to_column) \
+                   for from_column, to_column in zip(from_columns, to_columns)]
+            yield from joins(to_table)
+
+def join_strings(table):
+    for on_columns in joins(table):
+        for from_column, to_column in on_columns:
+            yield (on_columns[0].table.name, [(
+                unaliased_column_name(from_column),
+                unaliased_column_name(to_column),
+            ) for from_column, to_column in on_columns])
