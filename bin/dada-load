@@ -9,7 +9,7 @@ import datamarts
 import datawarehouse
 
 engine = create_engine('postgres:///tlevine')
-datamarts.load(engine)
+sessionmaker = datamarts.load(engine)
 
 directory = os.path.expanduser('~/git/dadawarehouse-manual')
 datawarehouse.load(directory)
