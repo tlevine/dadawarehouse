@@ -12,8 +12,7 @@ from ..muttalias.model import MuttAlias
 from .model import ProtoMaster
 
 def update(session):
-#   _mutt(session)
-#   _fb(FacebookMessage, session)
+    _mutt(session)
     _fb(FacebookChatStatusChange, session)
 
 def _mutt(session):
@@ -35,33 +34,21 @@ def _mutt(session):
     session.commit()
 
 def _fb(Class, session):
-    '''
-    This index should help. ::
-
-        CREATE INDEX facebook_status_current_name
-        ON ft_facebookchatstatuschange (current_name);
-
-    Or maybe something like this
-    https://bitbucket.org/zzzeek/sqlalchemy/wiki/UsageRecipes/PostgreSQLInheritance
-    '''
     q = session.query(Class.user_id, Class.current_name)\
                .distinct()
-    completed = set()
-    for user_id, name in q:
-        logger.debug('Checking Facebook user %d' % user_id)
-        if name in completed:
-            logger.info('Skipping "%s" because someone else had that name too' % name)
-        else:
-            person_id = unidecode(name.lower().replace(' ', '.'))
-            person = session.query(Person).filter(Person.facebook == user_id).first()
-            if person == None:
-                session.merge(Person(pk = person_id, facebook = user_id))
-                logger.info('Added %s' % person_id)
-            else:
-                condition = and_(Names.name == name, Names.person_id == person.pk)
-                if session.query(Names).filter(condition).first() == None:
-                    session.add(Names(name = name, person_id = person.pk))
-                    session.flush()
-                    logger.info('Added a name for %s' % person.pk)
-            completed.add(name)
+    condition = or_(ProtoMaster.context == 'facebook_name',
+                    ProtoMaster.context == 'facebook_id')
+    session.query(ProtoMaster).filter(context).delete()
+    session.flush()
+    def go():
+        for user_id, name in q:
+            global_id = unidecode(name.lower().replace(' ', '.'))
+            yield ProtoMaster(context = 'facebook_name',
+                              local_id = name,
+                              global_id = global_id)
+            yield ProtoMaster(context = 'facebook_id',
+                              local_id = user_id,
+                              global_id = global_id)
+            logger.info('Added %s from Facebook' % person.pk)
+    session.add_all(go())
     session.commit()
