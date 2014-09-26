@@ -102,10 +102,22 @@ The difficulty is knowing which columns you're allowed to do this on.
 
 How to implement this? I'm thinking that I find some way to encode this
 in the SQLAlchemy objects and then I write something in the base classes
-that allows me to encode the model in R. I'll produce R code that will
-allow me to do these things.
+that allows me to encode the model in R or Postgres. I'll produce R or
+SQL that will allow me to do these things.
 
 * List the cubes.
 * List the dimensions I can use on a cube.
 * Filter cubes based on exact matches.
-* Assemble the full...
+* Assemble the full joined table.
+
+I think I can do all this by creating views that do all the joins and
+add a column per dimension and by perhaps marking that filters are best
+applied to columns that are at the tips of the snowflake (so on global
+person identifiers rather than on email addresses, for example).
+
+I'll wind up with four kinds of tables.
+
+* Dimensions
+* Facts
+* Cubes (views)
+* Helpers (for many-to-many relationships, I think)
