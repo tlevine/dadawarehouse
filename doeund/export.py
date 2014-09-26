@@ -28,7 +28,7 @@ def columns_to_select(table):
 
     for column in table.columns:
         full_column_name = '"%s"."%s"' % (table.name, column.name)
-        if full_column_name not in do_not_select and not column.hide:
+        if full_column_name not in do_not_select and not column.info['hide']:
             yield full_column_name
 
 def joins(table):
