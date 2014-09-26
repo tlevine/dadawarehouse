@@ -5,8 +5,11 @@ import doeund as m
 
 Guid = s.String(32)
 
+class Currency(Dimension):
+    guid = m.Column(Guid, primary_key = True, hide = True)
+
 class Account(Dimension):
-    guid = m.Column(Guid, primary_key = True)
+    guid = m.Column(Guid, primary_key = True, hide = True)
 
     name = m.Column(s.String)
     code = m.Column(s.String)
@@ -17,7 +20,7 @@ class Account(Dimension):
     section = m.Column(s.String, nullable = True)
 
 class Transaction(Dimension):
-    guid = m.Column(Guid, primary_key = True)
+    guid = m.Column(Guid, primary_key = True, hide = True)
     currency = m.Column(Guid)
     post_date = m.Column(s.DateTime)
     enter_date = m.Column(s.DateTime)

@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship
 import doeund as m
 
 class TwitterAction(m.Fact):
-    pk = m.PkColumn()
+    pk = m.PkColumn(hide = True)
     user_handle = s.Column(s.String)
     user_name = s.Column(s.String)
     datetime = m.Column(s.DateTime)

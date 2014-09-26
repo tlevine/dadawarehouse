@@ -6,8 +6,8 @@ import doeund as m
 
 class FacebookMessage(m.Fact):
     # Two-column primary key
-    filedate = m.Column(s.Date, primary_key = True, label = 'File Date')
-    rowid = m.Column(s.Integer, primary_key = True, label = 'Row Id')
+    filedate = m.Column(s.Date, primary_key = True, label = 'File Date', hide = True)
+    rowid = m.Column(s.Integer, primary_key = True, label = 'Row Id', hide = True)
 
     user_id = m.Column(s.BigInteger)
     datetime = m.Column(s.DateTime)
@@ -16,8 +16,8 @@ class FacebookMessage(m.Fact):
 
 class FacebookChatStatusChange(m.Fact):
     # Two-column primary key
-    filedate = m.Column(s.Date, primary_key = True, label = 'File Date')
-    rowid = m.Column(s.Integer, primary_key = True)
+    filedate = m.Column(s.Date, primary_key = True, label = 'File Date', hide = True)
+    rowid = m.Column(s.Integer, primary_key = True, hide = True)
 
     user_id = m.Column(s.BigInteger)
     datetime = m.Column(s.DateTime)
@@ -34,7 +34,7 @@ class FacebookDuration(m.Fact):
     duration = m.Column(s.Integer) # in seconds
 
 class FacebookNameChange(m.Fact):
-    pk = m.PkColumn()
+    pk = m.PkColumn(hide = True)
     user_id = m.Column(s.BigInteger)
     datetime = m.Column(s.DateTime)
     new_name = m.Column(s.String)

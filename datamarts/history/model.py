@@ -18,7 +18,7 @@ def _arg(n, max_n = 3):
     return default
 
 class ShellSession(m.Dimension):
-    pk = m.PkColumn()
+    pk = m.PkColumn(hide = True)
     datetime = m.Column(s.DateTime, label = 'Session start')
     filename = m.Column(s.String, label = 'File Name')
 

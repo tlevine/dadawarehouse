@@ -16,7 +16,7 @@ class NotmuchRecipient(m.Helper):
     '''
     to_address includes CC, BCC
     '''
-    pk = m.PkColumn()
+    pk = m.PkColumn(hide = True)
     message_id = m.Column(s.String, s.ForeignKey(NotmuchMessage.message_id))
     message = relationship(NotmuchMessage)
     to_name = m.Column(s.String)

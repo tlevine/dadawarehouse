@@ -11,7 +11,7 @@ class PalFile(m.Dimension):
     description = m.Column(String)
 
 class PalEvent(m.Fact):
-    pk = m.PkColumn()
+    pk = m.PkColumn(hide = True)
     file_id = m.Column(String(2), ForeignKey(PalFile.pk))
     file = relationship(PalFile)
     date = m.Column(Date)
