@@ -38,10 +38,10 @@ class Facebook(Dimension):
     global_id = GidColumn()
     local_id = Column(s.BigInteger, primary_key = True)
 
-FacebookMessage.add_join('dim_facebook', [('user_id', 'local_id')])
-FacebookChatStatusChange.add_join('dim_facebook', [('user_id', 'local_id')])
-FacebookDuration.add_join('dim_facebook', [('user_id', 'local_id')])
-FacebookNameChange.add_join('dim_facebook', [('user_id', 'local_id')])
+FacebookMessage.add_join(Facebook, [('user_id', 'local_id')])
+FacebookChatStatusChange.add_join(Facebook, [('user_id', 'local_id')])
+FacebookDuration.add_join(Facebook, [('user_id', 'local_id')])
+FacebookNameChange.add_join(Facebook, [('user_id', 'local_id')])
 
 class Twitter(Dimension):
     global_id = GidColumn()
@@ -60,15 +60,15 @@ class IPAddress(Dimension):
     person = relationship(Person)
     ip_address = Column(CIDR)
 
-BranchableLog.add_join('dim_ipaddress', [('ip_address', 'ip_address')])
+BranchableLog.add_join(IPAddress, [('ip_address', 'ip_address')])
 
 class EmailAddress(Dimension):
     global_id = GidColumn()
     person = relationship(Person)
     email_address = Column(s.String, primary_key = True)
 
-NotmuchMessage.add_join('dim_emailaddress', [('from_address', 'email_address')])
-# NotmuchMessage.add_join('dim_emailaddress', [('to_address', 'email_address')])
+NotmuchMessage.add_join(EmailAddress, [('from_address', 'email_address')])
+# NotmuchMessage.add_join(EmailAddress, [('to_address', 'email_address')])
 
 file_mapping = [
     ('facebook.csv', Facebook),
