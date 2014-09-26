@@ -12,10 +12,18 @@ class Column(s.Column):
     def __init__(self, *args, **kwargs):
         _kwargs = dict(kwargs) # copy it rather than mutating it
         info = _kwargs.pop('info', {})
+
+        if 'hide' in _kwargs and hide not in info:
+            info['hide'] = _kwargs.pop('hide')
+        else:
+            info['hide'] = False
+
         if 'label' in _kwargs:
             info['label'] = _kwargs.pop('label')
+
         if 'nullable' not in _kwargs:
             _kwargs['nullable'] = False
+
         s.Column.__init__(self, *args, info = info, **_kwargs)
 
 def FkColumn(column, *args, **kwargs):
