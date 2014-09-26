@@ -78,3 +78,34 @@ Fun ideas
 * Connect website views to emails
 * Length of sentences (Saar Golde's idea)
 * http://www.pcthompson.co.uk/documents/The_Reverse_Star_Schema_v2.1.pdf
+
+Maybe I am gonna write an OLAP server
+==========================================
+Here are some thoughts on that.
+
+I'll define relationships on dimensions such that dimensions point to
+their fact tables. When you slice on dimensions, the server queries the
+dimension table, accesses the relationship, and continues the queries
+all the way down. For example, consider the schema below.
+
+* There is an email message fact table that contains a ``from_address``
+    column.
+* There is an email address dimension table that contains a global
+    person identifier and an email address.
+
+To query this table, we select the email addresses that belong to the
+global person identifier, and then we select the email messages that came
+from those email addresses.
+
+This is accomplished through a filter on either a join or a subquery.
+The difficulty is knowing which columns you're allowed to do this on.
+
+How to implement this? I'm thinking that I find some way to encode this
+in the SQLAlchemy objects and then I write something in the base classes
+that allows me to encode the model in R. I'll produce R code that will
+allow me to do these things.
+
+* List the cubes.
+* List the dimensions I can use on a cube.
+* Filter cubes based on exact matches.
+* Assemble the full...

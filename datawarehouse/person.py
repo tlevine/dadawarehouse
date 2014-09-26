@@ -56,14 +56,10 @@ class Twitter(Dimension):
     global_id = GidColumn
     local_id = Column(s.String, primary_key = True)
 
-class Name(Dimension):
+class Name(Fact):
     pk = PkColumn()
     global_id = GidColumn
     name = Column(s.String)
-    emails_from = relationship(EmailMessage,
-        primaryjoin = 'EmailAddress.name == EmailMessage.from_name')
-   #emails_to = relationship(EmailMessage,
-   #    primaryjoin = 'EmailAddress.email_address == EmailMessage.to_address')
 
 class IPAddress(Dimension):
     pk = PkColumn()
@@ -75,7 +71,7 @@ class IPAddress(Dimension):
 class EmailAddress(Dimension):
     global_id = GidColumn
     email_address = Column(s.String, primary_key = True)
-    emails_from = relationship(EmailMessage,
+    emails_from = relationship(EmailMessage, lazy = 'dynamic',
         primaryjoin = 'EmailAddress.email_address == EmailMessage.from_address')
-   #emails_to = relationship(EmailMessage,
-   #    primaryjoin = 'EmailAddress.email_address == EmailMessage.to_address')
+    emails_to = relationship(EmailMessage, lazy = 'dynamic',
+        primaryjoin = 'EmailAddress.email_address == EmailMessage.to_address')
