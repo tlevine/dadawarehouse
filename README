@@ -21,6 +21,10 @@ Piwik database
 Mutt aliases
     Person and email address
 
+Dimension tables are for things that I probably don't want
+to look at on their own, and fact tables are for things that
+I probably do want to look at on their own.
+
 How to use
 =======================================
 Install the package. ::

@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 
 import warehouse.model as m
 
-class EmailMessage(m.Dimension):
+class EmailMessage(m.Fact):
     message_id = m.Column(s.String, primary_key = True)
     datetime = m.Column(s.DateTime)
     thread_id = m.Column(s.String)

@@ -2,7 +2,7 @@ import os
 
 import sqlalchemy as s
 
-from ..model import Fact, Dimension
+from ..model import Fact
 import warehouse.model as m
 
 class FacebookMessage(Fact):
