@@ -53,11 +53,12 @@ def joins(table):
         yield from joins(to_table)
 
 def join_strings(table):
-    for to_table, on_columns in joins(table):
-        yield (to_table.name, [(
-            unaliased_column_name(from_column),
-            unaliased_column_name(to_column),
-        ) for from_column, to_column in on_columns])
+    for on_columns in joins(table):
+        for from_column, to_column in on_columns:
+            yield (on_columns[0].table.name, [(
+                unaliased_column_name(from_column),
+                unaliased_column_name(to_column),
+            ) for from_column, to_column in on_columns])
 
 
 def foreign_keys(table):
