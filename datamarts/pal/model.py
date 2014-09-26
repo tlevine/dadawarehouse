@@ -6,8 +6,8 @@ from sqlalchemy import ForeignKey, String, Date
 import doeund as m
 
 class PalFile(m.Dimension):
-    pk = m.Column(String(2), primary_key = True, label = 'Two-letter code')
-    filename = m.Column(String, unique = True, label = 'File name')
+    pk = m.Column(String(2), primary_key = True, label = 'Two-letter code', hide = True)
+    filename = m.Column(String, unique = True, label = 'File name', hide = True)
     description = m.Column(String)
 
 class PalEvent(m.Fact):

@@ -45,7 +45,7 @@ def update(session, calendars = CALENDARS):
                         todo.append(PalEvent(
                             file = file_record,
                             date = date,
-                            description = calendar_description))
+                            description = description))
 
         session.add_all(todo)
         session.commit()
