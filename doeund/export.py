@@ -1,14 +1,18 @@
 from sqlalchemy.sql.schema import ForeignKeyConstraint
 
+def make_cubes(tables):
+    for table in tables.values():
+        if table.name.startswith('ft_'):
+
 def joins(table):
     '''
     List the joins from this fact table to dimension tables.
     '''
     for from_table, from_columns, to_table, to_columns in foreign_keys(table):
-        yield [(
+        yield (from_table, to_table, [(
                 '%s.%s' % (from_table, from_column),
                 '%s.%s' % (to_table, to_column),
-        ) for from_column, to_column in zip(from_columns, to_columns)]
+        ) for from_column, to_column in zip(from_columns, to_columns)])
         yield from joins(to_table)
 
 def foreign_keys(table):
