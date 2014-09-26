@@ -17,10 +17,8 @@ from .muttalias.load import update as mutt
 
 CACHE_DIRECTORY = os.path.expanduser('~/.dadawarehouse')
 
-
 def get_engine():
     return create_engine('postgres:///tlevine')
-   #return create_engine('sqlite:////tmp/dada.sqlite')
 
 def load_data(engine = None):
     if engine == None:
@@ -28,6 +26,9 @@ def load_data(engine = None):
 
     Base.metadata.create_all(engine) 
     sm = sessionmaker(bind=engine)
+
+    pal(sm())
+    return
 
     # Import separate data marts in parallel.
     with ThreadPoolExecutor(max_workers = 4) as e:
