@@ -11,4 +11,4 @@ from .branchable.model import BranchableLog
 from .piwik.model import PiwikAction, PiwikVisit
 from .muttalias.model import MuttAlias
 
-from .main import load_data
+from .main import load

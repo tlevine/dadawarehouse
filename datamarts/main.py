@@ -15,9 +15,7 @@ from .branchable.load import update as branchable
 from .piwik.load import update as piwik
 from .muttalias.load import update as mutt
 
-CACHE_DIRECTORY = os.path.expanduser('~/.dadawarehouse')
-
-def load_data(engine):
+def load(engine):
     Base.metadata.create_all(engine) 
     sm = sessionmaker(bind=engine)
 
