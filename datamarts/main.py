@@ -15,8 +15,6 @@ from .branchable.load import update as branchable
 from .piwik.load import update as piwik
 from .muttalias.load import update as mutt
 
-from .mastering.load import update as master
-
 CACHE_DIRECTORY = os.path.expanduser('~/.dadawarehouse')
 
 
@@ -30,10 +28,6 @@ def load_data(engine = None):
 
     Base.metadata.create_all(engine) 
     sm = sessionmaker(bind=engine)
-
-    fb(sm())
-    master(sm())
-    return
 
     # Import separate data marts in parallel.
     with ThreadPoolExecutor(max_workers = 4) as e:
@@ -55,6 +49,3 @@ def load_data(engine = None):
         e.submit(pal, sm())
         e.submit(gnucash, sm())
         e.submit(mutt, sm())
-
-    # Assemble master data
-    master(sm())

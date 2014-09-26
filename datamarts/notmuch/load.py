@@ -8,11 +8,11 @@ import pyzmail
 import doeund as m
 
 from ..logger import logger
-from .model import EmailMessage, EmailAttachment, EmailCorrespondance
+from .model import NotmuchMessage, NotmuchAttachment, NotmuchRecipient
 
 def update(session):
     db = Database()
-    q = session.query(EmailMessage.message_id)
+    q = session.query(NotmuchMessage.message_id)
     past_messages = set(row[0] for row in q.distinct())
     for m in Query(db,'').search_messages():
         message_id = m.get_message_id()
@@ -38,11 +38,9 @@ def correspondances(m):
         for from_name, from_address in pyzm.get_addresses('from'):
             to_pairs = chain(*(pyzm.get_addresses(header) for header in headers))
             for to_name, to_address in to_pairs:
-                yield EmailCorrespondance(message_id = message_id,
-                                          from_name = from_name,
-                                          from_address = from_address,
-                                          to_name = to_name,
-                                          to_address = to_address)
+                yield NotmuchRecipient(message_id = message_id,
+                                       to_name = to_name,
+                                       to_address = to_address)
 
 def message(session, m): 
     filename = m.get_filename()
@@ -50,7 +48,7 @@ def message(session, m):
 
     name, address = parse_email_address(m.get_header('from'))
 
-    return EmailMessage(
+    return NotmuchMessage(
         message_id = m.get_message_id(),
         datetime = datetime.datetime.fromtimestamp(m.get_date()),
         thread_id = m.get_thread_id(),
@@ -64,7 +62,7 @@ def attachments(session, message):
     try:
         for part_number, message_part in enumerate(message.get_message_parts()):
             content_type, name = parse_attachment_name(message_part)
-            yield EmailAttachment(
+            yield NotmuchAttachment(
                 message_id = message.get_message_id(),
                 part_number = part_number,
                 content_type = content_type,
