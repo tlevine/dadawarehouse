@@ -2,10 +2,9 @@ import os
 
 import sqlalchemy as s
 
-from .model import Fact
 import doeund as m
 
-class FacebookMessage(Fact):
+class FacebookMessage(m.Fact):
     # Two-column primary key
     filedate = m.Column(s.Date, primary_key = True, label = 'File Date')
     rowid = m.Column(s.Integer, primary_key = True, label = 'Row Id')
@@ -15,7 +14,7 @@ class FacebookMessage(Fact):
     current_name = m.Column(s.String, label = 'Full Name')
     body = m.Column(s.String)
 
-class FacebookChatStatusChange(Fact):
+class FacebookChatStatusChange(m.Fact):
     # Two-column primary key
     filedate = m.Column(s.Date, primary_key = True, label = 'File Date')
     rowid = m.Column(s.Integer, primary_key = True)
@@ -26,7 +25,7 @@ class FacebookChatStatusChange(Fact):
     status = m.Column(s.Enum('avail','notavail', name = 'faceboook_chat_status'),
                       label = 'New Status')
 
-class FacebookDuration(Fact):
+class FacebookDuration(m.Fact):
     '''
     How long a person was on Facebook each day
     '''
@@ -34,7 +33,7 @@ class FacebookDuration(Fact):
     date = m.Column(s.Date, primary_key = True)
     duration = m.Column(s.Integer) # in seconds
 
-class FacebookNameChange(Fact):
+class FacebookNameChange(m.Fact):
     pk = m.PkColumn()
     user_id = m.Column(s.BigInteger)
     datetime = m.Column(s.DateTime)

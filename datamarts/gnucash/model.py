@@ -1,6 +1,6 @@
 import sqlalchemy as s
 
-from .model import Fact, Dimension
+from doeund import Fact, Dimension
 import doeund as m
 
 Guid = s.String(32)
