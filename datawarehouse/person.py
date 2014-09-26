@@ -30,9 +30,9 @@ from datamarts import (
 )
 
 class Person(Dimension):
-    pk = Column(s.String, primary_key = True)
+    global_id = Column(s.String, primary_key = True)
 
-GidColumn = lambda: Column(s.String, s.ForeignKey(Person.pk), nullable = True)
+GidColumn = lambda: Column(s.String, s.ForeignKey(Person.global_id), nullable = True)
 
 class Facebook(Dimension):
     global_id = GidColumn()
@@ -88,7 +88,7 @@ def load(directory, engine):
             with open(path) as fp:
                 rows = list(map(_strip, csv.DictReader(fp)))
                 new_global_ids = set(row['global_id'] for row in rows) - \
-                                 set(session.query(Person.pk))
+                                 set(session.query(Person.global_id))
                 break
                 session.add_all(Person(pk = pk) for pk in new_global_ids)
                 session.query(Class).delete()
