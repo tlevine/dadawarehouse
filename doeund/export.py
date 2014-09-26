@@ -15,64 +15,50 @@ def make_cubes(tables):
                 columns = list(columns_to_select(table)),
                 joins = list(joins(table)))
 
-def aliased_column_name(table_name, column_name):
-    alias = '%s_%s' % (re.sub(r'^(?:ft_|dim_)', '', table_name), column_name)
-    return '"%s"."%s" AS "%s"' % (table_name, column_name, alias)
+def aliased_column_name(column):
+    alias = '%s_%s' % (re.sub(r'^(?:ft_|dim_)', '', column.table.name), column.name)
+    return '"%s"."%s" AS "%s"' % (table.name, column.name, alias)
 
-def unaliased_column_name(table_name, column_name):
-    return '"%s"."%s"' % (table_name, column_name)
+def unaliased_column_name(column):
+    return '"%s"."%s"' % (column.table.name, column.name)
 
 def columns_to_select(table, aliased = False):
     '''
     Come up with a list of columns to put in the select statement.
     '''
+    from_table = table
     do_not_select = set()
-    for from_table, from_columns, to_table, _ in foreign_keys(table):
-        for from_column in from_columns:
-            do_not_select.add((from_table.name, from_column.name))
+    for on_columns in joins(table):
+        for from_column, _ in on_columns:
+            do_not_select.add(from_column.table.name, from_column.name)
         yield from columns_to_select(to_table, aliased = True)
 
     for column in table.columns:
         f = aliased_column_name if aliased else unaliased_column_name
-        if (table.name, column.name) not in do_not_select and not column.info['hide']:
-            yield f(table.name, column.name)
+        if (column.table.name, column.name) not in do_not_select and not column.info['hide']:
+            yield f(column)
 
 def joins(table):
     '''
-    List the joins from this fact table to dimension tables
-    in the following format. ::
-
-        [('to table', [('[from table].[from column]',
-                        '[to table].[to column]'),
-                       ('[from table].[from column]',
-                        '[to table].[to column]'),
-                       ...]),
-         ('to table', [('[from table].[from column]',
-                        '[to table].[to column]'),
-                       ('[from table].[from column]',
-                        '[to table].[to column]'),
-                       ...]),
-         ...]
+    List the joins from this table.
 
     This automatically detects joins that are encoded as
     foreign keys. If you have joins that are not encoded as
-    foreign keys, set the ``__joins__`` class attribute
-    with the add_join class method.
-
-        Foo.__joins__ = [('dim_emailaddress',
-            ('email_address', 'local_id')]
-
-    This is the same format as above but without the
-    "from table" and "to table" from the list in the right
-    of the tuple.
+    foreign keys, use the add_join class method.
     '''
-    yield from getattr(table, '__joins__', [])
+    yield from table.info.get('joins', [])
     for from_table, from_columns, to_table, to_columns in foreign_keys(table):
-        yield (to_table.name, [(
-                '"%s"."%s"' % (from_table.name, from_column.name),
-                '"%s"."%s"' % (to_table.name, to_column.name),
-        ) for from_column, to_column in zip(from_columns, to_columns)])
+        yield [(from_column,to_column) \
+               for from_column, to_column in zip(from_columns, to_columns)]
         yield from joins(to_table)
+
+def join_strings(table):
+    for to_table, on_columns in joins(table):
+        yield (to_table.name, [(
+            unaliased_column_name(from_column),
+            unaliased_column_name(to_column),
+        ) for from_column, to_column in on_columns])
+
 
 def foreign_keys(table):
     '''

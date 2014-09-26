@@ -5,18 +5,19 @@ Base = _declarative_base()
 
 class DadaBase(Base):
     __abstract__ = True
-    __joins__ = []
 
     @classmethod
-    def add_join(Class, to_table_name, on_columns):
-        from_table = Class.__table__
-        the_join = (to_table_name, [(
-            '%s.%s' % (from_table.name, from_column_name),
-            '%s.%s' % (to_table_name, to_column_name),
-        ) for from_column_name, to_column_name in on_columns])
-        if not hasattr(Class.__table__, '__joins__'):
-            Class.__table__.__joins__ = []
-        Class.__table__.__joins__.append(the_join)
+    def add_join(from_class, on_columns):
+        from_table = from_class.__table__
+        
+        if 'joins' not in from_table.info:
+            from_table.info['joins'] = []
+
+        from_table.info['joins'].append(
+            (to_table, [(
+                (from_table, from_column),
+                (to_table, to_column),
+            ) for from_column, to_column in on_columns]))
 
 class Fact(DadaBase):
     __abstract__ = True
