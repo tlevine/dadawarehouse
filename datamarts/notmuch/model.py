@@ -1,5 +1,6 @@
 import sqlalchemy as s
 from sqlalchemy.orm import relationship
+from sqlalchemy.dialects.postgresql import ARRAY
 
 import doeund as m
 
@@ -11,16 +12,8 @@ class NotmuchMessage(m.Fact):
     subject = m.Column(s.String)
     from_name = m.Column(s.String, nullable = True)
     from_address = m.Column(s.String)
-
-class NotmuchRecipient(m.Helper):
-    '''
-    to_address includes CC, BCC
-    '''
-    pk = m.PkColumn(hide = True)
-    message_id = m.Column(s.String, s.ForeignKey(NotmuchMessage.message_id))
-    message = relationship(NotmuchMessage)
-    to_name = m.Column(s.String)
-    to_address = m.Column(s.String)
+    recipient_names = m.Column(ARRAY(s.String))
+    recipient_addresses = m.Column(ARRAY(s.String, dimensions = 1))
 
 class NotmuchAttachment(m.Fact):
     message_id = m.Column(s.String,
