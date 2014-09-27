@@ -10,10 +10,12 @@ def make_cubes(tables):
         if table.name.startswith('ft_'):
             fact_table_base = re.sub(r'^ft_', '', table.name)
             yield drop_view.substitute(fact_table_base = fact_table_base)
-            yield create_view.substitute(
+            print(create_view.substitute(
                 fact_table_base = fact_table_base,
                 columns = list(columns_to_select(table)),
                 joins = list(join_strings(table)))
+            )
+    exit()
 
 def aliased_column_name(column):
     alias = '%s_%s' % (re.sub(r'^(?:ft_|dim_)', '', column.table.name), column.name)
