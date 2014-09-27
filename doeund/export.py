@@ -46,25 +46,29 @@ def joins(table):
     foreign keys. If you have joins that are not encoded as
     foreign keys, use the add_join class method.
     '''
-    yield from table.info.get('joins', [])
+    for on_columns in table.info.get('joins', []):
+        yield on_columns
+        to_table = on_columns[0][1].table
+        yield from joins(to_table)
+
     for constraint in table.constraints:
         if isinstance(constraint, ForeignKeyConstraint):
             from_columns = [col for col in constraint.columns]
             from_table = constraint.table
 
             to_columns = [fk.column for fk in constraint.elements]
+            to_table = to_columns[0].table
+            yield from joins(to_table)
+
             if len(set(to_column.table.name for to_column in to_columns)) != 1:
                 raise AssertionError('This shouldn\'t happen.')
-            to_table = to_columns[0].table
-
             yield list(zip(from_columns, to_columns))
-            yield from joins(to_table)
+
 
 def join_strings(table):
     for on_columns in joins(table):
-        for from_column, to_column in on_columns:
-            to_table = to_column.table
-            yield (to_table, [(
-                unaliased_column_name(from_column),
-                unaliased_column_name(to_column),
-            ) for from_column, to_column in on_columns])
+        to_table = on_columns[0][1].table
+        yield (to_table, [(
+            unaliased_column_name(from_column),
+            unaliased_column_name(to_column),
+        ) for from_column, to_column in on_columns])
