@@ -30,6 +30,11 @@ def twitter_actions(session, new_messages, old_message_ids):
                                 action = ACTION_NAMES[action],
                                 message_id = message_id,
                                 datetime = date)
+        try:
+            session.commit()
+        except Exception as e:
+            logger.error(e)
+            raise
 
 class actions:
     followed = re.compile(r'(?:(^[^(]+) \()?@([^)]+)\)? is now following you on Twitter!$')
