@@ -30,6 +30,7 @@ GidColumn = lambda: Column(s.String, s.ForeignKey(Person.person_id), nullable = 
 
 class Facebook(Dimension):
     person_id = GidColumn()
+    person = relationship(Person)
     local_id = Column(s.BigInteger, primary_key = True)
 
 FacebookMessage.add_join([(FacebookMessage.user_id, Facebook.local_id)])
