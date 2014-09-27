@@ -5,7 +5,7 @@ import doeund as m
 
 class PiwikAction(m.Fact):
     visit_id = m.Column(s.Integer,
-                        s.ForeignKey('dim_piwikvisit.idVisit'),
+                        s.ForeignKey('ft_piwikvisit.idVisit'),
                         primary_key = True)
     visit_action_id = m.Column(s.Integer, primary_key = True)
 

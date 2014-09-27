@@ -1,4 +1,4 @@
-    '''
+'''
 Mappings between service-specific identifiers and
 global person identifiers for different services
 
@@ -22,7 +22,7 @@ from datamarts import (
     FacebookMessage, FacebookChatStatusChange,
     FacebookDuration, FacebookNameChange,
     MuttAlias,
-    NotmuchMessage, NotmuchRecipient, NotmuchAttachment,
+    NotmuchMessage, NotmuchAttachment,
     PiwikVisit,
     TwitterAction
 )
@@ -38,11 +38,11 @@ class Person(Fact):
     twitters = Array(s.String)
 
 NotmuchMessage.add_join([(NotmuchMessage.from_address, Person.email_addresses)])
-NotmuchMessage.add_join([(NotmuchMessage.recipient_address, Person.email_addresses)])
+NotmuchMessage.add_join([(NotmuchMessage.recipient_addresses, Person.email_addresses)])
 
 # Match on names for email addresses in case we don't have an entity yet
 NotmuchMessage.add_join([(NotmuchMessage.from_name, Person.names)])
-NotmuchMessage.add_join([(NotmuchMessage.recipient_name, Person.names)])
+NotmuchMessage.add_join([(NotmuchMessage.recipient_names, Person.names)])
 
 BranchableLog.add_join([(BranchableLog.ip_address, Person.ip_addresses)])
 

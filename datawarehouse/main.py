@@ -5,20 +5,22 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 from doeund import make_cubes
-from .person import Facebook, EmailAddress, Person
-from .fuzzy_person import Name, IPAddress
+from .person import Person
 
+'''
 file_mapping = [
     ('facebook.csv', Facebook),
     ('name.csv', Name),
     ('emailaddress.csv', EmailAddress),
     ('ipaddress.csv', IPAddress),
 ]
+'''
 
 def _strip(dictionary):
     return {k.strip():v.strip() for k,v in dictionary.items()}
 
 def load(engine):
+    return
     directory = os.path.expanduser('~/git/dadawarehouse-manual')
     load_person(directory, engine)
     session = sessionmaker(engine)()
