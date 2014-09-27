@@ -25,6 +25,9 @@ def update(session):
 
 def new_entries(fp, most_recent):
     for line in fp:
+        if ' + pkBaseURL + ' in line:
+            # This request came from a bot that is bad at parsing Javascript
+            continue
         try:
             e = entry(line)
         except:
