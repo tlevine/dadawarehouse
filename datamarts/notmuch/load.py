@@ -23,27 +23,37 @@ def update(session):
         session.add(message(session, m))
         session.flush() # for foreign key constraints
         session.add_all(attachments(session, m))
-        session.add_all(correspondances(m))
 
         past_messages.add(message_id)
         session.commit()
 
         logger.info('Added message "id:%s"' % m.get_message_id())
 
-def correspondances(m):
-    message_id = m.get_message_id()
+def addresses(m):
     headers = ['to', 'cc', 'bcc']
     with open(m.get_filename(), 'rb') as fp:
         pyzm = pyzmail.PyzMessage.factory(fp)
-        for from_name, from_address in pyzm.get_addresses('from'):
-            to_pairs = chain(*(pyzm.get_addresses(header) for header in headers))
-#           for to_name, to_address in to_pairs:
+
+    tos = pyzm.get_addresses('to')
+    if len(tos) == 0:
+        from_name = from_address = None
+    else:
+        from_name, from_address = tos[0]
+
+    recipients = list(zip(*chain(*(pyzm.get_addresses(header) for header in headers))))
+    if len(recipients) == 0:
+        recipient_names = recipient_addresses = []
+    else:
+        recipient_names, recipient_addresses = recipients
+
+    return from_name, from_address, recipient_names, recipient_addresses
+
 
 def message(session, m): 
     filename = m.get_filename()
     subject = m.get_header('subject')
 
-    name, address = parse_email_address(m.get_header('from'))
+    from_name, from_address, recipient_names, recipient_addresses = addresses(m)
 
     return NotmuchMessage(
         message_id = m.get_message_id(),
@@ -51,8 +61,10 @@ def message(session, m):
         thread_id = m.get_thread_id(),
         filename = filename,
         subject = subject,
-        from_name = name,
-        from_address = address,
+        from_name = from_name,
+        from_address = from_address,
+        recipient_names = recipient_names,
+        recipient_addresses = recipient_names,
     )
 
 def attachments(session, message):

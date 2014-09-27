@@ -17,11 +17,14 @@ from .muttalias.load import update as mutt
 def load(engine):
     sm = sessionmaker(bind=engine)
 
+    notmuch(sm()) # This one crashes
+    return
+
     # Import separate data marts in parallel.
     with ThreadPoolExecutor(max_workers = 8) as e:
         # Minutely updates
         e.submit(history, sm())
-#       e.submit(notmuch, sm()) # This one crashes
+        e.submit(notmuch, sm()) # This one crashes
         e.submit(piwik, sm())
 
         # Daily updates
