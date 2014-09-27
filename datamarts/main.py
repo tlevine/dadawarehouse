@@ -18,10 +18,10 @@ def load(engine):
     sm = sessionmaker(bind=engine)
 
     # Import separate data marts in parallel.
-    with ThreadPoolExecutor(max_workers = 4) as e:
+    with ThreadPoolExecutor(max_workers = 8) as e:
         # Minutely updates
         e.submit(history, sm())
-        e.submit(notmuch, sm())
+#       e.submit(notmuch, sm()) # This one crashes
         e.submit(piwik, sm())
 
         # Daily updates
