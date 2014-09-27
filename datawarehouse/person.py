@@ -14,9 +14,9 @@ because different people have the same name.
 '''
 import sqlalchemy as s
 from sqlalchemy.orm import relationship
-from sqlalchemy.dialects.postgres import CIDR
+from sqlalchemy.dialects.postgres import ARRAY, CIDR
 
-from doeund import Dimension, Column
+from doeund import Fact, Dimension, Column
 from datamarts import (
     BranchableLog,
     FacebookMessage, FacebookChatStatusChange,
@@ -25,7 +25,7 @@ from datamarts import (
     NotmuchMessage, NotmuchRecipient, NotmuchAttachment,
 )
 
-class Person(Dimension):
+class Person(Fact):
     id = Column(s.String, primary_key = True)
 
 GidColumn = lambda: Column(s.String, s.ForeignKey(Person.id), nullable = True)
@@ -51,20 +51,29 @@ class EmailAddress(Dimension):
     person = relationship(Person)
     local_id = Column(s.String, primary_key = True)
 
+Person.add_join([(Person.id, EmailAddress.person_id)])
+
 NotmuchMessage.add_join([(NotmuchMessage.from_address, EmailAddress.local_id)])
 NotmuchMessage.add_join([(NotmuchMessage.recipient_address, EmailAddress.local_id)])
 
-class Name(Dimension):
-    global_id = GidColumn()
+class Name(Fact):
+    person_id = GidColumn()
     person = relationship(Person)
-    local_ids = Column(ARRAY(s.String, dimensions = 1))
+    aliases = Column(ARRAY(s.String, dimensions = 1))
+
+Person.add_join([(Person.id, Name.person_id)])
+
+NotmuchMessage.add_join([(NotmuchMessage.from_name, Name.aliases)])
+NotmuchMessage.add_join([(NotmuchMessage.recipient_name, Name.aliases)])
 
 class IPAddress(Dimension):
-    global_id = GidColumn()
+    person_id = GidColumn()
     person = relationship(Person)
     local_ids = Column(ARRAY(CIDR, dimensions = 1))
 
+BranchableLog.add_join([(BranchableLog.ip_address, IPAddress.local_ids)])
+
 class PiwikVisitorId(Dimension):
-    global_id = GidColumn()
+    person_id = GidColumn()
     person = relationship(Person)
     local_ids = Column(ARRAY(s.String, dimensions = 1))
