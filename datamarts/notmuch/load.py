@@ -17,7 +17,7 @@ def update(session):
     for m in Query(db,'').search_messages():
         message_id = m.get_message_id()
         if message_id in past_messages:
-        #   logger.info('Already imported %s' % message_id)
+            logger.debug('Already imported %s' % message_id)
             continue
 
         session.add(message(session, m))
@@ -28,7 +28,7 @@ def update(session):
         past_messages.add(message_id)
         session.commit()
 
-      # logger.info('Added message "id:%s"' % m.get_message_id())
+        logger.info('Added message "id:%s"' % m.get_message_id())
 
 def correspondances(m):
     message_id = m.get_message_id()

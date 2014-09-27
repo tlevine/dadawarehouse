@@ -18,9 +18,9 @@ def twitter_actions(session, new_messages, old_message_ids):
     for m in new_messages:
         message_id = m.get_message_id()
         if message_id in old_message_ids:
-            logger.info('Already imported %s' % message_id)
+            logger.debug('Already imported Twitter Action from %s' % message_id)
         else:
-            logger.info('Adding %s' % message_id)
+            logger.info('Adding Twitter action from %s' % message_id)
             subject = m.get_header('subject')
             filename = m.get_filename()
             date = datetime.datetime.fromtimestamp(m.get_date())

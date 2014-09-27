@@ -1,16 +1,15 @@
 import os
 import logging
 
-level = logging.DEBUG
 filename = os.path.expanduser('~/.dadawarehouse/warehouse.log')
 
 logger = logging.getLogger('dadawarehouse')
-logger.setLevel(level)
+logger.setLevel(logging.DEBUG)
 
 stream = logging.StreamHandler()
-stream.setLevel(level)
+stream.setLevel(logging.INFO)
 logger.addHandler(stream)
 
 logfile = logging.FileHandler(filename, 'a')
-logfile.setLevel(level)
+logfile.setLevel(logging.DEBUG)
 logger.addHandler(logfile)

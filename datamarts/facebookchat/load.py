@@ -103,22 +103,22 @@ def first_pass(session, today):
                 # The file might not be complete.
                 continue
             elif filedate in already_imported:
-                logger.info('Already imported %s' % filename)
+                logger.debug('Already imported %s' % filename)
                 continue
-            logger.info('Importing %s' % filename)
+            logger.debug('Importing %s' % filename)
 
             # Copy to RAM so it's faster.
             shutil.copy(os.path.join(LOCAL_CHAT, filename), '/tmp/fb.db')
-            logger.info('* Copied database to RAM')
+            logger.debug('* Copied database to RAM')
             engine = sqlalchemy.create_engine('sqlite:////tmp/fb.db')
 
             # Add stuff
             session.add_all(status_changes(engine, filedate, session))
-            logger.info('* Added status changes')
+            logger.debug('* Added status changes')
             session.add_all(messages(engine, filedate, session))
-            logger.info('* Added messages')
+            logger.debug('* Added messages')
             session.add_all(online_durations(engine, filedate, session))
-            logger.info('* Added durations')
+            logger.debug('* Added durations')
 
             # Commit only at the end so that we don't have partial file data.
             session.commit()
