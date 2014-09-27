@@ -31,7 +31,9 @@ Person
 Dates
     Dates and datetimes are converted into one thing.
 
-And I have some way of handling these many-to-many relationships.
+Many-to-many relationships also work; I
+`use <http://docs.sqlalchemy.org/en/latest/dialects/postgresql.html#sqlalchemy.dialects.postgresql.array>`_
+PostgreSQL's `array type <http://www.postgresql.org/docs/9.1/static/arrays.html>`_.
 
 Fuzzy person
     Real persons are guessed based on IP addresses, names, &c.
