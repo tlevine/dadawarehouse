@@ -1,4 +1,4 @@
-'''
+    '''
 Mappings between service-specific identifiers ("local_id")
 and global identifiers ("person_id") for different services
 
@@ -14,7 +14,7 @@ because different people have the same name.
 '''
 import sqlalchemy as s
 from sqlalchemy.orm import relationship
-from sqlalchemy.dialects.postgres import ARRAY, CIDR
+from sqlalchemy.dialects.postgres import CIDR
 
 from doeund import Fact, Dimension, Column
 from datamarts import (
@@ -26,9 +26,7 @@ from datamarts import (
     PiwikVisit,
     TwitterAction
 )
-
-def Array(columntype):
-    return Column(ARRAY(columntype, dimensions = 1))
+from .util import Array
 
 class Person(Fact):
     id = Column(s.String, primary_key = True)

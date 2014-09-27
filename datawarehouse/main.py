@@ -32,6 +32,7 @@ def load_person(directory, engine):
     for filename, Class in file_mapping:
         path = os.path.join(directory, filename)
         if os.path.exists(path):
+            raise NotImplementedError
             with open(path) as fp:
                 rows = list(map(_strip, csv.DictReader(fp)))
                 new_person_ids = set(row['person_id'] for row in rows) - \
