@@ -29,6 +29,17 @@ from datamarts import (
 from .util import Array
 
 class Person(Fact):
+    '''
+    If you have an attribute of a person and want to know the other
+    attributes of the person, filter based on the columns in this table.
+
+    If you have the global identifier of a person and want to filter
+    another cube based on this identifier (treating person as a dimension),
+    you should not use the columns in this table. Instead, you should use
+    the appropriate dimension column within that cube. The cube is a view
+    that recursively applies joins to denormalize a fact table, and this
+    dimesion is included in that denormalized view.
+    '''
     id = Column(s.String, primary_key = True)
     email_addresses = Array(s.String)
     names = Array(s.String)
@@ -36,6 +47,17 @@ class Person(Fact):
     piwiks = Array(s.String)
     facebooks = Array(s.BigInteger)
     twitters = Array(s.String)
+
+PersonId = lambda: Column(s.String, s.ForeignKey(Person.id))
+
+class EmailAddress(Dimension):
+    emailaddress = Column(s.String, primary_key = True)
+    person_id = PersonId()
+
+NotmuchMessage.add_join([(NotmuchMessage.from_address, EmailAddress.emailaddress)])
+NotmuchMessage.add_join([(NotmuchMessage.recipient_addresses, EmailAddress.emailaddress)])
+
+
 
 NotmuchMessage.add_join([(NotmuchMessage.from_address, Person.email_addresses)])
 NotmuchMessage.add_join([(NotmuchMessage.recipient_addresses, Person.email_addresses)])
@@ -51,10 +73,14 @@ PiwikVisit.add_join([(PiwikVisit.visitIp, Person.ip_addresses)])
 
 TwitterAction.add_join([(TwitterAction.user_handle, Person.twitters)])
 
-FacebookMessage.add_join([(FacebookMessage.user_id, Person.facebooks)])
+class Facebook(Dimension):
+    id = Column(s.BigInteger, primary_key = True)
+    person_id = PersonId()
+
+FacebookMessage.add_join([(FacebookMessage.user_id, Facebook.id)])
 FacebookChatStatusChange.add_join([(FacebookChatStatusChange.user_id,
-                                    Person.facebooks)])
-FacebookDuration.add_join([(FacebookDuration.user_id, Person.facebooks)])
-FacebookNameChange.add_join([(FacebookNameChange.user_id, Person.facebooks)])
+                                    Facebook.id)])
+FacebookDuration.add_join([(FacebookDuration.user_id, Facebook.id)])
+FacebookNameChange.add_join([(FacebookNameChange.user_id, Facebook.id)])
 
 Person.add_join([(Person.id, MuttAlias.pk)])
