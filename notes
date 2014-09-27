@@ -12,3 +12,11 @@ tlevine=> select * from employee left join department using(departmentid);
            93 | Levine     | 
 (7 rows)
 
+This is the Xapian error that I need to catch. ::
+
+    q = notmuch.Query(db, '')
+    a = q.search_messages()
+    In [106]: next(a)
+    A Xapian exception occurred when reading header: The revision being read has been discarded - you should call Xapian::Database::reopen() and retry the operation
+    Out[106]: <repr(<notmuch.message.Message at 0x7f9ced3c8048>) failed: notmuch.errors.NullPointerError: >
+
