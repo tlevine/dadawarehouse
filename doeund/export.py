@@ -81,6 +81,8 @@ def join_strings(table):
                 (True, False): 'left-array',
                 (False, True): 'right-array',
             }[are_they_arrays]
+            if join_type == 'right-array' or join_type == 'full-array':
+                raise NotImplementedError('I don\'t think this will work as you expect. Or if it does, it\'ll take a long time.')
 
         yield (join_type, to_table, [(
             unaliased_column_name(from_column),
