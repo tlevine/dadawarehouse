@@ -24,9 +24,9 @@ from datamarts import (
 )
 
 class Person(Dimension):
-    person_id = Column(s.String, primary_key = True)
+    id = Column(s.String, primary_key = True)
 
-GidColumn = lambda: Column(s.String, s.ForeignKey(Person.person_id), nullable = True)
+GidColumn = lambda: Column(s.String, s.ForeignKey(Person.id), nullable = True)
 
 class Facebook(Dimension):
     person_id = GidColumn()

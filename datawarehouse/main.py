@@ -34,10 +34,9 @@ def load_person(directory, engine):
         if os.path.exists(path):
             with open(path) as fp:
                 rows = list(map(_strip, csv.DictReader(fp)))
-                new_person_ids = set(row['global_id'] for row in rows) - \
-                                 set(session.query(Person.person_id))
-                break
-                session.add_all(Person(pk = pk) for pk in new_person_ids)
+                new_person_ids = set(row['person_id'] for row in rows) - \
+                                 set(session.query(Person.id))
+                session.add_all(Person(id = pid) for pid in new_person_ids)
                 session.query(Class).delete()
                 session.add_all(Class(**row) for row in rows)
         else:
