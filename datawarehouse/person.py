@@ -14,9 +14,11 @@ because different people have the same name.
 '''
 import sqlalchemy as s
 from sqlalchemy.orm import relationship
+from sqlalchemy.dialects.postgres import CIDR
 
 from doeund import Dimension, Column
 from datamarts import (
+    BranchableLog,
     FacebookMessage, FacebookChatStatusChange,
     FacebookDuration, FacebookNameChange,
     MuttAlias,
@@ -50,4 +52,19 @@ class EmailAddress(Dimension):
     local_id = Column(s.String, primary_key = True)
 
 NotmuchMessage.add_join([(NotmuchMessage.from_address, EmailAddress.local_id)])
-# NotmuchMessage.add_join(EmailAddress, [('to_address', 'email_address')])
+NotmuchMessage.add_join([(NotmuchMessage.recipient_address, EmailAddress.local_id)])
+
+class Name(Dimension):
+    global_id = GidColumn()
+    person = relationship(Person)
+    local_ids = Column(ARRAY(s.String, dimensions = 1))
+
+class IPAddress(Dimension):
+    global_id = GidColumn()
+    person = relationship(Person)
+    local_ids = Column(ARRAY(CIDR, dimensions = 1))
+
+class PiwikVisitorId(Dimension):
+    global_id = GidColumn()
+    person = relationship(Person)
+    local_ids = Column(ARRAY(s.String, dimensions = 1))
