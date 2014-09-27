@@ -54,16 +54,13 @@ def joins(table):
     for constraint in table.constraints:
         if isinstance(constraint, ForeignKeyConstraint):
             from_columns = [col for col in constraint.columns]
-            from_table = constraint.table
-
             to_columns = [fk.column for fk in constraint.elements]
-            to_table = to_columns[0].table
-            yield from joins(to_table)
-
-            if len(set(to_column.table.name for to_column in to_columns)) != 1:
-                raise AssertionError('This shouldn\'t happen.')
             yield list(zip(from_columns, to_columns))
 
+            to_table = to_columns[0].table
+            if len(set(to_column.table.name for to_column in to_columns)) != 1:
+                raise AssertionError('This shouldn\'t happen.')
+            yield from joins(to_table)
 
 def join_strings(table):
     for on_columns in joins(table):
