@@ -8,13 +8,16 @@ import doeund as m
 from ..logger import logger
 from .model import ShellSession, ShellCommand
 
-HISTORY = os.path.join(os.path.expanduser('~'), 'history')
+HISTORY = os.path.expanduser('~/.dadawarehouse/history')
 
 def download():
     RSYNC = ['rsync', '--archive', '--sparse']
-    remotes = ['history-nsa', 'history-home', 'history-laptop']
-    rsync = subprocess.Popen(RSYNC + remotes + [HISTORY])
-    rsync.wait()
+    subdirectories = ['history-nsa/', 'history-home/', 'history-laptop/']
+    for subdirectory in subdirectories:
+        remote = 'safe:' + os.path.join('rsync', subdirectory)
+        logger.debug(' '.join(RSYNC + [remote, HISTORY]))
+        rsync = subprocess.Popen(RSYNC + [remote, HISTORY])
+        rsync.wait()
 
 def update(session):
     download()
