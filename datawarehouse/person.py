@@ -23,57 +23,34 @@ from datamarts import (
     FacebookDuration, FacebookNameChange,
     MuttAlias,
     NotmuchMessage, NotmuchRecipient, NotmuchAttachment,
+    PiwikVisit,
 )
+
+def Array(columntype):
+    return Column(ARRAY(columntype, dimensions = 1))
 
 class Person(Fact):
     id = Column(s.String, primary_key = True)
+    facebooks = Array(s.BigInteger)
+    twitters = Array(s.String)
+    email_addresses = Array(s.String)
+    names = Array(s.String)
+    ip_addresses = Array(CIDR)
+    piwiks = Array(s.String)
 
-GidColumn = lambda: Column(s.String, s.ForeignKey(Person.id), nullable = True)
-
-class Facebook(Dimension):
-    person_id = GidColumn()
-    person = relationship(Person)
-    local_id = Column(s.BigInteger, primary_key = True)
-
-FacebookMessage.add_join([(FacebookMessage.user_id, Facebook.local_id)])
+FacebookMessage.add_join([(FacebookMessage.user_id, Person.facebooks)])
 FacebookChatStatusChange.add_join([(FacebookChatStatusChange.user_id,
-                                  Facebook.local_id)])
-FacebookDuration.add_join([(FacebookDuration.user_id, Facebook.local_id)])
-FacebookNameChange.add_join([(FacebookNameChange.user_id, Facebook.local_id)])
+                                    Person.facebooks)])
+FacebookDuration.add_join([(FacebookDuration.user_id, Person.facebooks)])
+FacebookNameChange.add_join([(FacebookNameChange.user_id, Person.facebooks)])
 
-class Twitter(Dimension):
-    person_id = GidColumn()
-    person = relationship(Person)
-    local_id = Column(s.String, primary_key = True)
+NotmuchMessage.add_join([(NotmuchMessage.from_address, Person.email_addresses)])
+NotmuchMessage.add_join([(NotmuchMessage.recipient_address, Person.email_addresses)])
 
-class EmailAddress(Dimension):
-    person_id = GidColumn()
-    person = relationship(Person)
-    local_id = Column(s.String, primary_key = True)
+NotmuchMessage.add_join([(NotmuchMessage.from_name, Person.names)])
+NotmuchMessage.add_join([(NotmuchMessage.recipient_name, Person.names)])
 
-Person.add_join([(Person.id, EmailAddress.person_id)])
+BranchableLog.add_join([(BranchableLog.ip_address, Person.ip_addresses)])
 
-NotmuchMessage.add_join([(NotmuchMessage.from_address, EmailAddress.local_id)])
-NotmuchMessage.add_join([(NotmuchMessage.recipient_address, EmailAddress.local_id)])
-
-class Name(Fact):
-    person_id = GidColumn()
-    person = relationship(Person)
-    aliases = Column(ARRAY(s.String, dimensions = 1))
-
-Person.add_join([(Person.id, Name.person_id)])
-
-NotmuchMessage.add_join([(NotmuchMessage.from_name, Name.aliases)])
-NotmuchMessage.add_join([(NotmuchMessage.recipient_name, Name.aliases)])
-
-class IPAddress(Dimension):
-    person_id = GidColumn()
-    person = relationship(Person)
-    local_ids = Column(ARRAY(CIDR, dimensions = 1))
-
-BranchableLog.add_join([(BranchableLog.ip_address, IPAddress.local_ids)])
-
-class PiwikVisitorId(Dimension):
-    person_id = GidColumn()
-    person = relationship(Person)
-    local_ids = Column(ARRAY(s.String, dimensions = 1))
+PiwikVisit.add_join([(PiwikVisit.visitorId, Person.piwiks)])
+PiwikVisit.add_join([(PiwikVisit.visitIp, Person.ip_addresses)])

@@ -1,4 +1,5 @@
 import sqlalchemy as s
+from sqlalchemy.dialects.postgres import CIDR
 
 import doeund as m
 
@@ -82,6 +83,6 @@ class PiwikVisit(m.Fact):
     searches = m.Column(s.Integer)
     visitCount = m.Column(s.Integer)
     visitDuration = m.Column(s.Integer)
-    visitIp = m.Column(s.String)
+    visitIp = m.Column(CIDR)
     visitorId = m.Column(s.String)
     visitorType = m.Column(s.String)

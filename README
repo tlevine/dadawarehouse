@@ -105,17 +105,3 @@ tables are the seeds of cubes and dimension tables aren't. With each of
 the fact tables, I create views that apply all of the joins, remove
 duplicate join keys from the resulting columns, and name the columns
 nicely. I name the view with the prefix "cube".
-
-Missing part
--------------
-At the moment, this doesn't support two-way join relationships, and I
-need to add that. Here's an example of why you would want that.
-
-I want to select Facebook messages based on a person's email address.
-I thus use two joins. I start with the Facebook message table. First,
-I join to the Facebook-person mapper table on the Facebook user
-identifier to get my global person identifier. Second, I join to the
-email address table on the global person identifier to get the email
-address. Then I can select based on email address
-Second, I join 
-* I join the Facebook-person mapper table 
