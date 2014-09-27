@@ -38,7 +38,6 @@ class Person(Fact):
     piwiks = Array(s.String)
     facebooks = Array(s.BigInteger)
     twitters = Array(s.String)
-    mutt = Column(s.String)
 
 NotmuchMessage.add_join([(NotmuchMessage.from_address, Person.email_addresses)])
 NotmuchMessage.add_join([(NotmuchMessage.recipient_address, Person.email_addresses)])
@@ -60,4 +59,4 @@ FacebookChatStatusChange.add_join([(FacebookChatStatusChange.user_id,
 FacebookDuration.add_join([(FacebookDuration.user_id, Person.facebooks)])
 FacebookNameChange.add_join([(FacebookNameChange.user_id, Person.facebooks)])
 
-Person.add_join([(
+Person.add_join([(Person.id, MuttAlias.pk)])
