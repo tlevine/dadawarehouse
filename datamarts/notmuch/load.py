@@ -8,7 +8,7 @@ import pyzmail
 import doeund as m
 
 from ..logger import logger
-from .model import NotmuchMessage, NotmuchAttachment, NotmuchRecipient
+from .model import NotmuchMessage, NotmuchAttachment
 
 def update(session):
     db = Database()
@@ -37,10 +37,7 @@ def correspondances(m):
         pyzm = pyzmail.PyzMessage.factory(fp)
         for from_name, from_address in pyzm.get_addresses('from'):
             to_pairs = chain(*(pyzm.get_addresses(header) for header in headers))
-            for to_name, to_address in to_pairs:
-                yield NotmuchRecipient(message_id = message_id,
-                                       to_name = to_name,
-                                       to_address = to_address)
+#           for to_name, to_address in to_pairs:
 
 def message(session, m): 
     filename = m.get_filename()

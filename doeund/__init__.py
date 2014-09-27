@@ -1,4 +1,4 @@
-from .base import Base, Fact, Dimension, Helper
+from .base import Base, Fact, Dimension
 from .columns import Column, PkColumn, FkColumn
 from .util import d
 from .export import make_cubes as _make_cubes

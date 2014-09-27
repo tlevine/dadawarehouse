@@ -31,10 +31,3 @@ class Dimension(DadaBase):
     @declared_attr
     def __tablename__(Class):
         return 'dim_' + Class.__name__.lower()
-
-class Helper(DadaBase):
-    __abstract__ = True
-
-    @declared_attr
-    def __tablename__(Class):
-        return 'helper_' + Class.__name__.lower()

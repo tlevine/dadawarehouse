@@ -5,7 +5,7 @@ from .facebookchat.model import (
     FacebookMessage, FacebookChatStatusChange,
     FacebookDuration, FacebookNameChange,
 )
-from .notmuch.model import NotmuchMessage, NotmuchAttachment, NotmuchRecipient
+from .notmuch.model import NotmuchMessage, NotmuchAttachment
 from .twitter.model import TwitterAction
 from .branchable.model import BranchableLog
 from .piwik.model import PiwikAction, PiwikVisit

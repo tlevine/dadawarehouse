@@ -1,7 +1,7 @@
 import re
-import itertools
 
 from sqlalchemy.sql.schema import ForeignKeyConstraint
+from sqlalchemy.dialects.postgresql import ARRAY
 
 from doeund.templates import drop_view, create_view
 
@@ -70,7 +70,19 @@ def joins(table):
 def join_strings(table):
     for on_columns in joins(table):
         to_table = on_columns[0][1].table
-        yield (to_table, [(
+
+        if len(on_columns) != 1:
+            join_type = 'normal'
+        else:
+            are_they_arrays = tuple(isinstance(column, ARRAY) for column in on_columns[0])
+            join_type = {
+                (False, False): 'normal',
+                (True, True): 'full-array',
+                (True, False): 'left-array',
+                (False, True): 'right-array',
+            }[are_they_arrays]
+
+        yield (join_type, to_table, [(
             unaliased_column_name(from_column),
             unaliased_column_name(to_column),
         ) for from_column, to_column in on_columns])
