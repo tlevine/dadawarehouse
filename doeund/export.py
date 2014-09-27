@@ -31,7 +31,7 @@ def columns_to_select(table, aliased = False):
         to_table = on_columns[0][1].table
         for from_column, to_column in on_columns:
             do_not_select.add((from_column.table.name, from_column.name))
-        yield from columns_to_select(to_table, aliased = True)
+  #     yield from columns_to_select(to_table, aliased = True)
 
     for column in table.columns:
         f = aliased_column_name if aliased else unaliased_column_name
