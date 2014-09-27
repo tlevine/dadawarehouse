@@ -68,37 +68,12 @@ def message(session, m):
     )
 
 def attachments(session, message):
-    try:
-        for part_number, message_part in enumerate(message.get_message_parts()):
-            content_type, name = parse_attachment_name(message_part)
-            yield NotmuchAttachment(
-                message_id = message.get_message_id(),
-                part_number = part_number,
-                content_type = content_type,
-                name = name
-            )
-    except UnicodeDecodeError:
-        logger.warning('Encoding error at message %s' % message.get_message_id())
-
-def parse_email_address(email_address):
-    'Return (name, email address)'
-    match = re.match(r'(?:(.+) <)?([^>]+)>?', email_address)
-    name = match.group(1)
-    address = match.group(2)
-    return name, address
-
-def parse_attachment_name(headers):
-    if headers.get('Content-Disposition') == 'inline':
-        return None, None
-
-    if 'Content-Type' in headers:
-        match = re.match(r'([^;]+); name="([^"]+)"', headers['Content-Type'])
-        if match:
-            return match.group(1), match.group(2)
-
-    if 'Content-Disposition' in headers:
-        match = re.match(r'attachment; filename="([^"]+)"', headers['Content-Disposition'])
-        if match:
-            return None, match.group(1)
-
-    return None, None
+    with open(message.get_filename(), 'rb') as fp:
+        pyzm = pyzmail.PyzMessage.factory(fp)
+    for part_number, part in enumerate(pyzm.mailparts):
+        yield NotmuchAttachment(
+            message_id = message.get_message_id(),
+            part_number = part_number,
+            content_type = part.type,
+            name = part.filename,
+        )
