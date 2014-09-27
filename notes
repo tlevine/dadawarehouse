@@ -1,0 +1,14 @@
+Use left joins in the cube views. so that we don't lose rows
+
+tlevine=> select * from employee left join department using(departmentid);
+ departmentid |  lastname  | departmentname 
+--------------+------------+----------------
+           31 | Rafferty   | Sales
+           33 | Jones      | Engineering
+           33 | Heisenberg | Engineering
+           34 | Robinson   | Clerical
+           34 | Smith      | Clerical
+              | Williams   | 
+           93 | Levine     | 
+(7 rows)
+
