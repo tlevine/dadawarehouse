@@ -9,7 +9,7 @@ SELECT
 {{endfor}}
 FROM ft_{{fact_table_base}}
 {{for to_table, on_columns in joins}}
-    JOIN {{to_table}} ON
+    LEFT JOIN {{to_table}} ON
   {{if jointype == 'normal'}}
     {{for loop, column_pair in looper(on_columns)}}
       {{py: from_column, to_column = column_pair}}
