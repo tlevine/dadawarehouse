@@ -24,7 +24,7 @@ def aliased_column_name(column):
 def unaliased_column_name(column):
     return '"%s"."%s"' % (column.table.name, column.name)
 
-def columns_to_select(table, aliased = False):
+def columns_to_select(table):
     '''
     Come up with a list of columns to put in the select statement.
     '''
@@ -33,8 +33,13 @@ def columns_to_select(table, aliased = False):
         to_table = on_columns[0][1].table
         for from_column, to_column in on_columns:
             do_not_select.add((from_column.table.name, from_column.name))
-  #     yield from columns_to_select(to_table, aliased = True)
 
+    yield from _columns_one_table(do_not_select, False, table)
+    for on_columns in joins(table):
+        table = on_columns[0][1].table
+        yield from _columns_one_table(do_not_select, True, table)
+
+def _columns_one_table(do_not_select, aliased, table):
     for column in table.columns:
         f = aliased_column_name if aliased else unaliased_column_name
         if (column.table.name, column.name) not in do_not_select and not column.info['hide']:
