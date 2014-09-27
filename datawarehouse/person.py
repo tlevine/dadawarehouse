@@ -1,6 +1,6 @@
     '''
-Mappings between service-specific identifiers ("local_id")
-and global identifiers ("person_id") for different services
+Mappings between service-specific identifiers and
+global person identifiers for different services
 
 The global identifier is in the format that I use in
 my mutt alias file, which is approximately one of these.
