@@ -7,6 +7,7 @@ my mutt alias file, which is approximately one of these.
 
 * ``[first name].[last name]``
 * ``[first name].[middle name].[last name]``
+* ``[nickname]``
 * ``[first name].[last name].[context, like a city]``
 
 I use the last of these if the others would be ambiguous
@@ -57,12 +58,16 @@ class EmailAddress(Dimension):
 NotmuchMessage.add_join([(NotmuchMessage.from_address, EmailAddress.emailaddress)])
 NotmuchMessage.add_join([(NotmuchMessage.recipient_addresses, EmailAddress.emailaddress)])
 
-BranchableLog.add_join([(BranchableLog.ip_address, Person.ip_addresses)])
+# BranchableLog.add_join([(BranchableLog.ip_address, Person.ip_addresses)])
 
-PiwikVisit.add_join([(PiwikVisit.visitorId, Person.piwiks)])
-PiwikVisit.add_join([(PiwikVisit.visitIp, Person.ip_addresses)])
+# PiwikVisit.add_join([(PiwikVisit.visitorId, Person.piwiks)])
+# PiwikVisit.add_join([(PiwikVisit.visitIp, Person.ip_addresses)])
 
-TwitterAction.add_join([(TwitterAction.user_handle, Person.twitters)])
+class Twitter(Dimension):
+    id = Column(s.String, primary_key = True)
+    person_id = PersonId()
+
+TwitterAction.add_join([(TwitterAction.user_handle, Twitter.id)])
 
 class Facebook(Dimension):
     id = Column(s.BigInteger, primary_key = True)
