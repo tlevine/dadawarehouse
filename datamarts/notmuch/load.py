@@ -14,20 +14,31 @@ def update(session):
     db = Database()
     q = session.query(NotmuchMessage.message_id)
     past_messages = set(row[0] for row in q.distinct())
-    for m in Query(db,'').search_messages():
-        message_id = m.get_message_id()
-        if message_id in past_messages:
-            logger.debug('Already imported %s' % message_id)
-            continue
+    try:
+        for m in Query(db,'').search_messages():
+            message_id = m.get_message_id()
+            if message_id in past_messages:
+                logger.debug('Already imported %s' % message_id)
+                continue
 
-        session.add(message(session, m))
-        session.flush() # for foreign key constraints
-        session.add_all(attachments(session, m))
+            session.add(message(session, m))
+            session.flush() # for foreign key constraints
+            session.add_all(attachments(session, m))
 
-        past_messages.add(message_id)
-        session.commit()
+            past_messages.add(message_id)
+            session.commit()
 
-        logger.info('Added message "id:%s"' % m.get_message_id())
+            logger.info('Added message "id:%s"' % m.get_message_id())
+
+    except notmuch.errors.XapianError as e:
+        print('XapianError indeed')
+        print(e)
+        raise
+        session.rollback()
+        update(session)
+    except:
+        raise
+
 
 def addresses(m):
     headers = ['to', 'cc', 'bcc']
