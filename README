@@ -105,3 +105,10 @@ tables are the seeds of cubes and dimension tables aren't. With each of
 the fact tables, I create views that apply all of the joins, remove
 duplicate join keys from the resulting columns, and name the columns
 nicely. I name the view with the prefix "cube".
+
+
+To do
+========
+In the notmuch importer, figure out how to catch this exception. ::
+
+    terminate called after throwing an instance of 'Xapian::DatabaseModifiedError'
