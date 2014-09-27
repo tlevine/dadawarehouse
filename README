@@ -95,45 +95,27 @@ Fun ideas
 * Length of sentences (Saar Golde's idea)
 * http://www.pcthompson.co.uk/documents/The_Reverse_Star_Schema_v2.1.pdf
 
-Maybe I am gonna write an OLAP server
+Something like OLAP
 ==========================================
-Here are some thoughts on that.
+I couldn't figure out how to install or even buy any OLAP server, so I
+just wrote my own thing that I might actually like more.
 
-I'll define relationships on dimensions such that dimensions point to
-their fact tables. When you slice on dimensions, the server queries the
-dimension table, accesses the relationship, and continues the queries
-all the way down. For example, consider the schema below.
+The difference between fact tables and dimension tables is that fact
+tables are the seeds of cubes and dimension tables aren't. With each of
+the fact tables, I create views that apply all of the joins, remove
+duplicate join keys from the resulting columns, and name the columns
+nicely. I name the view with the prefix "cube".
 
-* There is an email message fact table that contains a ``from_address``
-    column.
-* There is an email address dimension table that contains a global
-    person identifier and an email address.
+Missing part
+-------------
+At the moment, this doesn't support two-way join relationships, and I
+need to add that. Here's an example of why you would want that.
 
-To query this table, I select the email addresses that belong to the
-global person identifier, and then I select the email messages that came
-from those email addresses.
-
-This is accomplished through a filter on either a join or a subquery.
-The difficulty is knowing which columns you're allowed to do this on.
-
-How to implement this? I'm thinking that I find some way to encode this
-in the SQLAlchemy objects and then I write something in the base classes
-that allows me to encode the model in R or Postgres. I'll produce R or
-SQL that will allow me to do these things.
-
-* List the cubes.
-* List the dimensions I can use on a cube.
-* Filter cubes based on exact matches.
-* Assemble the full joined table.
-
-I think I can do all this by creating views that do all the joins and
-add a column per dimension and by perhaps marking that filters are best
-applied to columns that are at the tips of the snowflake (so on global
-person identifiers rather than on email addresses, for example).
-
-I'll wind up with four kinds of tables.
-
-* Dimensions
-* Facts
-* Cubes (views)
-* Helpers (for many-to-many relationships, I think)
+I want to select Facebook messages based on a person's email address.
+I thus use two joins. I start with the Facebook message table. First,
+I join to the Facebook-person mapper table on the Facebook user
+identifier to get my global person identifier. Second, I join to the
+email address table on the global person identifier to get the email
+address. Then I can select based on email address
+Second, I join 
+* I join the Facebook-person mapper table 
