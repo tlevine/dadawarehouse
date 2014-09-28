@@ -1,4 +1,5 @@
 import os, subprocess, datetime
+from functools import partial
 
 from sqlalchemy import desc
 
@@ -7,19 +8,24 @@ from ..logger import logger
 from .parser import entry
 from .model import BranchableLog
 
-LOCAL_LOGDUMP = os.path.expanduser('~/.dadawarehouse/branchable-logdump')
+LOCAL_LOGDUMP_DIR = os.path.expanduser('~/.dadawarehouse/branchable-logdump')
 
 def update(session):    
-    if i_should_copy(LOCAL_LOGDUMP):
-        copy_log(LOCAL_LOGDUMP)
+    os.makedirs(LOCAL_LOGDUMP_DIR, exist_ok = True)
+    new_logdump_file = os.path.join(LOCAL_LOGDUMP_DIR, datetime.date.today().isoformat())
+    if i_should_copy(new_logdump_file):
+        copy_log(new_logdump_file)
     most_recent = session.query(BranchableLog.datetime)\
                   .order_by(desc(BranchableLog.datetime))\
                   .limit(1).scalar()
-    try:
-        with open(LOCAL_LOGDUMP) as fp:
-            session.add_all(new_entries(fp, most_recent))
-    except KeyboardInterrupt:
-        pass
+
+    for logdump_file in map(partial(os.path.join, LOCAL_LOGDUMP_DIR), os.listdir(LOCAL_LOGDUMP_DIR)):
+        try:
+            with open(logdump_file) as fp:
+                session.add_all(new_entries(fp, most_recent))
+        except KeyboardInterrupt:
+            break
+
     else:
         session.commit()
 
