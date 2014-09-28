@@ -38,4 +38,4 @@ class FacebookNameChange(m.Fact):
     user_id = m.Column(s.BigInteger)
     datetime = m.Column(s.DateTime)
     new_name = m.Column(s.String)
-    initial_name = m.Column(s.Boolean)
+    is_initial_name = m.Column(s.Boolean)

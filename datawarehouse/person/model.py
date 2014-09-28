@@ -94,13 +94,19 @@ FacebookChatStatusChange.add_join([(FacebookChatStatusChange.user_id,
 FacebookDuration.add_join([(FacebookDuration.user_id, Facebook.id)])
 FacebookNameChange.add_join([(FacebookNameChange.user_id, Facebook.id)])
 
+# I need to union all of these
 class PersonName(Fact):
     'Populate this from a CSV file.'
     name = Column(s.String, primary_key = True)
     person_id = PersonId(primary_key = True)
 
-PersonName.add_union(
-    [(PersonName.name, PiwikVisitorLocation.ip_address)])
-...
+TwitterNameHandle.add_join([(TwitterNameHandle.user_handle, Twitter.id)])
+MuttAlias.add_join([(MuttAlias.pk, Person.id)])
+FacebookNameChange.add_join([(FacebookNameChange.user_id, Facebook.id)])
 
-Person.add_join([(Person.id, MuttAlias.pk)])
+# In the cube view, union to a bunch of other views.
+# The cube is the table for the left column, and the
+# selects are all the columns.
+PersonName.union([(TwitterNameHandle.name, Person.id),
+                  (MuttAlias.name, Person.id),
+                  (FacebookNameChange.new_name, Person.id)])
