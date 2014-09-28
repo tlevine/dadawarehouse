@@ -16,10 +16,10 @@ LEFT JOIN {{to_table}} ON
 {{endfor}}
 {{endfor}}
 {{for union in unions}}
+{{py: selects, table = union}}
 UNION ALL
 SELECT
-  {{for loop, column in looper(union)}}
-  {{py: selects, table = union}}
+  {{for loop, column in looper(selects)}}
   {{column}}{{if not loop.last}},{{endif}}
   {{endfor}}
 FROM {{table}}
