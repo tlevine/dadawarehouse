@@ -27,14 +27,15 @@ def update(session):
         _datetime = datetime.datetime.combine(most_recent.date(), datetime.time())
         date = most_recent.date()
 
+        session.query(PiwikAction)\
+               .filter(PiwikAction.datetime >= _datetime).delete()
         session.query(PiwikVisit)\
                .filter(PiwikVisit.serverDateTime >= _datetime)\
                .delete()
-        session.query(PiwikAction)\
-               .filter(PiwikAction.datetime >= _datetime).delete()
         session.commit()
 
     while date <= datetime.date.today():
+        logger.info('Loading visits for %s' % date.isoformat())
         session.add_all(visits(os.environ[key], date))
         session.commit()
         logger.info('Loaded visits for %s' % date.isoformat())
@@ -99,12 +100,15 @@ def reify_visit(v):
         screen_width, screen_height = tuple(map(int, v['resolution'].split('x')))
     else:
         screen_width = screen_height = 0
+
+    _serverDateTime = datetime.datetime.fromtimestamp(v['serverTimestamp'])
     visit = PiwikVisit(
         idVisit = int(v['idVisit']),
-        serverDateTime = datetime.datetime.fromtimestamp(v['serverTimestamp']),
+
+        serverDateTime = _serverDateTime,
         clientTime = datetime.time(*map(int, v['visitLocalTime'].split(':'))),
 
-        actions = int(v['actions']),
+        n_actions = int(v['actions']),
         browserCode = v['browserCode'],
         browserFamily = v['browserFamily'],
         browserFamilyDescription = v['browserFamilyDescription'],
@@ -160,13 +164,21 @@ def reify_visit(v):
     )
     for plugin in v['plugins'].split(', '):
         setattr(visit, 'plugin_' + plugin, True)
+    visit.actions = list(actions(visit, v['actionDetails'])),
 
-    yield visit
-    for visit_action_id, action in enumerate(v['actionDetails']):
+    yield visit # before because of foreign keys
+
+
+    logger.debug('Assembled Piwik visit %s' % v['idVisit'])
+
+
+
+def actions(visit, actionDetails):
+    for visit_action_id, action in enumerate(actionDetails):
         time = datetime.time(*map(int, action['serverTimePretty'].split(' ')[-1].split(':')))
         _datetime = datetime.datetime.combine(visit.serverDateTime.date(), time)
         yield PiwikAction(
-            visit_id = int(v['idVisit']),
+            visit_id = visit.idVisit,
             visit_action_id = visit_action_id,
 
             page_id = int(action['pageId']),

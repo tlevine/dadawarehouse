@@ -17,6 +17,9 @@ from .muttalias.load import update as mutt
 def load(engine):
     sm = sessionmaker(bind=engine)
 
+    piwik(sm())
+    return
+
     # Import separate data marts in parallel.
     with ThreadPoolExecutor(max_workers = 8) as e:
         # Minutely updates
