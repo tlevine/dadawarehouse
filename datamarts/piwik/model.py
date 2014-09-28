@@ -87,6 +87,6 @@ class PiwikVisit(m.Fact):
     visitorId = m.Column(s.String)
     visitorType = m.Column(s.String)
 
-class PiwikVisitorLocation(Fact):
-    ip_address = Column(CIDR, primary_key = True)
-    visitor_id = Column(s.String, primary_key = True)
+class PiwikVisitorLocation(m.Fact):
+    ip_address = m.Column(CIDR, primary_key = True)
+    visitor_id = m.Column(s.String, primary_key = True)

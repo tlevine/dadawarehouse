@@ -15,6 +15,6 @@ class TwitterAction(Fact):
                            name = 'twitter_action'), default = 'other')
     message_id = Column(s.String)
 
-class TwitterNameHandles(m.Fact):
-    name = m.Column(s.String, primary_key = True)
-    user_handle = m.Column(s.String, primary_key = True)
+class TwitterNameHandle(Fact):
+    name = Column(s.String, primary_key = True)
+    user_handle = Column(s.String, primary_key = True)

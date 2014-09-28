@@ -26,14 +26,14 @@ class Fact(DadaBase):
         return 'ft_' + Class.__name__.lower()
 
     @classmethod
-    def union(Class, table, columns):
+    def union(Class, OtherClass, columns):
         '''
         A query to this fact's cube view will include all of the
         fact table columns plus the selected columns from the union.
         '''
-        if 'unions' not in from_table.info:
-            from_table.info['unions'] = []
-        Class.__table__.info['unions'].append((table, columns))
+        if 'unions' not in Class.__table__.info:
+            Class.__table__.info['unions'] = []
+        Class.__table__.info['unions'].append((OtherClass.__table__, columns))
 
 class Dimension(DadaBase):
     __abstract__ = True
