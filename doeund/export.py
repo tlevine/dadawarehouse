@@ -13,7 +13,8 @@ def make_cubes(tables):
             yield create_view.substitute(
                 fact_table_base = fact_table_base,
                 columns = list(columns_to_select(table)),
-                joins = list(join_strings(table)))
+                joins = list(join_strings(table))
+                unions = list(union_strings(table)))
 
 def aliased_column_name(column):
     alias = '%s_%s' % (re.sub(r'^(?:ft_|dim_)', '', column.table.name), column.name)
@@ -71,20 +72,7 @@ def join_strings(table):
     for on_columns in joins(table):
         to_table = on_columns[0][1].table
 
-        if len(on_columns) != 1:
-            join_type = 'normal'
-        else:
-            are_they_arrays = tuple(isinstance(column, ARRAY) for column in on_columns[0])
-            join_type = {
-                (False, False): 'normal',
-                (True, True): 'full-array',
-                (True, False): 'left-array',
-                (False, True): 'right-array',
-            }[are_they_arrays]
-            if join_type == 'right-array' or join_type == 'full-array':
-                raise NotImplementedError('I don\'t think this will work as you expect. Or if it does, it\'ll take a long time.')
-
-        yield (join_type, to_table, [(
+        yield (to_table, [(
             unaliased_column_name(from_column),
             unaliased_column_name(to_column),
         ) for from_column, to_column in on_columns])

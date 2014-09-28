@@ -9,22 +9,11 @@ SELECT
 {{endfor}}
 FROM ft_{{fact_table_base}}
 {{for to_table, on_columns in joins}}
-    LEFT JOIN {{to_table}} ON
-  {{if jointype == 'normal'}}
-    {{for loop, column_pair in looper(on_columns)}}
-      {{py: from_column, to_column = column_pair}}
-      {{from_column}} = {{to_column}} {{if not loop.last}} AND{{endif}}
-    {{endfor}}
-  {{elif jointype == 'left-array'}}
-    {{py: from_column, to_column = on_columns[0]}}
-    ANY ({{from_column}}) = {{to_column}}
-  {{elif jointype == 'right-array'}}
-    {{py: from_column, to_column = on_columns[0]}}
-    {{from_column}} = ANY ({{to_column}})
-  {{elif jointype == 'full-array'}}
-    {{py: from_column, to_column = on_columns[0]}}
-    ANY ({{from_column}}) = ANY ({{to_column}})
-  {{endif}}
+LEFT JOIN {{to_table}} ON
+{{for loop, column_pair in looper(on_columns)}}
+  {{py: from_column, to_column = column_pair}}
+  {{from_column}} = {{to_column}} {{if not loop.last}} AND{{endif}}
+{{endfor}}
 {{endfor}}
 {{for union in unions}}
 UNION ALL
