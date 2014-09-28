@@ -5,6 +5,15 @@ from collections import defaultdict
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
+from datamarts import (
+    BranchableLog,
+    FacebookNameChange,
+    MuttAlias,
+    NotmuchMessage,
+    PiwikVisit,
+    TwitterAction
+)
+
 from .model import Person
 
 file_mapping = [
@@ -18,6 +27,9 @@ file_mapping = [
 
 def _strip(dictionary):
     return {k.strip():v.strip() for k,v in dictionary.items()}
+
+def load_notmuch(session):
+    session.query(Notmuch
 
 def load_csv(directory, engine):
     session = sessionmaker(bind=engine)()

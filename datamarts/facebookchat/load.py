@@ -86,7 +86,7 @@ def online_durations(engine, filedate, session):
         )
 
 def update(session, today = datetime.date.today()):
-   #first_pass(session, today)
+    first_pass(session, today)
     second_pass(session)
 
 def first_pass(session, today):
