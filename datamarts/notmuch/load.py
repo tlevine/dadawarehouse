@@ -1,6 +1,9 @@
+from io import StringIO
+import sys
 import re
 import datetime
 from itertools import chain
+import subprocess
 
 from notmuch import Database, Query
 import pyzmail
@@ -11,34 +14,31 @@ from ..logger import logger
 from .model import NotmuchMessage, NotmuchAttachment
 
 def update(session):
+    if offlineimap_is_running():
+        raise EnvironmentError('In case offlineimap runs "notmuch new", you should stop offlineimap while importing data from notmuch.')
     db = Database()
     q = session.query(NotmuchMessage.message_id)
     past_messages = set(row[0] for row in q.distinct())
-    try:
-        for m in Query(db,'').search_messages():
-            message_id = m.get_message_id()
-            if message_id in past_messages:
-                logger.debug('Already imported %s' % message_id)
-                continue
+    for m in Query(db,'').search_messages():
+        message_id = m.get_message_id()
+        if message_id in past_messages:
+            logger.debug('Already imported %s' % message_id)
+            continue
 
-            session.add(message(session, m))
-            session.flush() # for foreign key constraints
-            session.add_all(attachments(session, m))
+        session.add(message(session, m))
+        session.flush() # for foreign key constraints
+        session.add_all(attachments(session, m))
 
-            past_messages.add(message_id)
-            session.commit()
+        past_messages.add(message_id)
+        session.commit()
 
-            logger.info('Added message "id:%s"' % m.get_message_id())
+        logger.info('Added message "id:%s"' % m.get_message_id())
 
-    except notmuch.errors.XapianError as e:
-        print('XapianError indeed')
-        print(e)
-        raise
-        session.rollback()
-        update(session)
-    except:
-        raise
-
+def offlineimap_is_running():
+    pgrep = subprocess.Popen(['pgrep', 'offlineimap'], stdout = subprocess.PIPE)
+    pgrep.wait()
+    stdout, stderr = pgrep.communicate()
+    return len(stdout) > 0
 
 def addresses(m):
     headers = ['to', 'cc', 'bcc']
