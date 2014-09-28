@@ -104,9 +104,10 @@ TwitterNameHandle.add_join([(TwitterNameHandle.user_handle, Twitter.id)])
 MuttAlias.add_join([(MuttAlias.pk, Person.id)])
 FacebookNameChange.add_join([(FacebookNameChange.user_id, Facebook.id)])
 
-# In the cube view, union to a bunch of other views.
-# The cube is the table for the left column, and the
-# selects are all the columns.
-PersonName.union([(TwitterNameHandle.name, Person.id),
-                  (MuttAlias.name, Person.id),
-                  (FacebookNameChange.new_name, Person.id)])
+# In the cube view, union to a bunch of other views,
+# selecting the specified columns.
+PersonName.union([
+    (TwitterNameHandle, (TwitterNameHandle.name, Person.id)),
+    (MuttAlias, (MuttAlias.name, Person.id)),
+    (FacebookNameChange, (FacebookNameChange.new_name, Person.id)),
+])
