@@ -24,7 +24,7 @@ from datamarts import (
     FacebookDuration, FacebookNameChange,
     MuttAlias,
     NotmuchMessage, NotmuchAttachment,
-    PiwikVisit,
+    PiwikVisit, PiwikVisitorLocation,
     TwitterAction
 )
 from .util import Array
@@ -58,16 +58,13 @@ class EmailAddress(Dimension):
 NotmuchMessage.add_join([(NotmuchMessage.from_address, EmailAddress.emailaddress)])
 NotmuchMessage.add_join([(NotmuchMessage.recipient_addresses, EmailAddress.emailaddress)])
 
-class IPAddress(Fact):
-    
-# BranchableLog.add_join([(BranchableLog.ip_address, Person.ip_addresses)])
-
 class PiwikVisitor(Dimension):
     id = Column(s.String, primary_key = True)
     person_id = PersonId()
 
 PiwikVisit.add_join([(PiwikVisit.visitorId, PiwikVisitor.id)])
-# PiwikVisit.add_join([(PiwikVisit.visitIp, Person.ip_addresses)])
+PiwikVisitorLocation.add_join(
+    [(PiwikVisitorLocation.visitor_id, PiwikVisitor.id)])
 
 class Twitter(Dimension):
     id = Column(s.String, primary_key = True)
