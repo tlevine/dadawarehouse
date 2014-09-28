@@ -43,7 +43,7 @@ def load_csv(directory, engine):
 
                 person_sets = defaultdict(lambda: set())
                 for row in rows:
-                    person_sets[row['person_id']].add(row['id'])
+                    person_sets[row['person_id']].add(row['value'])
                 for person_id, local_ids in person_sets.items():
                     session.query(Person)\
                            .filter(id = row['person_id'])\
@@ -51,7 +51,11 @@ def load_csv(directory, engine):
 
                 if Class != None:
                     session.query(Class).delete()
-                    session.add_all(Class(**row) for row in rows)
+                    records = (Class(person_id = row['person_id'],
+                                     id = row['value'])\
+                               for row in rows)
+                    session.add_all(records)
+
         else:
             with open(path, 'w') as fp:
                 writer = csv.writer(fp)
