@@ -33,10 +33,10 @@ def load_person(session, directory):
             with open(path) as fp:
                 rows = list(map(_strip, csv.DictReader(fp)))
 
-            new_person_ids = set(row['person_id'] for row in rows) - \
-                             set(session.query(Person.id))
-            session.add_all(Person(id = pid) for pid in new_person_ids)
-
+            old_person_ids = set(row[0] for row in session.query(Person.id))
+            new_person_ids = set(row['person_id'] for row in rows)
+            session.add_all(Person(id = pid) for pid in \
+                            (new_person_ids - old_person_ids))
 
             if Class != None and len(rows) > 0:
                 for column_name in rows[0].keys():
