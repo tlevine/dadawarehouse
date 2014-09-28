@@ -58,6 +58,8 @@ class EmailAddress(Dimension):
 NotmuchMessage.add_join([(NotmuchMessage.from_address, EmailAddress.emailaddress)])
 NotmuchMessage.add_join([(NotmuchMessage.recipient_addresses, EmailAddress.emailaddress)])
 
+class IPAddress(Fact):
+    
 # BranchableLog.add_join([(BranchableLog.ip_address, Person.ip_addresses)])
 
 class PiwikVisitor(Dimension):

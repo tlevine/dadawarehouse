@@ -112,3 +112,5 @@ To do
 In the notmuch importer, figure out how to catch this exception. ::
 
     terminate called after throwing an instance of 'Xapian::DatabaseModifiedError'
+
+http://gerardnico.com/wiki/data_modeling/snowflake#many-to-many_relationship
