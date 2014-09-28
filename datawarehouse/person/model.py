@@ -42,14 +42,9 @@ class Person(Fact):
     dimesion is included in that denormalized view.
     '''
     id = Column(s.String, primary_key = True)
-    email_addresses = Array(s.String)
-    names = Array(s.String)
-    ip_addresses = Array(CIDR)
-    piwiks = Array(s.String)
-    facebooks = Array(s.BigInteger)
-    twitters = Array(s.String)
 
-PersonId = lambda: Column(s.String, s.ForeignKey(Person.id))
+def PersonId(*args, **kwargs):
+    return Column(s.String, s.ForeignKey(Person.id), *args, **kwargs)
 
 class EmailAddress(Dimension):
     emailaddress = Column(s.String, primary_key = True)
@@ -57,6 +52,21 @@ class EmailAddress(Dimension):
 
 NotmuchMessage.add_join([(NotmuchMessage.from_address, EmailAddress.emailaddress)])
 NotmuchMessage.add_join([(NotmuchMessage.recipient_addresses, EmailAddress.emailaddress)])
+
+class PersonLocation(Fact):
+    'Populate this from a CSV file.'
+    ip_address = Column(CIDR, primary_key = True)
+    person_id = PersonId(primary_key = True)
+
+# Join to PiwikVisitorLocation
+# on PersonLocation.ip_address == PiwikVisitorLocation.ip_address.
+# Then union the two results, returning only the columns that are
+# the final join targets from the columns in PersonLocation.
+#
+# This requires that joins be specified for all PersonLocation columns.
+# Each join must involve only one column per table.
+PersonLocation.add_union(
+    [(PersonLocation.ip_address, PiwikVisitorLocation.ip_address)])
 
 class PiwikVisitor(Dimension):
     id = Column(s.String, primary_key = True)

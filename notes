@@ -20,3 +20,15 @@ This is the Xapian error that I need to catch. ::
     A Xapian exception occurred when reading header: The revision being read has been discarded - you should call Xapian::Database::reopen() and retry the operation
     Out[106]: <repr(<notmuch.message.Message at 0x7f9ced3c8048>) failed: notmuch.errors.NullPointerError: >
 
+
+
+Combining many-to-many relationships
+
+CREATE VIEW ft_ipaddress_persons AS
+SELECT ipaddress, person_id
+FROM ipaddress_persons
+JOIN person ON ip_address_persons.person_id = person.id
+UNION ALL
+SELECT ip_address, person_id
+FROM piwikvisitor_locations
+JOIN 
