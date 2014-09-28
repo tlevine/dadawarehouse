@@ -37,12 +37,13 @@ def load_person(session, directory):
                              set(session.query(Person.id))
             session.add_all(Person(id = pid) for pid in new_person_ids)
 
+
             if Class != None and len(rows) > 0:
-                column_name = list(set(rows[0].keys()) - {'person_id'})[0]
-                counts = Counter(row[column_name] for row in rows)
-                for value, count in counts.items():
-                    if count > 1:
-                        logger.warning('The value "%s" is duplicated in the "%s" column of "%s".' % (value, column_name, filename))
+                for column_name in rows[0].keys():
+                    values = list(duplicates(rows, column_name))
+                    if len(values) > 0:
+                        msg = 'The following values are duplicated in the "%s" column of "%s":\n\n%s'
+                        logger.warning(msg % (column_name, filename, '\n'.join(values)))
 
                 session.query(Class).delete()
                 records = (Class(**row) for row in rows)
@@ -56,6 +57,12 @@ def load_person(session, directory):
                 writer.writerow(Class.__table__.columns.keys())
 
     session.commit()
+
+def duplicates(rows, column_name):
+    counts = Counter(row[column_name] for row in rows)
+    for value, count in counts.items():
+        if count > 1:
+            yield value
 
 def _strip(dictionary):
     return {k.strip():v.strip() for k,v in dictionary.items()}
