@@ -48,18 +48,21 @@ def _columns_one_table(do_not_select, aliased, table):
         if (column.table.name, column.name) not in do_not_select and not column.info['hide']:
             yield f(column)
 
-def joins(table):
+def _unpruned_joins(table):
     '''
     List the joins from this table.
 
     This automatically detects joins that are encoded as
     foreign keys. If you have joins that are not encoded as
     foreign keys, use the add_join class method.
+
+    If the same target table is specified twice, this includes both
+    join specifications, which could lead to an error.
     '''
     for on_columns in table.info.get('joins', []):
         yield on_columns
         to_table = on_columns[0][1].table
-        yield from joins(to_table)
+        yield from _unpruned_joins(to_table)
 
     for constraint in table.constraints:
         if isinstance(constraint, ForeignKeyConstraint):
@@ -70,7 +73,17 @@ def joins(table):
             to_table = to_columns[0].table
             if len(set(to_column.table.name for to_column in to_columns)) != 1:
                 raise AssertionError('This shouldn\'t happen.')
-            yield from joins(to_table)
+            yield from _unpruned_joins(to_table)
+
+def joins(table):
+    joined_tables = set()
+    for join in _unpruned_joins(table):
+        for from_column, to_column in join:
+            if to_column.table.name in joined_tables:
+                break
+        else:
+            joined_tables.add(to_column.table.name)
+            yield join
 
 def join_strings(table):
     for on_columns in joins(table):
