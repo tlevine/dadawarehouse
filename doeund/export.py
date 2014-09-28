@@ -6,15 +6,19 @@ from sqlalchemy.dialects.postgresql import ARRAY
 from doeund.templates import drop_view, create_view
 
 def make_cubes(tables):
-    for table in tables.values():
-        if table.name.startswith('ft_'):
-            fact_table_base = re.sub(r'^ft_', '', table.name)
-            yield drop_view.substitute(fact_table_base = fact_table_base)
-            yield create_view.substitute(
-                fact_table_base = fact_table_base,
-                columns = list(columns_to_select(table)),
-                joins = list(join_strings(table)),
-                unions = list(union_strings(table)))
+    fact_tables = filter(lambda table: table.name.startswith('ft_'), tables.values())
+    n_unions = lambda table: len(list(union_strings(table)))
+    for table in sorted(fact_tables, key = n_unions):
+        yield from make_cube(table)
+
+def make_cube(table):
+    fact_table_base = re.sub(r'^ft_', '', table.name)
+    yield drop_view.substitute(fact_table_base = fact_table_base)
+    yield create_view.substitute(
+        fact_table_base = fact_table_base,
+        columns = list(columns_to_select(table)),
+        joins = list(join_strings(table)),
+        unions = list(union_strings(table)))
 
 def aliased_column_name(column):
     alias = '%s_%s' % (re.sub(r'^(?:ft_|dim_)', '', column.table.name), column.name)
