@@ -27,7 +27,6 @@ from datamarts import (
     PiwikVisit, PiwikVisitorLocation,
     TwitterAction
 )
-from .util import Array
 
 class Person(Fact):
     '''
