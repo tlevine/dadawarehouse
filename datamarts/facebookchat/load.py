@@ -151,16 +151,27 @@ def second_pass(session):
     session.commit()
     
 def name_changes(q):
-    prev_names = {}
+    prev_name = {}
     for user, name, date in q:
-        if user not in prev_names:
-            prev_names[user] = name
-        elif name != prev_names[user]:
+        if user not in prev_name:
+            # If this a new user, record it.
+            # We don't know when the person first set this name,
+            # so we mark that it is the first one we saw.
+            yield FacebookNameChange(user_id = user,
+                                     datetime = date,
+                                     new_name = name,
+                                     initial_name = True)
+            prev_name[user] = name
+            logger.info('User %s\'s initial name was on "%s"' % \
+                        (user, name))
+
+        elif name != prev_name[user]:
             # If this is the same user but a new name, record it.
             yield FacebookNameChange(user_id = user,
                                      datetime = date,
-                                     new_name = name)
-            prev_names[user] = name
+                                     new_name = name,
+                                     initial_name = False)
+            prev_name[user] = name
             logger.info('Detected a name change for %s on %s' % \
                         (user, date.isoformat()))
         # Otherwise, this is the same user with the same name
