@@ -46,11 +46,11 @@ def PersonId(*args, **kwargs):
     return Column(s.String, s.ForeignKey(Person.id), *args, **kwargs)
 
 class EmailAddress(Dimension):
-    emailaddress = Column(s.String, primary_key = True)
+    email_address = Column(s.String, primary_key = True)
     person_id = PersonId()
 
-NotmuchMessage.add_join([(NotmuchMessage.from_address, EmailAddress.emailaddress)])
-NotmuchMessage.add_join([(NotmuchMessage.recipient_addresses, EmailAddress.emailaddress)])
+NotmuchMessage.add_join([(NotmuchMessage.from_address, EmailAddress.email_address)])
+NotmuchMessage.add_join([(NotmuchMessage.recipient_addresses, EmailAddress.email_address)])
 
 class PersonLocation(Fact):
     'Populate this from a CSV file.'
