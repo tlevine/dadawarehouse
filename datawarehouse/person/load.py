@@ -42,7 +42,7 @@ def load_person(session, directory):
                 counts = Counter(row[column_name] for row in rows)
                 for value, count in counts.items():
                     if count > 1:
-                        raise ValueError('The value "%s" is duplicated in the "%s" column of "%s".' % (value, column_name, filename))
+                        logger.warning('The value "%s" is duplicated in the "%s" column of "%s".' % (value, column_name, filename))
 
                 session.query(Class).delete()
                 records = (Class(**row) for row in rows)
