@@ -94,8 +94,6 @@ class PersonName(Fact):
 TwitterNameHandle.add_join([(TwitterNameHandle.user_handle, Twitter.id)])
 MuttAlias.add_join([(MuttAlias.pk, Person.id)])
 FacebookNameChange.add_join([(FacebookNameChange.user_id, Facebook.id)])
-PersonName.union([
-    (TwitterNameHandle, (TwitterNameHandle.name, Person.id)),
-    (MuttAlias, (MuttAlias.name, Person.id)),
-    (FacebookNameChange, (FacebookNameChange.new_name, Person.id)),
-])
+PersonName.union((TwitterNameHandle, (TwitterNameHandle.name, Person.id)))
+PersonName.union((MuttAlias, (MuttAlias.name, Person.id)))
+PersonName.union((FacebookNameChange, (FacebookNameChange.new_name, Person.id)))

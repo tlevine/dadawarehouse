@@ -25,5 +25,13 @@ FROM ft_{{fact_table_base}}
     {{py: from_column, to_column = on_columns[0]}}
     ANY ({{from_column}}) = ANY ({{to_column}})
   {{endif}}
-{{endfor}};
-''')
+{{endfor}}
+{{for union in unions}}
+UNION ALL
+SELECT
+  {{for loop, column in looper(union['selects'])}}
+  {{column}}{{if not loop.last}},{{endif}}
+  {{endfor}}
+FROM {{union['table']}}
+{{endfor}}
+;''')

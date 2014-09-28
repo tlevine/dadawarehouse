@@ -88,3 +88,10 @@ def join_strings(table):
             unaliased_column_name(from_column),
             unaliased_column_name(to_column),
         ) for from_column, to_column in on_columns])
+
+
+def union_strings(table):
+    for other_table, columns in table.info.get('unions', []):
+        select_strings = tuple(map(unaliased_column_name, columns))
+        table_string = re.sub(r'^ft_', 'cube_', table.name)
+        yield select_strings, table_string
