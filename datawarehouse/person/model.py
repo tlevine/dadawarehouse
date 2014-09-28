@@ -57,18 +57,9 @@ class PersonLocation(Fact):
     'Populate this from a CSV file.'
     ip_address = Column(CIDR, primary_key = True)
     person_id = PersonId(primary_key = True)
-
-# Union this table to the results of the following query.
-#
-# Join PersonLocation to PiwikVisitorLocation
-# on PersonLocation.ip_address == PiwikVisitorLocation.ip_address,
-# and select only the columns that are
-# the final join targets from the columns in PersonLocation.
-#
-# This requires that joins be specified for all PersonLocation columns.
-# Each join must involve only one column per table.
-PersonLocation.add_union(
-    [(PersonLocation.ip_address, PiwikVisitorLocation.ip_address)])
+PersonLocation.union([
+    (PiwikVisitorLocation, (PiwikVisitorLocation.ip_address, Person.id)),
+])
 
 class PiwikVisitor(Dimension):
     id = Column(s.String, primary_key = True)
@@ -103,9 +94,6 @@ class PersonName(Fact):
 TwitterNameHandle.add_join([(TwitterNameHandle.user_handle, Twitter.id)])
 MuttAlias.add_join([(MuttAlias.pk, Person.id)])
 FacebookNameChange.add_join([(FacebookNameChange.user_id, Facebook.id)])
-
-# In the cube view, union to a bunch of other views,
-# selecting the specified columns.
 PersonName.union([
     (TwitterNameHandle, (TwitterNameHandle.name, Person.id)),
     (MuttAlias, (MuttAlias.name, Person.id)),
