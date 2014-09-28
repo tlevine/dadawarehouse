@@ -8,7 +8,7 @@ import requests
 from sqlalchemy import desc
 
 from ..logger import logger
-from .model import PiwikAction, PiwikVisit
+from .model import PiwikAction, PiwikVisit, PiwikVisitorLocation
 
 def update(session):
     key = 'PIWIK_API_TOKEN'
@@ -39,6 +39,17 @@ def update(session):
         session.commit()
         logger.info('Loaded visits for %s' % date.isoformat())
         date += datetime.timedelta(days = 1)
+
+    session.add_all(visitor_locations(session))
+    session.commit()
+
+def visitor_locations(session):
+    session.query(PiwikVisitorLocation).delete()
+    session.flush()
+    rows = session.query(PiwikVisit.visitIp, PiwikVisit.visitorId).distinct()
+    for ip_address, visitor_id in rows:
+        yield PiwikVisitorLocation(ip_address = ip_address,
+                                   visitor_id = visitor_id)
 
 def visits(token, date):
     for offset in itertools.count(0, 100):
