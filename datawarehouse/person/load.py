@@ -1,6 +1,6 @@
 import os
 import csv
-from collections import defaultdict
+from collections import Counter
 
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -33,16 +33,22 @@ def load_person(session, directory):
             with open(path) as fp:
                 rows = list(map(_strip, csv.DictReader(fp)))
 
-                new_person_ids = set(row['person_id'] for row in rows) - \
-                                 set(session.query(Person.id))
-                session.add_all(Person(id = pid) for pid in new_person_ids)
+            new_person_ids = set(row['person_id'] for row in rows) - \
+                             set(session.query(Person.id))
+            session.add_all(Person(id = pid) for pid in new_person_ids)
 
-                if Class != None:
-                    session.query(Class).delete()
-                    records = (Class(**row) for row in rows)
-                    session.add_all(records)
+            if Class != None and len(rows) > 0:
+                column_name = list(set(rows[0].keys()) - {'person_id'})[0]
+                counts = Counter(row[column_name] for row in rows)
+                for value, count in counts.items():
+                    if count > 1:
+                        raise ValueError('The value "%s" is duplicated in the "%s" column of "%s".' % (value, column_name, filename))
 
-                session.flush()
+                session.query(Class).delete()
+                records = (Class(**row) for row in rows)
+                session.add_all(records)
+
+            session.flush()
 
         else:
             with open(path, 'w') as fp:
