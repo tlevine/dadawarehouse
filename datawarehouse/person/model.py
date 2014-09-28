@@ -60,7 +60,11 @@ NotmuchMessage.add_join([(NotmuchMessage.recipient_addresses, EmailAddress.email
 
 # BranchableLog.add_join([(BranchableLog.ip_address, Person.ip_addresses)])
 
-# PiwikVisit.add_join([(PiwikVisit.visitorId, Person.piwiks)])
+class PiwikVisitor(Dimension):
+    id = Column(s.String, primary_key = True)
+    person_id = PersonId()
+
+PiwikVisit.add_join([(PiwikVisit.visitorId, PiwikVisitor.id)])
 # PiwikVisit.add_join([(PiwikVisit.visitIp, Person.ip_addresses)])
 
 class Twitter(Dimension):
