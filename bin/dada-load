@@ -12,5 +12,5 @@ import datawarehouse
 engine = create_engine('postgres:///tlevine')
 Base.metadata.create_all(engine) 
 
-# datamarts.load(engine)
+datamarts.load(engine)
 datawarehouse.load(engine)
