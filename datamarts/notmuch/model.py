@@ -23,3 +23,7 @@ class NotmuchAttachment(m.Fact):
     part_number = m.Column(s.Integer, primary_key = True)
     content_type = m.Column(s.String, nullable = True)
     name = m.Column(s.String, nullable = True)
+
+class NotmuchNameAddresses(m.Fact):
+    name = m.Column(s.String, primary_key = True)
+    email_address = m.Column(s.String, primary_key = True)

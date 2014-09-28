@@ -14,3 +14,7 @@ class TwitterAction(Fact):
                            'reply', 'other', 'direct-message',
                            name = 'twitter_action'), default = 'other')
     message_id = Column(s.String)
+
+class TwitterNameHandles(m.Fact):
+    name = m.Column(s.String, primary_key = True)
+    user_handle = m.Column(s.String, primary_key = True)
