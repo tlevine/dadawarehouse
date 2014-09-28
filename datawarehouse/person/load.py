@@ -42,8 +42,8 @@ def load_person(session, directory):
                 for column_name in rows[0].keys():
                     values = list(duplicates(rows, column_name))
                     if len(values) > 0:
-                        msg = 'The following values are duplicated in the "%s" column of "%s":\n\n%s'
-                        logger.warning(msg % (column_name, filename, '\n'.join(values)))
+                        msg = 'The following values are duplicated in the "%s" column of "%s":\n\n%s\n'
+                        logger.warning(msg % (column_name, path, '\n'.join(values)))
 
                 session.query(Class).delete()
                 records = (Class(**row) for row in rows)
