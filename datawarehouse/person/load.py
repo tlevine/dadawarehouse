@@ -14,15 +14,19 @@ from datamarts import (
     TwitterAction,
 )
 
-from .model import Person, EmailAddress, Facebook, Twitter
+from .model import (
+    Person,
+    EmailAddress, Facebook, Twitter,
+    PersonName, PersonLocation, PiwikVisitor,
+)
 
 file_mapping = [
     ('emailaddress.csv', EmailAddress),
     ('facebook.csv', Facebook),
     ('twitter.csv', Twitter),
-    ('name.csv', None),
-    ('ipaddress.csv', None),
-    ('piwik.csv', None),
+    ('name.csv', PersonName),
+    ('personlocation.csv', PersonLocation),
+    ('piwik.csv', PiwikVisitor),
 ]
 
 def load_person(session, directory):
@@ -38,16 +42,17 @@ def load_person(session, directory):
             session.add_all(Person(id = pid) for pid in \
                             (new_person_ids - old_person_ids))
 
-            if Class != None and len(rows) > 0:
-                for column_name in rows[0].keys():
-                    values = list(duplicates(rows, column_name))
+            # Check for duplicates.
+            msg = 'The following values are duplicated in the "%s" column of "%s":\n\n%s\n'
+            for name, column in Class.__table__.columns.items():
+                if column.unique:
+                    values = list(duplicates(rows, name))
                     if len(values) > 0:
-                        msg = 'The following values are duplicated in the "%s" column of "%s":\n\n%s\n'
                         logger.warning(msg % (column_name, path, '\n'.join(values)))
 
-                session.query(Class).delete()
-                records = (Class(**row) for row in rows)
-                session.add_all(records)
+            session.query(Class).delete()
+            records = (Class(**row) for row in rows)
+            session.add_all(records)
 
             session.flush()
 
