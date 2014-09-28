@@ -42,6 +42,7 @@ def update(session):
 
     session.add_all(visitor_locations(session))
     session.commit()
+    logger.info('Determined Piwik visitor locations')
 
 def visitor_locations(session):
     session.query(PiwikVisitorLocation).delete()
