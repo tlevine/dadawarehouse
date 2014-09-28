@@ -98,5 +98,4 @@ def join_strings(table):
 def union_strings(table):
     for other_table, columns in table.info.get('unions', []):
         select_strings = tuple(map(unaliased_column_name, columns))
-        table_string = re.sub(r'^ft_', 'cube_', other_table.name)
-        yield select_strings, table_string
+        yield select_strings, other_table.name, join_strings(other_table)

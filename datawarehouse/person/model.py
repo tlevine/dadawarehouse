@@ -56,8 +56,8 @@ class PersonLocation(Fact):
     'Populate this from a CSV file.'
     ip_address = Column(CIDR, primary_key = True)
     person_id = PersonId(primary_key = True)
-PersonLocation.union(PiwikVisitorLocation,
-                     (PiwikVisitorLocation.ip_address, Person.id))
+PersonLocation.add_union(PiwikVisitorLocation,
+                         (PiwikVisitorLocation.ip_address, Person.id))
 
 class PiwikVisitor(Dimension):
     id = Column(s.String, primary_key = True)
@@ -92,6 +92,6 @@ class PersonName(Fact):
 TwitterNameHandle.add_join([(TwitterNameHandle.user_handle, Twitter.id)])
 MuttAlias.add_join([(MuttAlias.pk, Person.id)])
 FacebookNameChange.add_join([(FacebookNameChange.user_id, Facebook.id)])
-PersonName.union(TwitterNameHandle, (TwitterNameHandle.name, Person.id))
-PersonName.union(MuttAlias, (MuttAlias.name, Person.id))
-PersonName.union(FacebookNameChange, (FacebookNameChange.new_name, Person.id))
+PersonName.add_union(TwitterNameHandle, (TwitterNameHandle.name, Person.id))
+PersonName.add_union(MuttAlias, (MuttAlias.name, Person.id))
+PersonName.add_union(FacebookNameChange, (FacebookNameChange.new_name, Person.id))
