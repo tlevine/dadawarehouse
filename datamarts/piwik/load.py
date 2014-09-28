@@ -166,9 +166,7 @@ def reify_visit(v):
         setattr(visit, 'plugin_' + plugin, True)
     visit.actions = list(actions(visit, v['actionDetails'])),
 
-    yield visit # before because of foreign keys
-
-
+    yield visit
     logger.debug('Assembled Piwik visit %s' % v['idVisit'])
 
 
