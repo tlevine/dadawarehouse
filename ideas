@@ -1,0 +1,10 @@
+I want to match Piwik user IDs to email addresses.
+
+Consider this scatterplot matrix.
+
+    ggplot(cube) +
+      aes(y = email_count, x = piwik_visit_count) +
+      facet_grid(email_person ~ piwik_visitor_id)
+
+I want to select the scatterplots with high correlations
+within this matrix.
