@@ -18,7 +18,7 @@ updaters = [
     # Minutely updates
     history,
     notmuch, # This one crashes on `notmuch new`.
-    piwik,
+  # piwik,
 
     # Daily updates
     fb,

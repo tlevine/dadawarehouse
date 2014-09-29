@@ -81,6 +81,8 @@ def oldest_visit(token):
     rawdate = json.loads(response.text)[0]['serverDate']
     return datetime.datetime.strptime(rawdate, '%Y-%m-%d')
 
+# I need to be able to refresh this so I can get a fresh version
+# for the most recent date in case it was incomplete.
 @cache('~/.dadawarehouse/piwik-api-requests')
 def get_visits(date, offset, token = None): 
     url = 'http://piwik.thomaslevine.com'
