@@ -121,3 +121,6 @@ The server will respond with the location of the client.
 Then I can join between datetimes and Tom's location.
 This will help:
 http://pygeoip.readthedocs.org/en/latest/getting-started.html
+
+Switch to the visit and action Piwik API modules, and also add the visitor profile.
+http://piwik.thomaslevine.com/?module=API&method=Live.getVisitorProfile&idSite=2&format=JSON&token_auth=foo&visitorId=bar
