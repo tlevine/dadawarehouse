@@ -3,7 +3,6 @@ import itertools
 import json
 import datetime
 
-from picklecache import cache
 import requests
 from sqlalchemy import desc
 
@@ -83,7 +82,7 @@ def oldest_visit(token):
 
 # I need to be able to refresh this so I can get a fresh version
 # for the most recent date in case it was incomplete.
-@cache('~/.dadawarehouse/piwik-api-requests')
+# @cache('~/.dadawarehouse/piwik-api-requests')
 def get_visits(date, offset, token = None): 
     url = 'http://piwik.thomaslevine.com'
     params = {
