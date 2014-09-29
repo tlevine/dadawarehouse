@@ -175,6 +175,9 @@ def name_changes(q):
             logger.info('User %s\'s initial name was "%s", on "%s"' % \
                         (user, name, date.isoformat()))
 
+        elif name in {prev_name['user'], ''} or name.startswith('xmpp:-'):
+            # This is the same user with the same name
+            pass
         elif name != prev_name[user]:
             # If this is the same user but a new name, record it.
             yield FacebookNameChange(user_id = user,
@@ -184,4 +187,3 @@ def name_changes(q):
             prev_name[user] = name
             logger.info('Detected a name change for %s to "%s" on %s' % \
                         (user, name, date.isoformat()))
-        # Otherwise, this is the same user with the same name
