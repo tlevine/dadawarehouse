@@ -41,9 +41,9 @@ LEFT JOIN {{to_table}} ON
 {{endfor}}
 
 {{if len(unions) > 0:}}
-) AS potential_duplicates GROUP BY
+) AS with_duplicates GROUP BY
 {{for loop, column in looper(primary_keys)}}
-  {{column}}{{if not loop.last}},{{endif}}
+  "with_duplicates".{{column}}{{if not loop.last}},{{endif}}
 {{endfor}}
 {{endif}}
 ;''')
