@@ -172,8 +172,8 @@ def name_changes(q):
                                      new_name = name,
                                      is_initial_name = True)
             prev_name[user] = name
-            logger.info('User %s\'s initial name was on "%s"' % \
-                        (user, name))
+            logger.info('User %s\'s initial name was "%s", on "%s"' % \
+                        (user, name, date.isoformat()))
 
         elif name != prev_name[user]:
             # If this is the same user but a new name, record it.
@@ -182,6 +182,6 @@ def name_changes(q):
                                      new_name = name,
                                      is_initial_name = False)
             prev_name[user] = name
-            logger.info('Detected a name change for %s on %s' % \
-                        (user, date.isoformat()))
+            logger.info('Detected a name change for %s to "%s" on %s' % \
+                        (user, name, date.isoformat()))
         # Otherwise, this is the same user with the same name
