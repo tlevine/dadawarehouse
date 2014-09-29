@@ -19,12 +19,12 @@ class PiwikAction(m.Fact):
 
 class PiwikVisit(m.Fact):
     idVisit = m.Column(s.Integer, primary_key = True)
-    n_actions = s.orm.relationship(PiwikAction)
+    actions = s.orm.relationship(PiwikAction)
 
     serverDateTime = m.Column(s.DateTime)
     clientTime = m.Column(s.Time)
 
-    actions = m.Column(s.Integer)
+    n_actions = m.Column(s.Integer)
     browserCode = m.Column(s.String)
     browserFamily = m.Column(s.String)
     browserFamilyDescription = m.Column(s.String)

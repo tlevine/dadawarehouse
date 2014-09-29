@@ -164,7 +164,7 @@ def reify_visit(v):
     )
     for plugin in v['plugins'].split(', '):
         setattr(visit, 'plugin_' + plugin, True)
-    visit.actions = list(actions(visit, v['actionDetails'])),
+    visit.actions = list(actions(visit, v['actionDetails']))
 
     yield visit
     logger.debug('Assembled Piwik visit %s' % v['idVisit'])
