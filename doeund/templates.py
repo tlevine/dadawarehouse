@@ -35,4 +35,11 @@ LEFT JOIN {{to_table}} ON
 
 
 {{endfor}}
+
+{{if len(unions) > 0:}}
+GROUP BY
+{{for loop, column in looper(primary_keys)}}
+  {{column}}{{if not loop.last}},{{endif}}
+{{endfor}}
+{{endif}}
 ;''')
