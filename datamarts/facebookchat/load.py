@@ -1,4 +1,5 @@
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor
 from itertools import chain
 import shutil
 import os
@@ -95,10 +96,11 @@ def first_pass(sessionmaker, today):
     download()
     logger.info('Assessing the existing Facebook imports')
     could_import = set(os.listdir(LOCAL_CHAT))
-    already_imported = set(row[0] for row in session.query(FacebookChatStatusChange.filedate).all())
+    already_imported = set(row[0] for row in session.query(FacebookChatStatusChange.filedate).distinct())
     with ThreadPoolExecutor(10) as e:
         for filename in sorted(could_import, reverse = True):
-            future = e.submit(import_daily_db, sessionmaker, filename)
+            future = e.submit(import_daily_db, sessionmaker,
+                              already_imported, today, filename)
             future.add_done_callback(_raise)
 
 def _raise(future):
@@ -106,7 +108,8 @@ def _raise(future):
     if e != None:
         raise e
 
-def import_daily_db(sessionmaker, filename):
+def import_daily_db(sessionmaker, already_imported, today, filename):
+    session = sessionmaker()
     filedate = datetime.datetime.strptime(filename, '%Y-%m-%d.db').date()
     if filedate >= today:
         logger.info('Skipping %s because it is from today' % filename)
@@ -117,9 +120,9 @@ def import_daily_db(sessionmaker, filename):
         logger.debug('Importing %s' % filename)
 
         # Copy to RAM so it's faster.
-        shutil.copy(os.path.join(LOCAL_CHAT, filename), '/tmp/fb.db')
+        shutil.copy(os.path.join(LOCAL_CHAT, filename), '/tmp/fb-%s' % filename)
         logger.debug('* Copied database to RAM')
-        engine = sqlalchemy.create_engine('sqlite:////tmp/fb.db')
+        engine = sqlalchemy.create_engine('sqlite:////tmp/fb-%s' % filename)
 
         # Add stuff
         session.add_all(status_changes(engine, filedate, session))
