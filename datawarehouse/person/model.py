@@ -61,7 +61,7 @@ PersonLocation.add_union(PiwikVisitorLocation,
 
 class PiwikVisitor(Dimension):
     id = Column(s.String, primary_key = True)
-    person_id = PersonId()
+    person_id = PersonId(nullable = True)
 
 PiwikVisit.add_join([(PiwikVisit.visitorId, PiwikVisitor.id)])
 PiwikVisitorLocation.add_join(
