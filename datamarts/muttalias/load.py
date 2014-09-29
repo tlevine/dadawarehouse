@@ -4,7 +4,8 @@ import re
 from .model import MuttAlias
 from ..logger import logger
 
-def update(session):
+def update(sessionmaker):
+    session = sessionmaker()
     session.query(MuttAlias).delete()
     session.add_all(mutt_aliases())
     session.commit()

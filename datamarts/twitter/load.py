@@ -7,7 +7,8 @@ from notmuch import Database, Query
 from ..logger import logger
 from .model import TwitterAction
 
-def update(session):
+def update(sessionmaker):
+    session = sessionmaker()
     db = Database()
     q = session.query(TwitterAction.message_id)
     new_messages = Query(db, 'from:twitter.com').search_messages()

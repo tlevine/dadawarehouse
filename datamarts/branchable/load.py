@@ -10,11 +10,13 @@ from .model import BranchableLog
 
 LOCAL_LOGDUMP_DIR = os.path.expanduser('~/.dadawarehouse/branchable-logdump')
 
-def update(session):    
+def update(sessionmaker):    
     os.makedirs(LOCAL_LOGDUMP_DIR, exist_ok = True)
     new_logdump_file = os.path.join(LOCAL_LOGDUMP_DIR, datetime.date.today().isoformat())
     if i_should_copy(new_logdump_file):
         copy_log(new_logdump_file)
+
+    session = sessionmaker()
     most_recent = session.query(BranchableLog.datetime)\
                   .order_by(desc(BranchableLog.datetime))\
                   .limit(1).scalar()

@@ -15,7 +15,8 @@ CALENDARS = [os.path.join(os.path.expanduser('~/.pal'), rest) for rest in [\
     'p/postponed.pal',
 ]]
     
-def update(session, calendars = CALENDARS):
+def update(sessionmaker, calendars = CALENDARS):
+    session = sessionmaker()
     session.query(PalEvent).delete()
     session.query(PalFile).delete()
 

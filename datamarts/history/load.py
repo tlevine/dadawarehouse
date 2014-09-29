@@ -19,8 +19,9 @@ def download():
         rsync = subprocess.Popen(RSYNC + [remote, HISTORY])
         rsync.wait()
 
-def update(session):
+def update(sessionmaker):
     download()
+    session = sessionmaker()
     shell_history = os.path.join(HISTORY, 'shell')
     previous_shells = (row[0] for row in session.query(ShellSession.filename))
     for log in historian(directory = shell_history, skip = previous_shells):

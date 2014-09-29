@@ -7,7 +7,8 @@ from sqlalchemy import create_engine
 from ..logger import logger
 from .model import Account, Transaction, Split
 
-def update(session):
+def update(sessionmaker):
+    session = sessionmaker()
     for table in [Split, Transaction, Account]:
         session.query(table).delete()
     engine = get_engine()

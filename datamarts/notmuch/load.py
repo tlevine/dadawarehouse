@@ -4,6 +4,7 @@ import re
 import datetime
 from itertools import chain
 import subprocess
+from concurrent.futures import ThreadPoolExecutor
 
 from notmuch import Database, Query
 import pyzmail
@@ -13,26 +14,32 @@ import doeund as m
 from ..logger import logger
 from .model import NotmuchMessage, NotmuchAttachment
 
-def update(session):
+def update(sessionmaker):
     if offlineimap_is_running():
         raise EnvironmentError('In case offlineimap runs "notmuch new", you should stop offlineimap while importing data from notmuch.')
     db = Database()
-    q = session.query(NotmuchMessage.message_id)
+    q = sessionmaker().query(NotmuchMessage.message_id)
     past_messages = set(row[0] for row in q.distinct())
-    for m in Query(db,'').search_messages():
-        message_id = m.get_message_id()
-        if message_id in past_messages:
-            logger.debug('Already imported %s' % message_id)
-            continue
+    with ThreadPoolExecutor(10) as e:
+        for m in Query(db,'').search_messages():
+            message_id = m.get_message_id()
+            if message_id in past_messages:
+                logger.debug('Already imported %s' % message_id)
+            else:
+                past_messages.add(message_id)
+                future = e.submit(add_message, sessionmaker, past_messages, m)
+                future.add_done_callback(_raise_in_future)
 
-        session.add(message(m))
-        session.flush() # for foreign key constraints
-        session.add_all(attachments(m))
 
-        past_messages.add(message_id)
-        session.commit()
+    session = sessionmaker()
+    session.add(message(m))
+    session.flush() # for foreign key constraints
+    session.add_all(attachments(m))
 
-        logger.info('Added message "id:%s"' % m.get_message_id())
+    past_messages.add(m.get_message_id())
+    session.commit()
+
+    logger.info('Added message "id:%s"' % m.get_message_id())
 
 def offlineimap_is_running():
     pgrep = subprocess.Popen(['pgrep', 'offlineimap'], stdout = subprocess.PIPE)
