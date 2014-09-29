@@ -170,7 +170,7 @@ def name_changes(q):
             yield FacebookNameChange(user_id = user,
                                      datetime = date,
                                      new_name = name,
-                                     initial_name = True)
+                                     is_initial_name = True)
             prev_name[user] = name
             logger.info('User %s\'s initial name was on "%s"' % \
                         (user, name))
@@ -180,7 +180,7 @@ def name_changes(q):
             yield FacebookNameChange(user_id = user,
                                      datetime = date,
                                      new_name = name,
-                                     initial_name = False)
+                                     is_initial_name = False)
             prev_name[user] = name
             logger.info('Detected a name change for %s on %s' % \
                         (user, date.isoformat()))
