@@ -99,7 +99,7 @@ def get_visits(date, offset, token = None):
 
 def reify_visit(v):
     if v['resolution'].count('x') == 1:
-        screen_width, screen_height = tuple(map(int, v['resolution'].split('x')))
+        screen_width, screen_height = tuple(map(float, v['resolution'].split('x')))
     else:
         screen_width = screen_height = 0
 
