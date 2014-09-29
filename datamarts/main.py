@@ -29,9 +29,9 @@ updaters = [
     # These delete existing state and thus take a while.
     # Also, the data aren't updated that often.
     twitter,
-    pal,
-    gnucash,
-    mutt,
+  # pal,
+  # gnucash,
+  # mutt,
 ]
 
 def load(engine):
