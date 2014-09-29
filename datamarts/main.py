@@ -17,9 +17,6 @@ from .muttalias.load import update as mutt
 def load(engine):
     sm = sessionmaker(bind=engine)
 
-    piwik(sm())
-    return
-
     # Import separate data marts in parallel.
     with ThreadPoolExecutor(max_workers = 8) as e:
         # Minutely updates
@@ -31,7 +28,7 @@ def load(engine):
         e.submit(fb, sm())
 
         # This involves downloading a biggish file.
-        e.submit(branchable, sm())
+    #   e.submit(branchable, sm())
 
         # These delete existing state and thus take a while.
         # Also, the data aren't updated that often.
