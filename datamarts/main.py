@@ -14,28 +14,36 @@ from .branchable.load import update as branchable
 from .piwik.load import update as piwik
 from .muttalias.load import update as mutt
 
+updaters = [
+    # Minutely updates
+    history,
+    notmuch, # This one crashes on `notmuch new`.
+    piwik,
+
+    # Daily updates
+    fb,
+
+    # This involves downloading a biggish file.
+#   branchable,
+
+    # These delete existing state and thus take a while.
+    # Also, the data aren't updated that often.
+    twitter,
+    pal,
+    gnucash,
+    mutt,
+]
+
 def load(engine):
     sm = sessionmaker(bind=engine)
 
-    return notmuch(sm)
-
     # Import separate data marts in parallel.
     with ThreadPoolExecutor(max_workers = 8) as e:
-        # Minutely updates
-        e.submit(history, sm)
-        e.submit(notmuch, sm) # This one crashes on `notmuch new`.
-        e.submit(piwik, sm)
+        for updater in updaters:
+            future = e.submit(updater, sm)
+            future.add_done_callback(_raise)
 
-        # Daily updates
-        e.submit(fb, sm)
-
-        # This involves downloading a biggish file.
-    #   e.submit(branchable, sm)
-
-        # These delete existing state and thus take a while.
-        # Also, the data aren't updated that often.
-        # So we put them last.
-        e.submit(twitter, sm)
-        e.submit(pal, sm)
-        e.submit(gnucash, sm)
-        e.submit(mutt, sm)
+def _raise(future):
+    e = future.exception()
+    if e != None:
+        raise e
