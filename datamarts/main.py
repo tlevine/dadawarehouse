@@ -17,6 +17,8 @@ from .muttalias.load import update as mutt
 def load(engine):
     sm = sessionmaker(bind=engine)
 
+    notmuch(sm()) # This one crashes on `notmuch new`.
+
     # Import separate data marts in parallel.
     with ThreadPoolExecutor(max_workers = 8) as e:
         # Minutely updates

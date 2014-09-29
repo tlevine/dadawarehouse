@@ -4,6 +4,7 @@ import re
 import datetime
 from itertools import chain
 import subprocess
+from concurrent.futures import ThreadPoolExecutor
 
 from notmuch import Database, Query
 import pyzmail
@@ -19,20 +20,27 @@ def update(session):
     db = Database()
     q = session.query(NotmuchMessage.message_id)
     past_messages = set(row[0] for row in q.distinct())
-    for m in Query(db,'').search_messages():
+
+    def message_records(m):
         message_id = m.get_message_id()
         if message_id in past_messages:
             logger.debug('Already imported %s' % message_id)
-            continue
-
-        session.add(message(session, m))
-        session.flush() # for foreign key constraints
-        session.add_all(attachments(session, m))
-
-        past_messages.add(message_id)
-        session.commit()
-
-        logger.info('Added message "id:%s"' % m.get_message_id())
+            return None, []
+        else:
+            past_messages.add(message_id)
+            return message(m), list(attachments(m))
+ 
+    from itertools import takewhile
+    ms = Query(db,'date:..8Y').search_messages()
+    ms = (m for i, m in takewhile(lambda im: im[0] < 100, enumerate(ms)))
+    with ThreadPoolExecutor(20) as e:
+        for notmuchmessage, notmuchattachments in e.map(message_records, ms):
+            if notmuchmessage != None:
+                session.add(notmuchmessage)
+                session.flush() # for foreign key constraints
+                session.add_all(notmuchattachments)
+                session.commit()
+                logger.info('Added message "id:%s"' % m.get_message_id())
 
 def offlineimap_is_running():
     pgrep = subprocess.Popen(['pgrep', 'offlineimap'], stdout = subprocess.PIPE)
@@ -60,7 +68,7 @@ def addresses(m):
     return from_name, from_address, recipient_names, recipient_addresses
 
 
-def message(session, m): 
+def message(m): 
     filename = m.get_filename()
     subject = m.get_header('subject')
 
@@ -78,7 +86,7 @@ def message(session, m):
         recipient_addresses = recipient_names,
     )
 
-def attachments(session, message):
+def attachments(message):
     with open(message.get_filename(), 'rb') as fp:
         pyzm = pyzmail.PyzMessage.factory(fp)
     for part_number, part in enumerate(pyzm.mailparts):
