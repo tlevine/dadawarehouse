@@ -78,8 +78,8 @@ class PiwikVisit(m.Fact):
     referrerTypeName = m.Column(s.String)
     referrerUrl = m.Column(s.String, nullable = True)
 
-    screen_width = m.Column(s.Integer)
-    screen_height = m.Column(s.Integer)
+    screen_width = m.Column(s.Float)
+    screen_height = m.Column(s.Float)
     screenType = m.Column(s.String)
     searches = m.Column(s.Integer)
     visitCount = m.Column(s.Integer)
