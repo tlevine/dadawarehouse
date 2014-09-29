@@ -25,9 +25,9 @@ def update(session):
             logger.debug('Already imported %s' % message_id)
             continue
 
-        session.add(message(session, m))
+        session.add(message(m))
         session.flush() # for foreign key constraints
-        session.add_all(attachments(session, m))
+        session.add_all(attachments(m))
 
         past_messages.add(message_id)
         session.commit()
@@ -60,7 +60,7 @@ def addresses(m):
     return from_name, from_address, recipient_names, recipient_addresses
 
 
-def message(session, m): 
+def message(m): 
     filename = m.get_filename()
     subject = m.get_header('subject')
 
@@ -78,7 +78,7 @@ def message(session, m):
         recipient_addresses = recipient_names,
     )
 
-def attachments(session, message):
+def attachments(message):
     with open(message.get_filename(), 'rb') as fp:
         pyzm = pyzmail.PyzMessage.factory(fp)
     for part_number, part in enumerate(pyzm.mailparts):
