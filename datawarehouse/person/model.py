@@ -69,21 +69,21 @@ PiwikVisit.add_join([(PiwikVisit.visitorId, PiwikVisitor.id)])
 PiwikVisitorLocation.add_join(
     [(PiwikVisitorLocation.visitor_id, PiwikVisitor.id)])
 
-class Twitter(Dimension):
+class PersonTwitter(Fact):
     id = Column(s.String, primary_key = True)
     person_id = PersonId()
 
-TwitterAction.add_join([(TwitterAction.user_handle, Twitter.id)])
+TwitterAction.add_join([(TwitterAction.user_handle, PersonTwitter.id)])
 
-class Facebook(Dimension):
+class PersonFacebook(Fact):
     id = Column(s.BigInteger, primary_key = True)
     person_id = PersonId()
 
-FacebookMessage.add_join([(FacebookMessage.user_id, Facebook.id)])
+FacebookMessage.add_join([(FacebookMessage.user_id, PersonFacebook.id)])
 FacebookChatStatusChange.add_join([(FacebookChatStatusChange.user_id,
-                                    Facebook.id)])
-FacebookDuration.add_join([(FacebookDuration.user_id, Facebook.id)])
-FacebookNameChange.add_join([(FacebookNameChange.user_id, Facebook.id)])
+                                    PersonFacebook.id)])
+FacebookDuration.add_join([(FacebookDuration.user_id, PersonFacebook.id)])
+FacebookNameChange.add_join([(FacebookNameChange.user_id, PersonFacebook.id)])
 
 # I need to union all of these
 class PersonName(Fact):
@@ -91,9 +91,9 @@ class PersonName(Fact):
     name = Column(s.String, primary_key = True)
     person_id = PersonId(primary_key = True)
 
-TwitterNameHandle.add_join([(TwitterNameHandle.user_handle, Twitter.id)])
+TwitterNameHandle.add_join([(TwitterNameHandle.user_handle, PersonTwitter.id)])
 MuttAlias.add_join([(MuttAlias.pk, Person.id)])
-FacebookNameChange.add_join([(FacebookNameChange.user_id, Facebook.id)])
+FacebookNameChange.add_join([(FacebookNameChange.user_id, PersonFacebook.id)])
 PersonName.add_union(TwitterNameHandle, (TwitterNameHandle.name, Person.id))
 PersonName.add_union(MuttAlias, (MuttAlias.name, Person.id))
 PersonName.add_union(FacebookNameChange, (FacebookNameChange.new_name, Person.id))

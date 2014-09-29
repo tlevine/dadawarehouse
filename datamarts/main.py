@@ -37,6 +37,8 @@ updaters = [
 def load(engine):
     sm = sessionmaker(bind=engine)
 
+    return fb(sm)
+
     # Import separate data marts in parallel.
     with ThreadPoolExecutor(max_workers = 8) as e:
         for updater in updaters:
