@@ -11,7 +11,7 @@ def load(engine):
     directory = os.path.expanduser('~/git/dadawarehouse-manual')
     session = sessionmaker(engine)()
 
-    load_person(session, directory)
+  # load_person(session, directory)
     load_piwik(session)
 
     for statement in make_cubes():

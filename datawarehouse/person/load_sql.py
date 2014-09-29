@@ -16,7 +16,7 @@ from datamarts import (
 
 from .model import (
     Person,
-    EmailAddress, Facebook, Twitter,
+    PersonEmailAddress, Facebook, Twitter,
     PersonName, PersonLocation, PiwikVisitor,
 )
 
