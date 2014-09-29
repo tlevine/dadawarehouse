@@ -17,23 +17,25 @@ from .muttalias.load import update as mutt
 def load(engine):
     sm = sessionmaker(bind=engine)
 
+    return notmuch(sm)
+
     # Import separate data marts in parallel.
     with ThreadPoolExecutor(max_workers = 8) as e:
         # Minutely updates
-        e.submit(history, sm())
-        e.submit(notmuch, sm()) # This one crashes on `notmuch new`.
-        e.submit(piwik, sm())
+        e.submit(history, sm)
+        e.submit(notmuch, sm) # This one crashes on `notmuch new`.
+        e.submit(piwik, sm)
 
         # Daily updates
-        e.submit(fb, sm())
+        e.submit(fb, sm)
 
         # This involves downloading a biggish file.
-    #   e.submit(branchable, sm())
+    #   e.submit(branchable, sm)
 
         # These delete existing state and thus take a while.
         # Also, the data aren't updated that often.
         # So we put them last.
-        e.submit(twitter, sm())
-        e.submit(pal, sm())
-        e.submit(gnucash, sm())
-        e.submit(mutt, sm())
+        e.submit(twitter, sm)
+        e.submit(pal, sm)
+        e.submit(gnucash, sm)
+        e.submit(mutt, sm)
