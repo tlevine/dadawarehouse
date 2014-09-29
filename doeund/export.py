@@ -18,8 +18,7 @@ def make_cube(table):
         fact_table_base = fact_table_base,
         columns = list(columns_to_select(table)),
         joins = list(join_strings(table)),
-        unions = list(union_strings(table)),
-        primary_keys = list(primary_key_strings(table)))
+        unions = list(union_strings(table)))
 
 def aliased_column_name(column):
     alias = '%s_%s' % (re.sub(r'^(?:ft_|dim_)', '', column.table.name), column.name)
@@ -100,9 +99,3 @@ def union_strings(table):
     for other_table, columns in table.info.get('unions', []):
         select_strings = tuple(map(unaliased_column_name, columns))
         yield select_strings, other_table.name, join_strings(other_table)
-
-def primary_key_strings(table):
-    for constraint in table.constraints:
-        if isinstance(constraint, PrimaryKeyConstraint):
-            for column in constraint.columns.values():
-                yield '"%s"' % column.name

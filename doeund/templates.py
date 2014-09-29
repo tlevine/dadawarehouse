@@ -3,10 +3,6 @@ from tempita import Template
 drop_view = Template('DROP VIEW IF EXISTS cube_{{fact_table_base}};')
 
 create_view = Template('''CREATE VIEW cube_{{fact_table_base}} AS
-{{if len(unions) > 0:}}
-SELECT * FROM (
-{{endif}}
-
 SELECT
 {{for loop, column in looper(columns)}}
   {{column}}{{if not loop.last}},{{endif}}
@@ -21,7 +17,7 @@ LEFT JOIN {{to_table}} ON
 {{endfor}}
 {{for union in unions}}
 {{py: selects, table, joins = union}}
-UNION ALL
+UNION
 SELECT
   {{for loop, column in looper(selects)}}
   {{column}}{{if not loop.last}},{{endif}}
@@ -39,11 +35,4 @@ LEFT JOIN {{to_table}} ON
 
 
 {{endfor}}
-
-{{if len(unions) > 0:}}
-) AS with_duplicates GROUP BY
-{{for loop, column in looper(primary_keys)}}
-  "with_duplicates".{{column}}{{if not loop.last}},{{endif}}
-{{endfor}}
-{{endif}}
 ;''')
