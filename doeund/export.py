@@ -104,4 +104,5 @@ def union_strings(table):
 def primary_key_strings(table):
     for constraint in table.constraints:
         if isinstance(constraint, PrimaryKeyConstraint):
-            return map(unaliased_column_name, constraint.columns)
+            for column in constraint.columns.values():
+                yield '"%s"' % column.name
