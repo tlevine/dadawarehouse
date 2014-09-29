@@ -86,49 +86,54 @@ def online_durations(engine, filedate, session):
         )
 
 def update(sessionmaker, today = datetime.date.today()):
-    session = sessionmaker()
-    first_pass(session, today)
-    second_pass(session)
+    first_pass(sessionmaker, today)
+    second_pass(sessionmaker)
 
-def first_pass(session, today):
+def first_pass(sessionmaker, today):
+    session = sessionmaker()
     logger.info('Downloading Facebook logs')
     download()
     logger.info('Assessing the existing Facebook imports')
     could_import = set(os.listdir(LOCAL_CHAT))
     already_imported = set(row[0] for row in session.query(FacebookChatStatusChange.filedate).all())
-    for filename in sorted(could_import, reverse = True):
-        try:
-            filedate = datetime.datetime.strptime(filename, '%Y-%m-%d.db').date()
-            if filedate >= today:
-                logger.info('Skipping %s because it is from today' % filename)
-                # The file might not be complete.
-                continue
-            elif filedate in already_imported:
-                logger.debug('Already imported %s' % filename)
-                continue
-            logger.debug('Importing %s' % filename)
+    with ThreadPoolExecutor(10) as e:
+        for filename in sorted(could_import, reverse = True):
+            future = e.submit(import_daily_db, sessionmaker, filename)
+            future.add_done_callback(_raise)
 
-            # Copy to RAM so it's faster.
-            shutil.copy(os.path.join(LOCAL_CHAT, filename), '/tmp/fb.db')
-            logger.debug('* Copied database to RAM')
-            engine = sqlalchemy.create_engine('sqlite:////tmp/fb.db')
+def _raise(future):
+    e = future.exception()
+    if e != None:
+        raise e
 
-            # Add stuff
-            session.add_all(status_changes(engine, filedate, session))
-            logger.debug('* Added status changes')
-            session.add_all(messages(engine, filedate, session))
-            logger.debug('* Added messages')
-            session.add_all(online_durations(engine, filedate, session))
-            logger.debug('* Added durations')
+def import_daily_db(sessionmaker, filename):
+    filedate = datetime.datetime.strptime(filename, '%Y-%m-%d.db').date()
+    if filedate >= today:
+        logger.info('Skipping %s because it is from today' % filename)
+        # The file might not be complete.
+    elif filedate in already_imported:
+        logger.debug('Already imported %s' % filename)
+    else:
+        logger.debug('Importing %s' % filename)
 
-            # Commit only at the end so that we don't have partial file data.
-            session.commit()
-            logger.info('Finished %s\n' % filename)
+        # Copy to RAM so it's faster.
+        shutil.copy(os.path.join(LOCAL_CHAT, filename), '/tmp/fb.db')
+        logger.debug('* Copied database to RAM')
+        engine = sqlalchemy.create_engine('sqlite:////tmp/fb.db')
 
-        except KeyboardInterrupt:
-            break
+        # Add stuff
+        session.add_all(status_changes(engine, filedate, session))
+        logger.debug('* Added status changes')
+        session.add_all(messages(engine, filedate, session))
+        logger.debug('* Added messages')
+        session.add_all(online_durations(engine, filedate, session))
+        logger.debug('* Added durations')
 
-def second_pass(session):
+        # Commit only at the end so that we don't have partial file data.
+        session.commit()
+        logger.info('Finished %s\n' % filename)
+
+def second_pass(sessionmaker):
     '''
     Get name changes.
 
@@ -139,6 +144,7 @@ def second_pass(session):
 
     Or maybe I can order by primary key?
     '''
+    session = sessionmaker()
     Class = FacebookChatStatusChange
   # Class = FacebookMessage
 
