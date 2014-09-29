@@ -16,14 +16,14 @@ from datamarts import (
 
 from .model import (
     Person,
-    PersonEmailAddress, Facebook, Twitter,
+    PersonEmailAddress, PersonFacebook, PersonTwitter,
     PersonName, PersonLocation, PiwikVisitor,
 )
 
 file_mapping = [
     ('emailaddress.csv', PersonEmailAddress),
-    ('facebook.csv', Facebook),
-    ('twitter.csv', Twitter),
+    ('facebook.csv', PersonFacebook),
+    ('twitter.csv', PersonTwitter),
     ('name.csv', PersonName),
     ('personlocation.csv', PersonLocation),
     ('piwik.csv', PiwikVisitor),
