@@ -18,7 +18,7 @@ updaters = [
     # Minutely updates
     history,
     notmuch, # This one crashes on `notmuch new`.
-  # piwik,
+    piwik,
 
     # Daily updates
     fb,
@@ -29,15 +29,13 @@ updaters = [
     # These delete existing state and thus take a while.
     # Also, the data aren't updated that often.
     twitter,
-  # pal,
+    pal,
   # gnucash,
-  # mutt,
+    mutt,
 ]
 
 def load(engine):
     sm = sessionmaker(bind=engine)
-
-    return fb(sm)
 
     # Import separate data marts in parallel.
     with ThreadPoolExecutor(max_workers = 8) as e:

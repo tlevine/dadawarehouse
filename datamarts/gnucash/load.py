@@ -70,6 +70,7 @@ WHERE guid = ?
                       section = name_mapping.get(section))
 
 def get_hierarchy(account_network):
+    raise NotImplementedError('I have to account for accounts that go more than three tiers deep. I think I just cut it off at three and separate the account from the tiers.')
     network, placeholders = account_network
     for account_type in network[None]:
         if account_type not in network and account_type not in placeholders:
@@ -79,14 +80,11 @@ def get_hierarchy(account_network):
                 if section not in network and section not in placeholders:
                     yield account_type, None, section
                 else:
-                    for account in network[section]:
-                        if account not in network and account not in placeholders:
-                            yield account_type, section, account
+                    for subsection in network[section]:
+                        if subsection not in network and subsection not in placeholders:
+                            yield account_type, section, subsection
                         else:
                             raise ValueError('The account with GUID %s does not fit in the three-tier hierarchy.' % account)
-
-            
-
 
 def get_engine(path = os.path.expanduser('~/safe/finances/finances.gnucash')):
     shutil.copy(path, '/tmp/gnucash.db')
