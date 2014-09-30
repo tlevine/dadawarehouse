@@ -1,12 +1,13 @@
 from subprocess import Popen, PIPE
 
-def update(session):
+from .model import Last
 
-def query():
+def update(session):
     for host in ['nsa', 'home']:
         for filename in ls(host):
-            for line in last(host, filename):
-                yield Last.factory(host, filename, line)
+            records = (Last.factory(host, filename, line) for line in last(host, filename))
+            session.add_all(records)
+            session.commit()
 
 def shell(f):
     def wrapper(*args, **kwargs):
