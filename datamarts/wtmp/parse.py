@@ -1,9 +1,12 @@
 import pyparsing as p
 
 twointeger = lambda name: p.Word(p.nums, exact = 2).setResultsName(name)
-duration = p.Combine('(' + twointeger('hours') +
-                     ':' + twointeger('minutes') + ')')\
-               .setResultsName('duration')
+duration = p.Group(p.Suppress('(') +
+                   twointeger('hours') +
+                   p.Suppress(':') +
+                   twointeger('minutes') +
+                   p.Suppress(')')
+           ).setResultsName('duration')
 
 ip_address_byte = p.Word(p.nums, max = 3)
 ip_address = p.Combine(ip_address_byte + '.' + ip_address_byte + '.' +
