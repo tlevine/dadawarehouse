@@ -1,27 +1,30 @@
-import string
-
 import pyparsing as p
 
-day_of_week = p.Word(string.ascii_uppercase, string.ascii_lowercase, exact=3)
-month = p.Word(string.ascii_uppercase, string.ascii_lowercase, exact=3)
-duration = p.Combine('(' + integer + ':' + integer + ')')
-ip_address = p.Combine(integer + '.' + integer + '.' +
-                       integer + '.' + integer + '.')
+twointeger = lambda name: p.Word(p.nums, exact = 2).setResultsName(name)
+duration = p.Combine('(' + twointeger('hours') +
+                     ':' + twointeger('minutes') + ')')\
+               .setResultsName('duration')
 
-datetime = p.Group(day_of_week + 
-                   month +
-                   integer + 
-                   p.Combine(integer + ':' + integer + ':' integer) +
-                   integer)
+ip_address_byte = p.Word(p.nums, max = 3)
+ip_address = p.Combine(ip_address_byte + '.' + ip_address_byte + '.' +
+                       ip_address_byte + '.' + ip_address_byte + '.')\
+                .setResultsName('ip_address')
 
-parser = p.Word() + p.Word() +
-         datetime +
-         p.Suppress('-') +
-         datetime +
-         duration +
-         ip_address + 
-         p.restOfLine
+datetime = p.Group(p.Word(p.alphas, exact=3).setResultsName('day_of_week') +
+                   p.Word(p.alphas, exact=3).setResultsName('month') +
+                   p.Word(p.nums + ' ', exact = 2).setResultsName('day') +
+                   p.Combine(twointeger('hour') + ':' +
+                             twointeger('minute') + ':' +
+                             twointeger('second')) +
+                   p.Word(p.nums, exact = 4).setResultsName('year'))
 
+parser = p.Word.setResultsName('user') + \
+         p.Word.setResultsName('tty') + \
+         datetime.setResultsName('login_datetime') + \
+         p.Suppress('-') + \
+         datetime.setResultsName('logout_datetime') + \
+         duration + \
+         ip_address + p.restOfLine
 
 line = 'tlevine  pts/7        Fri Aug  1 10:05:24 2014 - Fri Aug  1 10:15:07 2014  (00:09)     178.36.15.241 via mosh [30685]\n'
 print(parser.parseString(line))
