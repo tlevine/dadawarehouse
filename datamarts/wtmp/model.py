@@ -11,4 +11,4 @@ class Last(Fact):
     user = Column(s.String)
     ip_address = Column(CIDR)
     login_datetime = Column(s.DateTime)
-    logout_datetime = Column(s.DateTime)
+    logout_datetime = Column(s.DateTime, nullable = True)
