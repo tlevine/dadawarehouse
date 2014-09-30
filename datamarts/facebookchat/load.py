@@ -157,6 +157,7 @@ def second_pass(sessionmaker):
                .order_by(Class.filedate,
                          Class.rowid)
 
+    session.query(FacebookNameChange).delete()
     session.add_all(name_changes(q))
     session.commit()
     
