@@ -13,9 +13,9 @@ ip_address = p.Combine(ip_address_byte + '.' + ip_address_byte + '.' +
 datetime = p.Group(p.Word(p.alphas, exact=3).setResultsName('day_of_week') +
                    p.Word(p.alphas, exact=3).setResultsName('month') +
                    p.Word(p.nums + ' ', exact = 2).setResultsName('day') +
-                   p.Combine(twointeger('hour') + ':' +
-                             twointeger('minute') + ':' +
-                             twointeger('second')) +
+                   p.Group(twointeger('hour') + p.Suppress(':') +
+                           twointeger('minute') + p.Suppress(':') +
+                           twointeger('second')) +
                    p.Word(p.nums, exact = 4).setResultsName('year'))
 
 parser = p.Word(p.alphanums).setResultsName('user') + \
