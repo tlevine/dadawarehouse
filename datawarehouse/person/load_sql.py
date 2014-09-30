@@ -23,5 +23,5 @@ from .model import (
 def load_piwik(session):
     old = set(r[0] for r in session.query(PiwikVisitor.id).distinct())
     new = set(r[0] for r in session.query(PiwikVisitorLocation.visitor_id).distinct())
-    session.add_all(PiwikVisitor(id = row[0]) for row in (new - old))
+    session.add_all(PiwikVisitor(id = visitor_id) for visitor_id in (new - old))
     session.flush()
