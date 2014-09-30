@@ -34,7 +34,7 @@ def update(sessionmaker):
                .filter(PiwikVisit.serverDateTime >= _datetime)\
                .delete()
         session.commit()
-        prior_visits = set(session.query(PiwikVisit.idVisit))
+        prior_visits = set(row[0] for row in session.query(PiwikVisit.idVisit))
 
     while date <= datetime.date.today():
         logger.info('Loading visits for %s' % date.isoformat())
@@ -60,7 +60,7 @@ def visits(token, date, prior_visits):
         response = get_visits(date, offset, token = token)
         rawvisits = json.loads(response.text)
         for visit in map(reify_visit, rawvisits):
-            if visit.visitId not in prior_visits:
+            if visit.idVisit not in prior_visits:
                 yield visit
         if len(rawvisits) == 0:
             break
