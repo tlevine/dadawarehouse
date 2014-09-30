@@ -34,10 +34,11 @@ def update(sessionmaker):
                .filter(PiwikVisit.serverDateTime >= _datetime)\
                .delete()
         session.commit()
+        prior_visits = set(session.query(PiwikVisit.idVisit))
 
     while date <= datetime.date.today():
         logger.info('Loading visits for %s' % date.isoformat())
-        session.add_all(visits(os.environ[key], date))
+        session.add_all(visits(os.environ[key], date, prior_visits))
         session.commit()
         logger.info('Loaded visits for %s' % date.isoformat())
         date += datetime.timedelta(days = 1)
@@ -54,11 +55,13 @@ def visitor_locations(session):
         yield PiwikVisitorLocation(ip_address = ip_address,
                                    visitor_id = visitor_id)
 
-def visits(token, date):
+def visits(token, date, prior_visits):
     for offset in itertools.count(0, 100):
         response = get_visits(date, offset, token = token)
         rawvisits = json.loads(response.text)
-        yield from itertools.chain(*map(reify_visit, rawvisits))
+        for visit in map(reify_visit, rawvisits):
+            if visit.visitId not in prior_visits:
+                yield visit
         if len(rawvisits) == 0:
             break
 
@@ -169,10 +172,8 @@ def reify_visit(v):
         setattr(visit, 'plugin_' + plugin, True)
     visit.actions = list(actions(visit, v['actionDetails']))
 
-    yield visit
     logger.debug('Assembled Piwik visit %s' % v['idVisit'])
-
-
+    return visit
 
 def actions(visit, actionDetails):
     for visit_action_id, action in enumerate(actionDetails):
