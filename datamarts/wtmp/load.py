@@ -1,11 +1,12 @@
 from subprocess import Popen, PIPE
 
 def update(session):
+
+def query():
     for host in ['nsa', 'home']:
         for filename in ls(host):
-            print(host, filename)
-            print(len(list(last(host, filename))))
-
+            for line in last(host, filename):
+                yield Last.factory(host, filename, line)
 
 def shell(f):
     def wrapper(*args, **kwargs):
@@ -22,4 +23,4 @@ def ls(host):
 
 @shell
 def last(host, filename):
-    return ['ssh', host, "last -F -a -f '%s'" % filename]
+    return ['ssh', host, "last -w -F -a -f '%s'" % filename]
