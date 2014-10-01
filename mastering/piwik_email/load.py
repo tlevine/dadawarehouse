@@ -30,4 +30,7 @@ def identifier_sets(session, date_column, identifier_column)
     query = session.query(date_column, identifier_column)
     for date, identifier in query:
         identifier_days[identifier].add(date)
+    for identifier, days in identifier_days.items():
+        if len(days) <= 2:
+            del(identifier_days[identifier])
     return identifier_days
