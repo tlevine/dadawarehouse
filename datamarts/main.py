@@ -1,7 +1,6 @@
 import os
 from concurrent.futures import ThreadPoolExecutor
 
-from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from .pal.load import update as pal

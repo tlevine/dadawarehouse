@@ -7,10 +7,12 @@ import sys
 sys.path.append('.')
 from doeund import Base
 import datamarts
+import mastering
 import datawarehouse
 
 engine = create_engine('postgres:///tlevine')
 Base.metadata.create_all(engine) 
 
-datamarts.load(engine)
-datawarehouse.load(engine)
+#datamarts.load(engine)
+mastering.load(engine)
+#datawarehouse.load(engine)
