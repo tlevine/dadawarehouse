@@ -7,12 +7,12 @@ import sys
 sys.path.append('.')
 from doeund import Base
 import datamarts
-import mastering
-import datawarehouse
+import fuzzylink
+import masterlink
 
 engine = create_engine('postgres:///tlevine')
 Base.metadata.create_all(engine) 
 
 #datamarts.load(engine)
-mastering.load(engine)
-#datawarehouse.load(engine)
+fuzzylink.load(engine)
+#masterlink.load(engine)
