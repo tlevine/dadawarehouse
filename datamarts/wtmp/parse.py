@@ -33,11 +33,12 @@ parser = p.Word(p.alphanums).setResultsName('user') + \
          p.restOfLine
 
 def parse(line):
-    DATEFORMAT = '%Y%b%d%H%M%S'
+    DATEFORMAT = '%Y %b %d %H %M %S'
     result = dict(parser.parseString(line))
     del(result['duration'])
     for key in ['login_datetime', 'logout_datetime']:
-        raw = result[key]
-        datestring = raw.year + raw.month + raw.day + raw.hour + raw.minute + raw.second
+        for subkey in ['year', 'day', 'hour', 'minute', 'second']:
+            result[key][subkey] = int(result[key][subkey])
+        datestring = '%(year)04d %(month)s %(day)02d %(hour)02d %(minute)02d %(second)02d' % result[key]
         result[key] = datetime.datetime.strptime(datestring, DATEFORMAT)
     return result
