@@ -1,5 +1,11 @@
 from collections import defaultdict
 
+import sqlachemy as s
+
+from datamarts import NotmuchMessage, PiwikVisit
+
+from .model import PiwikEmailOverlap
+
 def piwik_email(sessionmaker):
     session = sessionmaker()
 
