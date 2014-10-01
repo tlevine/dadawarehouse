@@ -13,9 +13,8 @@ def piwik_email(sessionmaker):
 
     query = session.query(s.func.date(BranchableLog.datetime),
                           BranchableLog.ip_address).distinct()\
-                   .union(
-                                      PiwikVisit.serverDateTime,
-                                      PiwikVisit.visitIp)
+        .union(session.query(s.func.date(PiwikVisit.serverDateTime),
+                             PiwikVisit.visitIp).distinct())
     ip_address_days = identifier_sets(query)
 
     query = session.query(NotmuchMessage.datetime,
@@ -44,7 +43,10 @@ def pairwise_check(email_address_days, piwik_visitorid_days):
 
 def identifier_sets(query):
     identifier_days = defaultdict(set)
-    for date, identifier, count in query:
+    for date, identifier in query:
         if count >= 2:
             identifier_days[identifier].add(date)
+    for identifier, dates in identifier_days.items():
+        if len(dates) <= 2:
+            del(identifier_days[identifier])
     return identifier_days
