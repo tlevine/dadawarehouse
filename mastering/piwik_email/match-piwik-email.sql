@@ -25,13 +25,3 @@ SELECT "email_address"
 FROM "ft_emailaddress_days"
 GROUP BY "email_address"
 WHERE count(*) >= 2;
-
--- Maybe I need a windowed query for this...
--- I want to convert the Python in load.py to SQL.
-SELECT
-  "helper_returning_visitors"."piwik_visitorid",
-  "helper_returning_emailers"."email_address"
-FROM "helper_returning_visitors"
-FULL OUTER JOIN "helper_returning_emailers"
-ON "helper_returning_visitors"."piwik_visitorid" =
-   "helper_returning_emailers"."email_address"
