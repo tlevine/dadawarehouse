@@ -13,6 +13,6 @@ import masterlink
 engine = create_engine('postgres:///tlevine')
 Base.metadata.create_all(engine) 
 
-#datamarts.load(engine)
+datamarts.load(engine)
 fuzzylink.load(engine)
 #masterlink.load(engine)

@@ -1,9 +1,11 @@
 from subprocess import Popen, PIPE
 
+from ..logger import logger
+
 from .model import Last
 
 def update(sessionmaker):
-    sm = sessionmaker()
+    session = sessionmaker()
     for host in ['nsa', 'home']:
         session.query(Last).filter(Last.computer == host).delete()
         session.flush()
@@ -11,6 +13,7 @@ def update(sessionmaker):
             records = (Last.factory(host, filename, line) for line in last(host, filename))
             session.add_all(records)
         session.commit()
+        logger.debug('Imported last logs from %s' % host)
 
 def shell(f):
     def wrapper(*args, **kwargs):
