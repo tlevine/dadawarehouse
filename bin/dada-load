@@ -15,4 +15,4 @@ Base.metadata.create_all(engine)
 
 datamarts.load(engine)
 fuzzylink.load(engine)
-#masterlink.load(engine)
+masterlink.load(engine)
