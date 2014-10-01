@@ -1,8 +1,6 @@
 from collections import defaultdict
 
 def piwik_email(sessionmaker):
-    session = sessionmaker()
-
     email_address_days = identifier_sets(sessionmaker(),
                                          EmailAddressDays.date,
                                          EmailAddressDays.email_address)
@@ -10,11 +8,22 @@ def piwik_email(sessionmaker):
                                            PiwikVisitorDays.date,
                                            PiwikVisitorDays.visitor_id)
 
+    session = sessionmaker()
+    session.query(PiwikEmailOverlap).delete()
+    session.flush()
+    session.add_all(pairwise_check(email_address_days,
+                                   piwik_visitorid_days))
+    session.commit()
+
+def pairwise_check(email_address_days, piwik_visitorid_days):
     for email_address, email_dates in email_address_days:
         for piwik_visitorid, piwik_dates in piwik_visitorid_days:
             intersection = len(email_dates.intersection(piwik_dates))
             union = len(email_dates.union(piwik_dates))
-            intersection / union
+            yield PiwikEmailOverlap(email_address = email_address,
+                                    piwik_visitorid = piwik_visitorid,
+                                    intersecting_dates = intersection,
+                                    unioned_dates = union)
 
 def identifier_sets(session, date_column, identifier_column)
     identifier_days = defaultdict(set)
