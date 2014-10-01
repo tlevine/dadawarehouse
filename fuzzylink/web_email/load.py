@@ -47,7 +47,7 @@ def identifier_sets(query):
     identifier_days = defaultdict(set)
     for date, identifier in query:
         identifier_days[identifier].add(date)
-    for identifier, dates in identifier_days.items():
-        if len(dates) <= 2:
+    for identifier in list(identifier_days.keys()):
+        if len(identifier_days[identifier]) <= 2:
             del(identifier_days[identifier])
     return identifier_days
