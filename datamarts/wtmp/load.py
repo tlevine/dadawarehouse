@@ -2,12 +2,15 @@ from subprocess import Popen, PIPE
 
 from .model import Last
 
-def update(session):
+def update(sessionmaker):
+    sm = sessionmaker()
     for host in ['nsa', 'home']:
+        session.query(Last).filter(Last.computer == host).delete()
+        session.flush()
         for filename in ls(host):
             records = (Last.factory(host, filename, line) for line in last(host, filename))
             session.add_all(records)
-            session.commit()
+        session.commit()
 
 def shell(f):
     def wrapper(*args, **kwargs):

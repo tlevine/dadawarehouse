@@ -12,12 +12,14 @@ from .twitter.load import update as twitter
 from .branchable.load import update as branchable
 from .piwik.load import update as piwik
 from .muttalias.load import update as mutt
+from .wtmp.load import update as wtmp
 
 updaters = [
     # Minutely updates
     history,
     notmuch, # This one crashes on `notmuch new`.
     piwik,
+    wtmp,
 
     # Daily updates
     fb,
@@ -35,6 +37,7 @@ updaters = [
 
 def load(engine):
     sm = sessionmaker(bind=engine)
+    return wtmp(sm)
 
     # Import separate data marts in parallel.
     with ThreadPoolExecutor(max_workers = 8) as e:

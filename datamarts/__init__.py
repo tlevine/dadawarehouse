@@ -10,5 +10,6 @@ from .twitter.model import TwitterAction, TwitterNameHandle
 from .branchable.model import BranchableLog
 from .piwik.model import PiwikAction, PiwikVisit, PiwikVisitorLocation
 from .muttalias.model import MuttAlias
+from .wtmp.model import Last
 
 from .main import load
