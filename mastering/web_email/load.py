@@ -9,12 +9,22 @@ from .model import PiwikEmailOverlap
 def piwik_email(sessionmaker):
     session = sessionmaker()
 
-    email_address_days = identifier_sets(session,
-                                         NotmuchMessage.datetime,
-                                         NotmuchMessage.from_address)
-    piwik_visitorid_days = identifier_sets(session,
-                                           PiwikVisit.serverDateTime,
-                                           PiwikVisit.visitorId)
+
+
+    query = session.query(s.func.date(BranchableLog.datetime),
+                          BranchableLog.ip_address).distinct()\
+                   .union(
+                                      PiwikVisit.serverDateTime,
+                                      PiwikVisit.visitIp)
+    ip_address_days = identifier_sets(query)
+
+    query = session.query(NotmuchMessage.datetime,
+                          NotmuchMessage.from_address).distinct()
+    email_address_days = identifier_sets(query)
+
+    query = session.query(PiwikVisit.serverDateTime,
+                          PiwikVisit.visitorId).distinct()
+    piwik_visitorid_days = identifier_sets(query)
 
     session.query(PiwikEmailOverlap).delete()
     session.flush()
@@ -32,12 +42,8 @@ def pairwise_check(email_address_days, piwik_visitorid_days):
                                     intersecting_dates = intersection,
                                     unioned_dates = union)
 
-def identifier_sets(session, datetime_column, identifier_column):
+def identifier_sets(query):
     identifier_days = defaultdict(set)
-    query = session.query(s.func.date(datetime_column),
-                          identifier_column,
-                          s.func.count(),
-                   ).group_by(s.func.date(datetime_column), identifier_column)
     for date, identifier, count in query:
         if count >= 2:
             identifier_days[identifier].add(date)
