@@ -28,9 +28,10 @@ WHERE count(*) >= 2;
 
 -- Maybe I need a windowed query for this...
 -- I want to convert the Python in load.py to SQL.
-SELECT *
+SELECT
+  "helper_returning_visitors"."piwik_visitorid",
+  "helper_returning_emailers"."email_address"
 FROM "helper_returning_visitors"
-JOIN "ft_piwikvisitor_days"
-ON "helper_returning_visitors"."piwik_visitorid" 
-
-CREATE VIEW "ft_piwik_email_overlap" AS
+FULL OUTER JOIN "helper_returning_emailers"
+ON "helper_returning_visitors"."piwik_visitorid" =
+   "helper_returning_emailers"."email_address"
