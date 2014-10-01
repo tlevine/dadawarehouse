@@ -1,14 +1,15 @@
 from collections import defaultdict
 
 def piwik_email(sessionmaker):
-    email_address_days = identifier_sets(sessionmaker(),
-                                         EmailAddressDays.date,
-                                         EmailAddressDays.email_address)
-    piwik_visitorid_days = identifier_sets(sessionmaker(),
-                                           PiwikVisitorDays.date,
-                                           PiwikVisitorDays.visitor_id)
-
     session = sessionmaker()
+
+    email_address_days = identifier_sets(session,
+                                         NotmuchMessage.datetime,
+                                         NotmuchMessage.email_address)
+    piwik_visitorid_days = identifier_sets(session,
+                                           PiwikVisit.serverDateTime,
+                                           PiwikVisit.visitorId)
+
     session.query(PiwikEmailOverlap).delete()
     session.flush()
     session.add_all(pairwise_check(email_address_days,
@@ -25,12 +26,11 @@ def pairwise_check(email_address_days, piwik_visitorid_days):
                                     intersecting_dates = intersection,
                                     unioned_dates = union)
 
-def identifier_sets(session, date_column, identifier_column)
+def identifier_sets(session, datetime_column, identifier_column)
     identifier_days = defaultdict(set)
-    query = session.query(date_column, identifier_column)
+    query = session.query(s.func.date(datetime_column), identifier_column)
+                   .group_by(s.func.date(datetime_column), identifier_column)
+                   .filter(s.func.count(identifier_column) >= 2)
     for date, identifier in query:
         identifier_days[identifier].add(date)
-    for identifier, days in identifier_days.items():
-        if len(days) <= 2:
-            del(identifier_days[identifier])
     return identifier_days
