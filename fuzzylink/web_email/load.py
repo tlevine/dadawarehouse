@@ -2,7 +2,9 @@ from collections import defaultdict
 
 import sqlalchemy as s
 
-from datamarts import NotmuchMessage, PiwikVisit
+from datamarts import (
+    NotmuchMessage, PiwikVisit, BranchableLog,
+)
 
 from .model import PiwikEmailOverlap
 
@@ -44,8 +46,7 @@ def pairwise_check(email_address_days, piwik_visitorid_days):
 def identifier_sets(query):
     identifier_days = defaultdict(set)
     for date, identifier in query:
-        if count >= 2:
-            identifier_days[identifier].add(date)
+        identifier_days[identifier].add(date)
     for identifier, dates in identifier_days.items():
         if len(dates) <= 2:
             del(identifier_days[identifier])
